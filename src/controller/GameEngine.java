@@ -3,7 +3,6 @@ package controller;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
@@ -17,7 +16,6 @@ import javax.swing.WindowConstants;
 import data.UserRepository;
 import model.*;
 import ui.UIConstants;
-import ui.UISettings;
 import view.ClassificaView;
 import view.GameView;
 import view.MenuPrincipaleView;
@@ -147,7 +145,7 @@ public class GameEngine implements Observer {
 	    }
 	
 	    mainFrame.setContentPane(panel);
-	    mainFrame.pack();                 // rispetta le preferred size appena impostate
+	    mainFrame.pack();                 // rispetta le preferred size impostate
 	    mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);       // nel caso sia la prima volta
     }

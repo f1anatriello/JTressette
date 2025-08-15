@@ -22,7 +22,6 @@ public class MenuPrincipaleView extends JPanel {
     public MenuPrincipaleView(GameEngine gameEngine) {
         this.gameEngine = gameEngine;
 
-        // Questo è un JPanel, quindi layout e background sul pannello stesso
         setLayout(new BorderLayout());
         setBackground(UIConstants.BACKGROUND_DARK);
         setPreferredSize(new Dimension(400, 600));

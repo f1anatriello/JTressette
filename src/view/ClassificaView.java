@@ -61,11 +61,11 @@ public class ClassificaView extends JPanel {
         }
 
         StringBuilder sb = new StringBuilder("Rank. |    Nickname    | P.Giocate | P.Vinte | P.Perse\n");
-        sb.append("-----------------------------------------------------------\n");
+        sb.append("------------------------------------------------------\n");
         int rank = 0;
         for (UtentePojo p : classifica) {
         	rank++;
-            sb.append(String.format("%-5d | %-14s | %-8d | %-8d | %-7"
+            sb.append(String.format("%-5d | %-14s | %-9d | %-7d | %-7"
             		+ "d\n",
                 rank, p.getUsername(), p.getPartiteGiocate(), p.getPartiteVinte(), p.getPartitePerse()));
         }
