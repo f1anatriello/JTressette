@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
+import data.UtentePojo;
+
 public class UIAssets {
 
     private static UIAssets instance;
@@ -110,11 +112,11 @@ public class UIAssets {
         return immaginiCarte.get(c.getValore().name() + "_" + c.getSeme().name());
     }
 
-//    public BufferedImage getImmagineAvatar(String nomeFileAvatar) {
-//        if (nomeFileAvatar == null || nomeFileAvatar.isEmpty()) return null;
-//        String path = "images/avatars/" + new File(nomeFileAvatar).getName();
-//        return controlloBuffer(path, "avatar");
-//    }
+    public BufferedImage getImmagineAvatar(UtentePojo profilo) {
+        if (profilo.getUsername() == null || profilo.getUsername().isEmpty()) return null;
+        String path = "images/avatars/" + new File(profilo.getUsername()).getName();
+        return controlloBuffer(path, "avatar");
+    }
 
     public BufferedImage getImmagineSfondoTavolo() {
         return immagineSfondoTavolo;

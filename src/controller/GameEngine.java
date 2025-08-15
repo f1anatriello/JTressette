@@ -150,4 +150,14 @@ public class GameEngine implements Observer {
         mainFrame.setVisible(true);       // nel caso sia la prima volta
     }
 
+    public Object avviaCambioProfilo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'avviaCambioProfilo'");
+    }
+
+    public Object avviaModificaProfilo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'avviaModificaProfilo'");
+    }
+
 }
