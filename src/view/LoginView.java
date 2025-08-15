@@ -2,6 +2,8 @@ package view;
 
 import controller.GameEngine;
 import data.UserRepository;
+import data.UtentePojo;
+
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -98,7 +100,7 @@ public class LoginView extends JFrame{
                     existed ? "Bentornato, " + username + "!" : "Creato nuovo utente: " + username,
                     "Accesso", JOptionPane.INFORMATION_MESSAGE);
 
-            GiocatoreUmano giocatore = new GiocatoreUmano(username);
+            UtentePojo giocatore = new UtentePojo(username,UserRepository.DEFAULT_AVATAR);
             GameEngine engine = new GameEngine(giocatore);
             engine.avviaUIPrincipale();   // crea la JFrame principale e mostra il menu
             dispose();                    // chiudi il login

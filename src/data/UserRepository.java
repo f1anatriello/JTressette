@@ -11,8 +11,8 @@ import java.util.*;
 public final class UserRepository {
 
     private static UserRepository instance;
-    private static final String FILE_NAME = "utenti.txt";
-    private static final String DEFAULT_AVATAR = "/images/avatars/avatar1.png";
+    public static final String FILE_NAME = "utenti.txt";
+    public static final String DEFAULT_AVATAR = "/images/avatars/avatar1.png";
 
     public UserRepository() {
         File f = new File(FILE_NAME);

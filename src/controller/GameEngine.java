@@ -14,11 +14,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import data.UserRepository;
+import data.UtentePojo;
 import model.*;
 import ui.UIConstants;
 import view.ClassificaView;
 import view.GameView;
 import view.MenuPrincipaleView;
+import view.ProfiloView;
 
 /**
  * Controller: gestisce le azioni sui pulsanti.
@@ -31,7 +33,8 @@ public class GameEngine implements Observer {
     private GameView gameView;
     private ClassificaView cv;
     private MenuPrincipaleView mpv;
-    private GiocatoreUmano player;
+    private ProfiloView pv;
+    private UtentePojo player;
 	private JFrame mainFrame;  // mi serve per switchare da una finestra all'altra
 
     @Override
@@ -39,23 +42,24 @@ public class GameEngine implements Observer {
         // TODO: implement update logic if needed
     }
 
-    public GameEngine(GiocatoreUmano player) {
+    public GameEngine(UtentePojo player) {
         gameView = GameView.getInstance();
         this.player = player;
     }
 
-    public GameEngine(GiocatoreUmano player, JFrame mainFrame) {
+    public GameEngine(UtentePojo player, JFrame mainFrame) {
     		gameView = GameView.getInstance();
     		this.player = player;
     		this.mainFrame = mainFrame;	
     	}
+
 
 	public int avviaNuovaPartita(int numPlayer) {
         if(numPlayer == 2){
             GiocatoreAI g1 = new GiocatoreAI();
             List<Giocatore> giocatori = new ArrayList();
             giocatori.add(g1);
-            giocatori.add(player);
+            giocatori.add(new GiocatoreUmano(player.getUsername()));
             Partita1v1 partita = new Partita1v1(giocatori);
             iniziaPartita1v1(partita);
             
@@ -106,15 +110,22 @@ public class GameEngine implements Observer {
             visualizzaMenu();                
         });
     }
+
+    public Object avviaModificaProfilo() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'avviaModificaProfilo'");
+    }
     
     
     public void visualizzaProfilo() {
+        pv = new ProfiloView(this);
+        pv.mostraProfilo(player);
+        setScreen(pv);
     }
 
     public void visualizzaStatistiche() {
     	cv = new ClassificaView(this);
     	cv.mostraClassifica(UserRepository.getClassifica()); 
-
     	setScreen(cv);
     }
     
@@ -122,6 +133,8 @@ public class GameEngine implements Observer {
     	mpv = new MenuPrincipaleView(this);
     	setScreen(mpv);
     }
+
+    
     
     /* ===== UTILITIES ===== */
     private boolean isFixedSizedView(JPanel panel) {
@@ -148,16 +161,6 @@ public class GameEngine implements Observer {
 	    mainFrame.pack();                 // rispetta le preferred size impostate
 	    mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);       // nel caso sia la prima volta
-    }
-
-    public Object avviaCambioProfilo() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'avviaCambioProfilo'");
-    }
-
-    public Object avviaModificaProfilo() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'avviaModificaProfilo'");
-    }
+    }    
 
 }

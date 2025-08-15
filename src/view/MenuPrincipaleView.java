@@ -72,7 +72,7 @@ public class MenuPrincipaleView extends JPanel {
         // Azioni
         btnPartita1v1.addActionListener(e -> gameEngine.avviaNuovaPartita(2));
         btnPartita2v2.addActionListener(e -> gameEngine.avviaNuovaPartita(4));
-        // btnProfilo.addActionListener(e -> ProfiloView.visualizzaProfilo());
+        btnProfilo.addActionListener(e -> gameEngine.visualizzaProfilo());
         btnClassifica.addActionListener(e -> gameEngine.visualizzaStatistiche());
         btnEsci.addActionListener(e -> System.exit(0));
     }
