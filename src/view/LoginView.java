@@ -105,6 +105,7 @@ public class LoginView extends JFrame{
         });
         setSize(400, 240);
         setResizable(false);
+        getRootPane().setDefaultButton(btnEntra);
         setLocationRelativeTo(null);
     }
 }
