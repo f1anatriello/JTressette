@@ -1,7 +1,5 @@
 package data;
 
-import ui.UIAssets;
-
 /**
  * Rappresenta il profilo di un utente con statistiche di gioco e avatar.
  */
@@ -77,8 +75,7 @@ public class UtentePojo {
                 ", partiteGiocate=" + partiteGiocate +
                 ", partiteVinte=" + partiteVinte +
                 ", partitePerse=" + partitePerse +
-                ", avatarPath='" + avatarPath + '\'' +
-                '}';
+            "}";
     }
 
 }
