@@ -1,5 +1,7 @@
 package data;
 
+import ui.UIAssets;
+
 /**
  * Rappresenta il profilo di un utente con statistiche di gioco e avatar.
  */
@@ -35,7 +37,7 @@ public class UtentePojo {
         this.partiteGiocate = partiteGiocate;
         this.partiteVinte = partiteVinte;
         this.partitePerse = partitePerse;
-        this.avatarPath = avatarPath == null ? "" : avatarPath;
+        this.avatarPath = avatarPath == null ? UserRepository.DEFAULT_AVATAR : avatarPath;
     }
 
     /** @return il nome utente */

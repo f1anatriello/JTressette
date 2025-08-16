@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
-import model.GiocatoreUmano;
 import ui.UIConstants;
 import ui.UISettings;
 

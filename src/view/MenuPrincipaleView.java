@@ -77,13 +77,6 @@ public class MenuPrincipaleView extends JPanel {
         btnEsci.addActionListener(e -> System.exit(0));
     }
 
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        // Imposta il default button quando il pannello è attaccato a una finestra
-        JRootPane root = SwingUtilities.getRootPane(this);
-        if (root != null) {
-            root.setDefaultButton(btnPartita1v1);
-        }
-    }
+    
+    
 }

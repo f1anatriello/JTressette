@@ -132,9 +132,7 @@ public class GameEngine implements Observer {
     public void visualizzaMenu() {
     	mpv = new MenuPrincipaleView(this);
     	setScreen(mpv);
-    }
-
-    
+    }  
     
     /* ===== UTILITIES ===== */
     private boolean isFixedSizedView(JPanel panel) {

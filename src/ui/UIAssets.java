@@ -113,9 +113,7 @@ public class UIAssets {
     }
 
     public BufferedImage getImmagineAvatar(UtentePojo profilo) {
-        if (profilo.getUsername() == null || profilo.getUsername().isEmpty()) return null;
-        String path = "images/avatars/" + new File(profilo.getUsername()).getName();
-        return controlloBuffer(path, "avatar");
+        return controlloBuffer(profilo.getAvatarPath(), "avatar");
     }
 
     public BufferedImage getImmagineSfondoTavolo() {
