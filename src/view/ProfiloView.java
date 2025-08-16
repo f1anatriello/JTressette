@@ -2,12 +2,12 @@ package view;
 
 import controller.GameEngine;
 import data.UtentePojo;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.swing.*;
 import ui.UIAssets;
 import ui.UIConstants;
 import ui.UISettings;
-
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * Mostra le informazioni del profilo dell'utente loggato (versione BorderLayout),
@@ -70,11 +70,10 @@ public class ProfiloView extends JPanel {
         btnModifica = UISettings.createButton("Modifica Profilo", UISettings.ButtonVariant.PRIMARY);
         btnMenu     = UISettings.createButton("Torna al Menù", UISettings.ButtonVariant.TERTIARY);
 
-        // Eventi
-        // btnModifica.addActionListener(e ->
-        //     new DialogModificaProfilo(SwingUtilities.getWindowAncestor(this), controller).setVisible(true)
-        // );
+        
+        btnModifica.addActionListener(e -> controller.avviaModificaProfilo());
         btnMenu.addActionListener(e -> controller.visualizzaMenu());
+
 
         // Wrapper centrato per la colonna di bottoni
         JPanel southWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
@@ -118,6 +117,13 @@ public class ProfiloView extends JPanel {
         }
     }
 
+    public void modificaProfilo(UtentePojo player) {
+        // Apri un dialogo per modificare il profilo
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        DialogModificaProfilo dialog = new DialogModificaProfilo(controller);
+        dialog.showDialog();
+    }
+
     /**
      * Aggiorna la vista con i dati dell'utente.
      */
@@ -125,20 +131,18 @@ public class ProfiloView extends JPanel {
         if (utente != null) {
             lblNickname.setText("Nickname: " + utente.getUsername());
 
-            // Avatar
-            if (utente.getAvatarPath() != null && !utente.getAvatarPath().isEmpty()) {
-                Image avatarImg = UIAssets.getInstance().getImmagineAvatar(utente);
-                if (avatarImg != null) {
-                    Image scaled = avatarImg.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-                    lblAvatar.setIcon(new ImageIcon(scaled));
-                    lblAvatar.setText("");
-                } else {
-                    lblAvatar.setIcon(null);
-                    lblAvatar.setText("[Avatar non trovato]");
-                }
+            // Avatar ridimensionato
+            BufferedImage avatarImg = UIAssets.getInstance().getImmagineAvatar(utente);
+            if (avatarImg != null) {
+                int avatarWidth = 64;  // larghezza desiderata
+                int avatarHeight = 64; // altezza desiderata
+                Image scaledImg = avatarImg.getScaledInstance(avatarWidth, avatarHeight, Image.SCALE_SMOOTH);
+                ImageIcon avatarIcon = new ImageIcon(scaledImg);
+                lblAvatar.setIcon(avatarIcon);
+                lblAvatar.setText(""); // rimuove testo se c'è un'icona
             } else {
                 lblAvatar.setIcon(null);
-                lblAvatar.setText("[Nessun Avatar]");
+                lblAvatar.setText("Nessun avatar impostato");
             }
 
             // Statistiche

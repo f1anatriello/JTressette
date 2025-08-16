@@ -1,9 +1,6 @@
 package ui;
 
-import model.Carta;
-import model.Seme;
-import model.Valore;
-
+import data.UtentePojo;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -11,8 +8,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
-
-import data.UtentePojo;
+import model.Carta;
+import model.Seme;
+import model.Valore;
 
 public class UIAssets {
 
@@ -104,7 +102,6 @@ public class UIAssets {
     private void caricaIntroLogo() {
     	String path = "images/logos/sch_principale.png";
         menuLogo = controlloBuffer(path, "intro");
-		
 	}
 
     public Image getImmagineCarta(Carta c) {
@@ -113,7 +110,19 @@ public class UIAssets {
     }
 
     public BufferedImage getImmagineAvatar(UtentePojo profilo) {
+        System.out.println(profilo.getAvatarPath());
         return controlloBuffer(profilo.getAvatarPath(), "avatar");
+    }
+
+    public Map<BufferedImage, String> getAllAvatar() {
+        Map<BufferedImage, String> avatars = new HashMap<>();
+        for (int i = 1; i < 6; i++) {
+            BufferedImage img = controlloBuffer("images/avatars/avatar" + i + ".png", "avatar");
+            if (img != null) {
+                avatars.put(img, "images/avatars/avatar" + i + ".png");
+            }
+        }
+        return avatars;
     }
 
     public BufferedImage getImmagineSfondoTavolo() {

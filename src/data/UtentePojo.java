@@ -9,7 +9,6 @@ public class UtentePojo {
     private int partiteGiocate;
     private int partiteVinte;
     private int partitePerse;
-    /** Percorso relativo/assoluto dell'avatar (o URL). */
     private String avatarPath;
 
     /**
@@ -18,7 +17,11 @@ public class UtentePojo {
      * @param username nome dell'utente
      */
     public UtentePojo(String username, String avatarPath) {
-        this(username, 0, 0, 0, avatarPath);
+        this.username = username;
+        this.partiteGiocate = 0;
+        this.partiteVinte = 0;
+        this.partitePerse = 0;
+        this.avatarPath = avatarPath;
     }
 
     /**
@@ -30,13 +33,6 @@ public class UtentePojo {
      * @param partitePerse    numero di partite perse
      * @param avatarPath      percorso/URL dell'avatar (può essere vuoto)
      */
-    public UtentePojo(String username, int partiteGiocate, int partiteVinte, int partitePerse, String avatarPath) {
-        this.username = username;
-        this.partiteGiocate = partiteGiocate;
-        this.partiteVinte = partiteVinte;
-        this.partitePerse = partitePerse;
-        this.avatarPath = avatarPath == null ? UserRepository.DEFAULT_AVATAR : avatarPath;
-    }
 
     /** @return il nome utente */
     public String getUsername() { return username; }
@@ -53,7 +49,7 @@ public class UtentePojo {
     public void setPartiteGiocate(int partiteGiocate) { this.partiteGiocate = partiteGiocate; }
     public void setPartiteVinte(int partiteVinte) { this.partiteVinte = partiteVinte; }
     public void setPartitePerse(int partitePerse) { this.partitePerse = partitePerse; }
-    public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath == null ? "" : avatarPath; }
+    public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath == null ? UserRepository.DEFAULT_AVATAR : avatarPath; }
     
 
     /** Incrementa il numero di partite giocate e di vittorie. */
@@ -67,15 +63,4 @@ public class UtentePojo {
         partiteGiocate++;
         partitePerse++;
     }
-
-    @Override
-    public String toString() {
-        return "ProfiloUtente{" +
-                "username='" + username + '\'' +
-                ", partiteGiocate=" + partiteGiocate +
-                ", partiteVinte=" + partiteVinte +
-                ", partitePerse=" + partitePerse +
-            "}";
-    }
-
 }

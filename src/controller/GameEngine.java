@@ -1,20 +1,18 @@
 package controller;
 
+import data.UserRepository;
+import data.UtentePojo;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-
-import data.UserRepository;
-import data.UtentePojo;
 import model.*;
 import ui.UIConstants;
 import view.ClassificaView;
@@ -111,9 +109,10 @@ public class GameEngine implements Observer {
         });
     }
 
-    public Object avviaModificaProfilo() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'avviaModificaProfilo'");
+    public void avviaModificaProfilo() {
+        pv = new ProfiloView(this);
+        pv.modificaProfilo(player);
+        setScreen(pv);
     }
     
     
@@ -159,6 +158,10 @@ public class GameEngine implements Observer {
 	    mainFrame.pack();                 // rispetta le preferred size impostate
 	    mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);       // nel caso sia la prima volta
-    }    
+    }
+
+    public UtentePojo getPlayer() {
+        return player;
+    }
 
 }
