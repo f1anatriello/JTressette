@@ -21,6 +21,7 @@ public class UIAssets {
     private BufferedImage immagineRetroCarta;
     private BufferedImage introLogo;
     private BufferedImage menuLogo;
+    private BufferedImage avatarDefault;
 
     private UIAssets() {
         caricaImmaginiCarte();
@@ -28,6 +29,7 @@ public class UIAssets {
         caricaImmagineRetroCarta();
         caricaMenuLogo();
         caricaIntroLogo();
+        avatarDefault = controlloBuffer("images/avatars/avatar1.png", "avatar default");
     }
 
 
@@ -139,6 +141,10 @@ public class UIAssets {
     
     public BufferedImage getMenuLogo() {
         return menuLogo;
+    }
+
+    public BufferedImage getDefaultAvatar() {
+        return avatarDefault;
     }
 
     // ---- helper semplice che ritorna direttamente BufferedImage ----

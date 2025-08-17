@@ -29,20 +29,27 @@ import view.ProfiloView;
 public class GameEngine implements Observer {
 
     private static GameEngine instance = null;
-    private GameView gameView;
     private ClassificaView cv;
     private MenuPrincipaleView mpv;
     private ProfiloView pv;
     private UtentePojo player;
-	private JFrame mainFrame;  // mi serve per switchare da una finestra all'altra
+    private GameView gameView;
+    private JFrame mainFrame;  // mi serve per switchare da una finestra all'altra
 
     @Override
     public void update(java.util.Observable o, Object arg) {
         // TODO: implement update logic if needed
     }
 
-    public GameEngine(UtentePojo player) {
+    private GameEngine(UtentePojo player) {
         this.player = player;
+    }
+
+    public static GameEngine getInstance(UtentePojo player) {
+        if (instance == null) {
+            instance = new GameEngine(player);
+        }
+        return instance;
     }
 
 	public int avviaNuovaPartita(int numPlayer) {
@@ -54,14 +61,14 @@ public class GameEngine implements Observer {
             giocatori.add(ai);
             Partita1v1 partita = new Partita1v1(giocatori);
 
-            gameView = GameView.getInstance(player.getUsername(),
+            gameView = GameView.getInstance(this,
+                player.getUsername(),
                 new ImageIcon(player.getAvatarPath()),
                 partita.getGiocatori().get(1).getNome(),
                 new ImageIcon("images/avatars/avatar5.png"),
                 partita.getGiocatori().get(0).getMano(),
                 partita.getGiocatori().get(1).getMano());
-                
-            iniziaPartita1v1(partita);
+            // setScreen(gameView);
         } else {
             List<Giocatore> giocatori = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
@@ -69,7 +76,7 @@ public class GameEngine implements Observer {
             }
             giocatori.add(new GiocatoreUmano(player.getUsername()));
             Partita2v2 partita = new Partita2v2(giocatori);
-            iniziaPartita2v2(partita);
+            // chiamo il campo del 2v2
         }
         return 0;
     }
@@ -179,9 +186,9 @@ public class GameEngine implements Observer {
     }
     
     public void visualizzaMenu() {
-    	mpv = new MenuPrincipaleView(this);
+    	mpv = MenuPrincipaleView.getInstance(this);
     	setScreen(mpv);
-    }  
+    } 
     
     /* ===== UTILITIES ===== */
     private boolean isFixedSizedView(JPanel panel) {

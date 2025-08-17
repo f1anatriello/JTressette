@@ -14,10 +14,16 @@ public class MenuPrincipaleView extends JPanel {
     private final JButton btnProfilo;
     private final JButton btnClassifica;
     private final JButton btnEsci;
+    private static MenuPrincipaleView instance;
 
-    // Removed unused gameEngine field
+    public static MenuPrincipaleView getInstance(GameEngine gameEngine) {
+        if (instance == null) {
+            instance = new MenuPrincipaleView(gameEngine);
+        }
+        return instance;
+    }
 
-    public MenuPrincipaleView(GameEngine gameEngine) {
+    private MenuPrincipaleView(GameEngine gameEngine) {
         // Removed assignment to unused field
 
         setLayout(new BorderLayout());
@@ -69,12 +75,12 @@ public class MenuPrincipaleView extends JPanel {
 
         // Azioni
         btnPartita1v1.addActionListener(e -> {
-            SwingUtilities.getWindowAncestor(this).dispose();
             gameEngine.avviaNuovaPartita(2);
+            SwingUtilities.getWindowAncestor(this).dispose();
         });
         btnPartita2v2.addActionListener(e -> {
-            SwingUtilities.getWindowAncestor(this).dispose();
             gameEngine.avviaNuovaPartita(4);
+            SwingUtilities.getWindowAncestor(this).dispose();
         });
         btnProfilo.addActionListener(e -> gameEngine.visualizzaProfilo());
         btnClassifica.addActionListener(e -> gameEngine.visualizzaStatistiche());
