@@ -45,7 +45,7 @@ public abstract class Partita {
 	}
 
 	public Carta cartaVincente(List<Carta> terr) {
-	    Seme semeUscita = terr.getFirst().getSeme();
+	    Seme semeUscita = terr.get(0).getSeme();
 	    Carta best = null;
 	    int bestOrd = Integer.MIN_VALUE;
 	    for (Carta c : terr) {
@@ -62,5 +62,13 @@ public abstract class Partita {
 	        if (terr.get(i) == v) return i; // stessa istanza calata
 	    return -1;
 	}
-	
+
+	public boolean isMazzoVuoto() {
+		return mazzo.isEmpty();
+	}
+
+	public List<Carta> getTerreno() {
+		return terreno;
+	}
+
 }

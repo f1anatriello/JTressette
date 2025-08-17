@@ -12,6 +12,38 @@ public class GiocatoreAI extends Giocatore{
         return nomi[i] + "_" + (100 + (int)(Math.random() * 900));
     }
 
-    // TO DO: Implementa la strategia di gioco
-    
+    public Carta scegliCarta(Partita p) {
+        // Implementa una semplice logica per scegliere una carta
+        // Ad esempio, può scegliere la prima carta disponibile nella mano
+        try {
+            Thread.sleep(3000 + (int)(Math.random() * 5000)); // Simula una pausa tra 3 e 5 secondi
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        for (Carta carta : getMano()) {
+            // Se è il primo a giocare, può scegliere qualsiasi carta
+            if (p.getTerreno().isEmpty()) {
+                return carta;
+            }
+            // Altrimenti deve seguire il seme della prima carta sul tavolo se possibile
+            Seme semeDaSeguire = p.getTerreno().get(0).getSeme();
+            boolean haSeme = getMano().stream().anyMatch(c -> c.getSeme().equals(semeDaSeguire));
+            if (haSeme) {
+                if (carta.getSeme().equals(semeDaSeguire)) {
+                    return carta;
+                }
+            } else {
+                // Se non ha il seme, può giocare qualsiasi carta
+                return carta;
+            }
+        }
+        // Se non trova nessuna carta (caso raro), restituisce null
+        return null;
+    }
+
+    @Override
+    public String getNome() {
+        return "AI_" + super.getNome();
+    }
+
 }

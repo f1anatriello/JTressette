@@ -22,6 +22,10 @@ public class Mazzo {
         }
     }
 
+    public List<Carta> getCarte() {
+        return carte;
+    }
+
     /**
      * Mescola le carte nel mazzo in modo casuale.
      */

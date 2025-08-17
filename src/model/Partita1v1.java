@@ -28,8 +28,8 @@ public class Partita1v1 extends Partita {
 		    if (terr == null || terr.isEmpty())
 		        throw new IllegalArgumentException("Terreno vuoto");
 
-		    // Seme d’uscita = seme della prima carta sul tavolo
-		    Seme semeUscita = terr.getFirst().getSeme();
+			// Seme d’uscita = seme della prima carta sul tavolo
+			Seme semeUscita = terr.get(0).getSeme();
 
 		    int bestIdx = -1;
 		    int bestOrd = Integer.MIN_VALUE;
@@ -49,8 +49,6 @@ public class Partita1v1 extends Partita {
 		    if (bestIdx < 0)
 		        throw new IllegalStateException("Nessuna carta valida nel seme d’uscita");
 
-		    // Assunzione: l’ordine delle carte in 'terr' corrisponde all’ordine dei giocatori.
-		    // In questo package 'nome' è 'protected', quindi è accessibile.
 		    return giocatori.get(bestIdx).nome;   // oppure giocatori.get(bestIdx).getNome() se preferisci il getter
 		}
 	}
