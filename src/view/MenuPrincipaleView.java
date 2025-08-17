@@ -1,11 +1,9 @@
 package view;
 
 import controller.GameEngine;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-
+import javax.swing.*;
 import ui.UIAssets;
 import ui.UIConstants;
 import ui.UISettings;
@@ -17,10 +15,10 @@ public class MenuPrincipaleView extends JPanel {
     private final JButton btnClassifica;
     private final JButton btnEsci;
 
-    private final GameEngine gameEngine;
+    // Removed unused gameEngine field
 
     public MenuPrincipaleView(GameEngine gameEngine) {
-        this.gameEngine = gameEngine;
+        // Removed assignment to unused field
 
         setLayout(new BorderLayout());
         setBackground(UIConstants.BACKGROUND_DARK);
@@ -70,7 +68,7 @@ public class MenuPrincipaleView extends JPanel {
         add(center, BorderLayout.CENTER);
 
         // Azioni
-        btnPartita1v1.addActionListener(e -> gameEngine.avviaNuovaPartita(2));
+        btnPartita1v1.addActionListener(e -> gameEngine.getPlayer().incrementaVinte());
         btnPartita2v2.addActionListener(e -> gameEngine.avviaNuovaPartita(4));
         btnProfilo.addActionListener(e -> gameEngine.visualizzaProfilo());
         btnClassifica.addActionListener(e -> gameEngine.visualizzaStatistiche());

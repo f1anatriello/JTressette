@@ -33,13 +33,17 @@ public final class UserRepository {
     }
 
     /** Login o crea nuovo profilo */
-    public boolean loginOrCreate(String nickname) {
+    public UtentePojo loginOrCreate(String nickname) {
         Map<String, UtentePojo> utenti = leggiTutti();
         if (utenti.containsKey(nickname)) {
-            return true; // già esistente
+            // Se esiste recupero tutte le informazioni dal file txt
+            UtentePojo p = utenti.get(nickname);
+            recuperaDatiUtente(nickname);
+            return p;
         }
         utenti.put(nickname, creaProfiloDiDefault(nickname));
-        return salvaTutti(utenti);
+        salvaTutti(utenti);
+        return utenti.get(nickname);
     }
 
     public boolean salvaProfilo(UtentePojo profilo) {
@@ -55,7 +59,6 @@ public final class UserRepository {
     public void registraVittoria(String nickname) {
         Map<String, UtentePojo> utenti = leggiTutti();
         UtentePojo p = utenti.getOrDefault(nickname, creaProfiloDiDefault(nickname));
-        p.incrementaVinte();
         utenti.put(nickname, p);
         salvaTutti(utenti);
     }
@@ -63,7 +66,6 @@ public final class UserRepository {
     public void registraSconfitta(String nickname) {
         Map<String, UtentePojo> utenti = leggiTutti();
         UtentePojo p = utenti.getOrDefault(nickname, creaProfiloDiDefault(nickname));
-        p.incrementaPerse();
         utenti.put(nickname, p);
         salvaTutti(utenti);
     }
@@ -91,14 +93,15 @@ public final class UserRepository {
     /* ===== Utilities ===== */
 
     private UtentePojo creaProfiloDiDefault(String nickname) {
-        UtentePojo p = new UtentePojo(nickname, DEFAULT_AVATAR);
-        p.setPartiteGiocate(0);
-        p.setPartiteVinte(0);
-        p.setPartitePerse(0);
+        UtentePojo p = new UtentePojo(nickname, DEFAULT_AVATAR, 0, 0, 0);
         return p;
     }
 
     /** Legge tutto il file in memoria */
+    /**
+     * Legge tutti gli utenti dal file di testo e li restituisce come mappa.
+     * @return Una mappa contenente tutti gli utenti, identificati dal loro nickname.
+     */
     private static Map<String, UtentePojo> leggiTutti() {
         Map<String, UtentePojo> map = new HashMap<>();
         try (BufferedReader r = new BufferedReader(new FileReader(FILE_NAME))) {
@@ -111,22 +114,27 @@ public final class UserRepository {
                 int giocate = Integer.parseInt(campi[2]);
                 int vinte = Integer.parseInt(campi[3]);
                 int perse = Integer.parseInt(campi[4]);
-                UtentePojo p = new UtentePojo(nick, avatar);
-                p.setPartiteGiocate(giocate);
-                p.setPartiteVinte(vinte);
-                p.setPartitePerse(perse);
+                UtentePojo p = new UtentePojo(nick, avatar, giocate, vinte, perse);
                 map.put(nick, p);
             }
+        } catch (FileNotFoundException e) {
+            System.err.println("File non trovato: " + e.getMessage());
         } catch (IOException e) {
-            System.err.println("Errore lettura utenti.txt: " + e.getMessage());
+            System.err.println("Errore lettura file: " + e.getMessage());
         }
         return map;
     }
 
-    /** Sovrascrive il file con tutti gli utenti */
+    /** Aggiunge o aggiorna un utente nel file senza cancellare gli altri */
     private boolean salvaTutti(Map<String, UtentePojo> utenti) {
+        Map<String, UtentePojo> esistenti = leggiTutti();
+        // Aggiorna o aggiunge i dati degli utenti passati
+        for (Map.Entry<String, UtentePojo> entry : utenti.entrySet()) {
+            esistenti.put(entry.getKey(), entry.getValue());
+        }
+        // Scrive tutti gli utenti (vecchi + nuovi/aggiornati) nel file
         try (BufferedWriter w = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (UtentePojo p : utenti.values()) {
+            for (UtentePojo p : esistenti.values()) {
                 w.write(p.getUsername() + ";" + p.getAvatarPath() + ";" +
                         p.getPartiteGiocate() + ";" + p.getPartiteVinte() + ";" + p.getPartitePerse());
                 w.newLine();
@@ -135,6 +143,34 @@ public final class UserRepository {
         } catch (IOException e) {
             System.err.println("Errore scrittura utenti.txt: " + e.getMessage());
             return false;
+        }
+    }
+
+    public void recuperaDatiUtente(String nickname) {
+        try (BufferedReader r = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                String[] campi = line.split(";", -1); // nickname;avatar;giocate;vinte;perse
+                if (campi.length != 5) continue;
+                String nick = campi[0];
+                String avatar = campi[1].isBlank() ? DEFAULT_AVATAR : campi[1];
+                int giocate = Integer.parseInt(campi[2]);
+                int vinte = Integer.parseInt(campi[3]);
+                int perse = Integer.parseInt(campi[4]);
+                System.out.println("RECUPERA DATI UTENTE");
+                System.out.println("Giocate: " + giocate);
+                System.out.println("Vinte: " + vinte);
+                System.out.println("Perse: " + perse);
+                if (nick.equals(nickname)) {
+                    UtentePojo p = new UtentePojo(nick, avatar, giocate, vinte, perse);
+                    
+                    System.out.println("Utente trovato: " + p.getUsername());
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("File non trovato: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Errore lettura file: " + e.getMessage());
         }
     }
 }

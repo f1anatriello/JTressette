@@ -16,11 +16,11 @@ public class UtentePojo {
      *
      * @param username nome dell'utente
      */
-    public UtentePojo(String username, String avatarPath) {
+    public UtentePojo(String username, String avatarPath, int partiteGiocate, int partiteVinte, int partitePerse) {
         this.username = username;
-        this.partiteGiocate = 0;
-        this.partiteVinte = 0;
-        this.partitePerse = 0;
+        this.partiteGiocate = partiteGiocate != 0 ? partiteGiocate : 0;
+        this.partiteVinte = partiteVinte != 0 ? partiteVinte : 0;
+        this.partitePerse = partitePerse != 0 ? partitePerse : 0;
         this.avatarPath = avatarPath;
     }
 
@@ -46,9 +46,9 @@ public class UtentePojo {
     public String getAvatarPath() { return avatarPath; }
 
     public void setUsername(String username) { this.username = username; }
-    public void setPartiteGiocate(int partiteGiocate) { this.partiteGiocate = partiteGiocate; }
-    public void setPartiteVinte(int partiteVinte) { this.partiteVinte = partiteVinte; }
-    public void setPartitePerse(int partitePerse) { this.partitePerse = partitePerse; }
+    public void setPartiteGiocate(int partiteGiocate) { this.partiteGiocate = getPartiteGiocate() + 1; }
+    public void setPartiteVinte(int partiteVinte) { this.partiteVinte = getPartiteVinte() + 1; }
+    public void setPartitePerse(int partitePerse) { this.partitePerse = getPartitePerse() + 1; }
     public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath == null ? UserRepository.DEFAULT_AVATAR : avatarPath; }
     
 
@@ -56,11 +56,13 @@ public class UtentePojo {
     public void incrementaVinte() {
         partiteGiocate++;
         partiteVinte++;
+        UserRepository.getInstance().salvaProfilo(this);
     }
 
     /** Incrementa il numero di partite giocate e di sconfitte. */
     public void incrementaPerse() {
         partiteGiocate++;
         partitePerse++;
+        UserRepository.getInstance().salvaProfilo(this);
     }
 }

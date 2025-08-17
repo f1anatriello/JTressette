@@ -1,6 +1,7 @@
 package view;
 
 import controller.GameEngine;
+import data.UserRepository;
 import data.UtentePojo;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -130,7 +131,7 @@ public class ProfiloView extends JPanel {
     public void mostraProfilo(UtentePojo utente) {
         if (utente != null) {
             lblNickname.setText("Nickname: " + utente.getUsername());
-
+            
             // Avatar ridimensionato
             BufferedImage avatarImg = UIAssets.getInstance().getImmagineAvatar(utente);
             if (avatarImg != null) {
@@ -144,12 +145,12 @@ public class ProfiloView extends JPanel {
                 lblAvatar.setIcon(null);
                 lblAvatar.setText("Nessun avatar impostato");
             }
-
+            System.out.println("Stampo le statistiche");
             // Statistiche
             lblStatistiche.setText(String.format("Giocate: %d | Vinte: %d | Perse: %d",
-                    utente.getPartiteGiocate(),
-                    utente.getPartiteVinte(),
-                    utente.getPartitePerse()));
+                    UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartiteGiocate(),
+                    UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartiteVinte(),
+                    UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartitePerse()));
         } else {
             lblNickname.setText("Nessun profilo caricato");
             lblAvatar.setIcon(null);

@@ -3,7 +3,6 @@ package view;
 import controller.GameEngine;
 import data.UserRepository;
 import data.UtentePojo;
-
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -94,13 +93,12 @@ public class LoginView extends JFrame{
                 return;
             }
 
-            boolean existed = repo.loginOrCreate(username);
+            UtentePojo existed = repo.loginOrCreate(username);
             JOptionPane.showMessageDialog(this,
-                    existed ? "Bentornato, " + username + "!" : "Creato nuovo utente: " + username,
+                    existed != null ? "Bentornato, " + username + "!" : "Creato nuovo utente: " + username,
                     "Accesso", JOptionPane.INFORMATION_MESSAGE);
 
-            UtentePojo giocatore = new UtentePojo(username,UserRepository.DEFAULT_AVATAR);
-            GameEngine engine = new GameEngine(giocatore);
+            GameEngine engine = new GameEngine(existed);
             engine.avviaUIPrincipale();   // crea la JFrame principale e mostra il menu
             dispose();                    // chiudi il login
         });
