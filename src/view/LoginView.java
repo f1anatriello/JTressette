@@ -98,8 +98,8 @@ public class LoginView extends JFrame{
                     existed != null ? "Bentornato, " + username + "!" : "Creato nuovo utente: " + username,
                     "Accesso", JOptionPane.INFORMATION_MESSAGE);
 
-            GameEngine engine = new GameEngine(existed);
-            engine.avviaUIPrincipale();   // crea la JFrame principale e mostra il menu
+            GameEngine engine = GameEngine.getInstance(existed);
+            engine.avviaUIPrincipale();  // crea la JFrame principale e mostra il menu
             dispose();                    // chiudi il login
         });
         setSize(400, 240);
