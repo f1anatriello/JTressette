@@ -93,15 +93,22 @@ public class GameEngine implements Observer {
         List<Giocatore> giocatori = p.getGiocatori();
         List<Carta> terreno = new ArrayList<>();
         String vincitore = null;
+        int indiceVincitore = 0;
+        int carteGiocate = 0;
+        // mani giocate per capire quando sono all'ultima mano / quando ho finito il mazzo
         while(true){
             System.out.println("Tocca a te");
-            int indiceVincitore = 0;
-            for (int i = indiceVincitore; i < 4; i = (i + 1) % 4) {
+            for (int i = indiceVincitore; i < 2; i = (i + 1) % 2) {
+                if(carteGiocate == 2){
+                    carteGiocate = 0;
+                    break;
+                }
                 Giocatore gioc = giocatori.get(i);
                 if(gioc instanceof GiocatoreUmano) {
                     Carta scelta = ((GiocatoreUmano) gioc).scegliCarta();
                     giocaCarta(gioc, scelta, p); // mi aggiorna mano e terreno
-                    if (gioc == giocatori.get(giocatori.size() - 1)) {
+                    carteGiocate++;
+                    if (gioc == giocatori.get(giocatori.size() - 1) && gioc.getMano().isEmpty()) {
                         vincitore = p.manoVintaDa(terreno);
                         terreno.clear();
                         if (p.isMazzoVuoto()) {
@@ -111,6 +118,7 @@ public class GameEngine implements Observer {
                 } else {
                     Carta scelta = ((GiocatoreAI) gioc).scegliCarta(p);
                     giocaCarta(gioc, scelta, p);
+                    carteGiocate++;
                     if (gioc == giocatori.get(giocatori.size() - 1)) {
                         vincitore = p.manoVintaDa(terreno);
                         terreno.clear();
