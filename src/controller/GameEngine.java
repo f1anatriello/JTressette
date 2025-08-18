@@ -52,7 +52,7 @@ public class GameEngine implements Observer {
         return instance;
     }
 
-	public int avviaNuovaPartita(int numPlayer) {
+	public void avviaNuovaPartita(int numPlayer) {
         if(numPlayer == 2){
             List<Giocatore> giocatori = new ArrayList();
             GiocatoreUmano playerUmano = new GiocatoreUmano(this.player.getUsername());
@@ -60,15 +60,15 @@ public class GameEngine implements Observer {
             giocatori.add(playerUmano);
             giocatori.add(ai);
             Partita1v1 partita = new Partita1v1(giocatori);
-
+            partita.inizializzaPartita();
             gameView = GameView.getInstance(this,
                 player.getUsername(),
                 new ImageIcon(player.getAvatarPath()),
                 partita.getGiocatori().get(1).getNome(),
                 new ImageIcon("images/avatars/avatar5.png"),
+
                 partita.getGiocatori().get(0).getMano(),
                 partita.getGiocatori().get(1).getMano());
-            // setScreen(gameView);
         } else {
             List<Giocatore> giocatori = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
@@ -78,7 +78,6 @@ public class GameEngine implements Observer {
             Partita2v2 partita = new Partita2v2(giocatori);
             // chiamo il campo del 2v2
         }
-        return 0;
     }
     
     public void giocaCarta(Giocatore g, Carta c, Partita p) {

@@ -42,11 +42,12 @@ public class GameView extends JFrame{
 
         // Player 1 (bottom)
         JLabel avatar1 = new JLabel(player1Avatar);
-        avatar1.setBounds(80, 530, 70, 70);
+        avatar1.setIcon(new ImageIcon(player1Avatar.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH)));
+        avatar1.setBounds(90, 570, 50, 50);
         tablePanel.add(avatar1);
 
         JLabel name1 = new JLabel(player1Name, SwingConstants.CENTER);
-        name1.setBounds(60, 600, 100, 30);
+        name1.setBounds(60, 540, 100, 30);
         tablePanel.add(name1);
 
         JPanel handPanel1 = new JPanel();
@@ -64,6 +65,7 @@ public class GameView extends JFrame{
 
         // Player 2 (top)
         JLabel avatar2 = new JLabel(player2Avatar);
+        avatar2.setIcon(new ImageIcon(player2Avatar.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH)));
         avatar2.setBounds(80, 30, 70, 70);
         tablePanel.add(avatar2);
 
@@ -90,7 +92,6 @@ public class GameView extends JFrame{
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
             dispose();
-            MenuPrincipaleView menuView = MenuPrincipaleView.getInstance(gameEngine);
             gameEngine.visualizzaMenu();
             }
         });

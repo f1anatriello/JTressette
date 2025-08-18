@@ -17,11 +17,11 @@ public abstract class Partita {
 	public void inizializzaPartita() {
 		this.mazzo = new Mazzo();
 		this.mazzo.mescola();
-		
+		mazzo.mescola();
 		giocatori.forEach(g -> {
 			g.getMano().clear();
 			g.puntiOttenuti = 0;
-			mazzo.assegnaMano(g);
+			mazzo.assegnaMano(g); // assegna 10 carte a ciascun giocatore
 		});
 		terreno = new ArrayList<>(4);
 	}
