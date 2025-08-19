@@ -7,8 +7,7 @@ public class Partita2v2 extends Partita {
     private Squadra squadra1;
     private Squadra squadra2;
 
-    @Override
-    public String manoVintaDa(List<Carta> carte) {
+    public Giocatore manoVintaDa(List<Carta> carte) {
         // TODO: Implement logic to determine which player wins the hand
         // Return the name or identifier of the winning player, or null if not determined
         return null; // Placeholder implementation

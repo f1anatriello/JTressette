@@ -17,10 +17,6 @@ public abstract class Giocatore {
 		mano.add(c);
 	}
 	
-	public void rimuoviCarta(int indice) {
-		mano.remove(indice);
-	}
-	
 	public String getNome() {
 		return nome;
 	}

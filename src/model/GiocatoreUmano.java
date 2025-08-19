@@ -1,20 +1,26 @@
 package model;
 
-import java.util.Scanner;
-
 public class GiocatoreUmano extends Giocatore {
 
-	public GiocatoreUmano(String nome) {
+    private OnCartaSceltaListener listener;
+
+    public GiocatoreUmano(String nome) {
         super(nome);
     }
 
-    public Carta scegliCarta() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Scegli una carta:");
-        for (int i = 0; i < mano.size(); i++) {
-            System.out.println(i + 1 + ": " + mano.get(i));
+    // interfaccia funzionale
+    public interface OnCartaSceltaListener {
+        void onCartaScelta(Carta c);
+    }
+
+    public void setOnCartaSceltaListener(OnCartaSceltaListener listener) {
+        this.listener = listener;
+    }
+
+    // metodo chiamato quando l’utente sceglie una carta dalla GUI
+    public void notificaCartaScelta(Carta c) {
+        if (listener != null) {
+            listener.onCartaScelta(c);
         }
-        int scelta = scanner.nextInt() - 1;
-        return mano.get(scelta);
     }
 }

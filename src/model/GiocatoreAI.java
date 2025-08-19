@@ -16,7 +16,7 @@ public class GiocatoreAI extends Giocatore{
         // Implementa una semplice logica per scegliere una carta
         // Ad esempio, può scegliere la prima carta disponibile nella mano
         try {
-            Thread.sleep(3000 + (int)(Math.random() * 5000)); // Simula una pausa tra 3 e 5 secondi
+            Thread.sleep(3000 + (int)(Math.random() * 4000)); // Simula una pausa tra 3 e 4 secondi
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -30,10 +30,12 @@ public class GiocatoreAI extends Giocatore{
             boolean haSeme = getMano().stream().anyMatch(c -> c.getSeme().equals(semeDaSeguire));
             if (haSeme) {
                 if (carta.getSeme().equals(semeDaSeguire)) {
+                    System.out.println("Carta giocata: " + carta);
                     return carta;
                 }
             } else {
                 // Se non ha il seme, può giocare qualsiasi carta
+                System.out.println("Carta diverso seme: " + carta);
                 return carta;
             }
         }

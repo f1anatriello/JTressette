@@ -2,13 +2,10 @@ package view;
 
 import controller.GameEngine;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import model.Carta;
-import model.Giocatore;
-import model.GiocatoreAI;
-import model.GiocatoreUmano;
-import model.Partita1v1;
 
 public class GameView extends JFrame {
 
@@ -28,6 +25,7 @@ public class GameView extends JFrame {
     private JPanel topHUD;     // avatar/nome avversario
     private JPanel bottomHUD;  // avatar/nome giocatore + pulsanti (se vuoi)
     private GameSupport gameSupp; // canvas centrale
+    private List<Carta> terreno;  // terreno di gioco
 
     public static final Color BACKGROUND_GREEN = new Color(0, 128, 0);
 
@@ -120,6 +118,9 @@ public class GameView extends JFrame {
         gameSupp = new GameSupport(player1Hand, player2Hand);
         // niente setBounds: BorderLayout lo ridimensiona in automatico
         root.add(gameSupp, BorderLayout.CENTER);
+        // (opzionale) se vuoi mostrare il terreno, aggiungi un metodo setTerreno
+        gameSupp.setTerreno(new ArrayList<>());
+        paintComponents(getGraphics());
     }
 
     private ImageIcon scale(ImageIcon icon, int w, int h) {
@@ -131,14 +132,16 @@ public class GameView extends JFrame {
     /* ============== RENDER/UPDATE ============== */
 
     /** Aggiorna mani e (se lo disegni nel GamePane) anche il terreno. */
-    private void render() {
+    public void render() {
         gameSupp.setHands(player1Hand, player2Hand);
         // se il tuo GamePane mostra anche il terreno, passa la lista:
         try {
             gameSupp.getClass().getMethod("setTerreno", java.util.List.class)
                     .invoke(gameSupp, getTerrenoSafe());
         } catch (Exception ignore) {}
-        gameSupp.refresh();
+
+        gameSupp.setTerreno(terreno);
+        gameSupp.repaint();
     }
 
     @SuppressWarnings("unchecked")
@@ -166,11 +169,22 @@ public class GameView extends JFrame {
         render();
     }
 
+    public void setTerreno(List<Carta> terreno) {
+        this.terreno = terreno;
+        render();
+    }
+
+    public void refreshTerreno(List<Carta> terreno) {
+        this.terreno = terreno;
+        render();
+    }
+    
+
     /* ============== Azioni ============== */
 
     /* Non so qua cosa si sia fumato chatGPT
      * a breve stacco tutto
-     */
+     * 
     private void giocaCartaSelezionata() {
         Carta sel = gameSupp.getSelected();
         if (sel == null) {
@@ -190,4 +204,22 @@ public class GameView extends JFrame {
         // player2Hand = p2.getMano();
         render();
     }
+    */
+
+    private void giocaCartaSelezionata() {
+    Carta sel = gameSupp.getSelected();
+    if (sel == null) {
+        JOptionPane.showMessageDialog(
+            this,
+            "Seleziona una carta prima di giocare.",
+            "Nessuna carta selezionata",
+            JOptionPane.WARNING_MESSAGE
+        );
+        return;
+    }
+
+    // 👉 notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta
+    gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
+}
+
 }

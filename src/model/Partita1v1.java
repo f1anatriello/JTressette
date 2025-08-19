@@ -6,10 +6,19 @@ import java.util.Map;
 
 public class Partita1v1 extends Partita {
 
+	private static Partita1v1 instance = null;
+
     public Partita1v1(List<Giocatore> giocatori) {
         super(giocatori);
     }
-    
+
+	public static Partita1v1 getInstance(List<Giocatore> giocatori) {
+		if (instance == null) {
+			instance = new Partita1v1(giocatori);
+		}
+		return instance;
+	}
+
     public String vincitore1v1(){
     	Map<String,Double> mappa = new HashMap<>();
     	
@@ -24,32 +33,36 @@ public class Partita1v1 extends Partita {
     }
 
 	@Override
-	public String manoVintaDa(List<Carta> terr) {
-		    if (terr == null || terr.isEmpty())
-		        throw new IllegalArgumentException("Terreno vuoto");
+	public Giocatore manoVintaDa(List<Carta> terr) {
+    if (terr == null || terr.size() < 2) {
+        throw new IllegalArgumentException("Terreno non valido: devono esserci almeno 2 carte");
+    }
 
-			// Seme d’uscita = seme della prima carta sul tavolo
-			Seme semeUscita = terr.get(0).getSeme();
+    // La prima carta appartiene al giocatore che ha iniziato
+    Carta cartaPrima = terr.get(0);
+    Carta cartaSeconda = terr.get(1);
 
-		    int bestIdx = -1;
-		    int bestOrd = Integer.MIN_VALUE;
+    // Recupero i due giocatori
+    Giocatore primoGiocatore = giocatori.get(0);  // assumo che l'ordine sia Umano = 0, AI = 1
+    Giocatore secondoGiocatore = giocatori.get(1);
 
-		    for (int i = 0; i < terr.size(); i++) {
-		        Carta c = terr.get(i);
-		        // in Tressette chi è fuori seme non può "prendere"
-		        if (c.getSeme() != semeUscita) continue;
+    Seme semeRegnante = cartaPrima.getSeme();
+    Giocatore vincitore;
 
-		        int ord = c.getValore().getOrdinePresa();
-		        if (ord > bestOrd) {
-		            bestOrd = ord;
-		            bestIdx = i;
-		        }
-		    }
+    if (cartaSeconda.getSeme() != semeRegnante) {
+        // Vince automaticamente chi ha giocato la prima carta
+        vincitore = primoGiocatore;
+    } else {
+        // Entrambi hanno lo stesso seme → vince chi ha il valore più alto
+        if (cartaPrima.getValore().getPunti() >= cartaSeconda.getValore().getPunti()) {
+            vincitore = primoGiocatore;
+        } else {
+            vincitore = secondoGiocatore;
+        }
+    }
 
-		    if (bestIdx < 0)
-		        throw new IllegalStateException("Nessuna carta valida nel seme d’uscita");
+    return vincitore;
+}
 
-		    return giocatori.get(bestIdx).nome;   // oppure giocatori.get(bestIdx).getNome() se preferisci il getter
-		}
-	}
+}
     

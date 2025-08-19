@@ -1,13 +1,13 @@
 package view;
 
-import model.Carta;
-import ui.UIAssets;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.List;
+import javax.swing.*;
+import model.Carta;
+import ui.UIAssets;
 
 /** Classe di aiuto per grafica leggera durante la partita. */
 public class GameSupport extends JPanel {
@@ -22,14 +22,15 @@ public class GameSupport extends JPanel {
     private static final int BOTTOM_PAD   = 10;        // margine basso
     private static final int LIFT_SELECTED= 20;        // sollevamento selezione
 
-    private java.util.List<Carta> manoGiocatore;
-    private java.util.List<Carta> manoAvversario;
+    private List<Carta> manoGiocatore;
+    private List<Carta> manoAvversario;
+    private List<Carta> terreno = Collections.emptyList();
 
     // solo per mano giocatore
     private final Map<Carta, Rectangle> mapCards = new LinkedHashMap<>();
     private Carta selected;
 
-    public GameSupport(java.util.List<Carta> manoGiocatore, java.util.List<Carta> manoAvversario) {
+    public GameSupport(List<Carta> manoGiocatore, List<Carta> manoAvversario) {
         this.manoGiocatore = (manoGiocatore != null) ? manoGiocatore : Collections.emptyList();
         this.manoAvversario = (manoAvversario != null) ? manoAvversario : Collections.emptyList();
 
@@ -60,7 +61,7 @@ public class GameSupport extends JPanel {
     }
 
     /** Aggiorna le mani dall'esterno, poi chiama refresh(). */
-    public void setHands(java.util.List<Carta> manoGiocatore, java.util.List<Carta> manoAvversario) {
+    public void setHands(List<Carta> manoGiocatore, List<Carta> manoAvversario) {
         this.manoGiocatore = (manoGiocatore != null) ? manoGiocatore : Collections.emptyList();
         this.manoAvversario = (manoAvversario != null) ? manoAvversario : Collections.emptyList();
     }
@@ -115,6 +116,20 @@ public class GameSupport extends JPanel {
                 x += X_DELTA;
             }
         }
+        // dentro paintComponent, PRIMA di disegnare la mano giocatore
+        // ===== terreno (carte sul tavolo, al centro) =====
+        if (!terreno.isEmpty()) {
+            int totW = CARD_W + (terreno.size() - 1) * X_DELTA;
+            int x = Math.max(PAD_X, (getWidth() - totW) / 2); // centraggio dinamico
+            int y = getHeight() / 2 - CARD_H / 2;
+            for (Carta c : terreno) {
+                Image img = assets.getImmagineCarta(c);
+                g2.drawImage(img, x, y, CARD_W, CARD_H, this);
+                g2.setColor(Color.BLACK);
+                g2.drawRect(x, y, CARD_W, CARD_H);
+                x += X_DELTA;
+            }
+        }
 
         // ===== mano giocatore (fronte) in basso =====
         for (Carta c : manoGiocatore) {
@@ -134,4 +149,11 @@ public class GameSupport extends JPanel {
 
         g2.dispose();
     }
+
+
+    // === NUOVO METODO ===
+    public void setTerreno(List<Carta> terreno) {
+        this.terreno = (terreno != null) ? terreno : Collections.emptyList();
+    }
+
 }

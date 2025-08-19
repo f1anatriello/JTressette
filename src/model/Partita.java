@@ -26,7 +26,7 @@ public abstract class Partita {
 		terreno = new ArrayList<>(4);
 	}
 	
-	public abstract String manoVintaDa(List<Carta> terr);
+	public abstract Giocatore manoVintaDa(List<Carta> terr);
 	
 	public void aggiungiAlTerreno(Carta c) {
 		terreno.add(c);
@@ -42,6 +42,10 @@ public abstract class Partita {
 
 	public List<Giocatore> getGiocatori() {
 		return giocatori;
+	}
+
+	public Mazzo getMazzo() {
+		return mazzo;
 	}
 
 	public Carta cartaVincente(List<Carta> terr) {
@@ -69,6 +73,10 @@ public abstract class Partita {
 
 	public List<Carta> getTerreno() {
 		return terreno;
+	}
+
+	public void clearTerreno() {
+		this.terreno.clear();
 	}
 
 }

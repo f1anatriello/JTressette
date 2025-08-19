@@ -33,6 +33,8 @@ public class GameEngine implements Observer {
     private MenuPrincipaleView mpv;
     private ProfiloView pv;
     private UtentePojo player;
+    private GiocatoreAI ai;
+    GiocatoreUmano playerUmano;
     private GameView gameView;
     private JFrame mainFrame;  // mi serve per switchare da una finestra all'altra
 
@@ -55,20 +57,13 @@ public class GameEngine implements Observer {
 	public void avviaNuovaPartita(int numPlayer) {
         if(numPlayer == 2){
             List<Giocatore> giocatori = new ArrayList();
-            GiocatoreUmano playerUmano = new GiocatoreUmano(this.player.getUsername());
-            GiocatoreAI ai = new GiocatoreAI();
+            playerUmano = new GiocatoreUmano(this.player.getUsername());
+            ai = new GiocatoreAI();
             giocatori.add(playerUmano);
             giocatori.add(ai);
             Partita1v1 partita = new Partita1v1(giocatori);
             partita.inizializzaPartita();
-            gameView = GameView.getInstance(this,
-                player.getUsername(),
-                new ImageIcon(player.getAvatarPath()),
-                partita.getGiocatori().get(1).getNome(),
-                new ImageIcon("images/avatars/avatar5.png"),
-
-                partita.getGiocatori().get(0).getMano(),
-                partita.getGiocatori().get(1).getMano());
+            iniziaPartita1v1(partita);
         } else {
             List<Giocatore> giocatori = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
@@ -84,58 +79,110 @@ public class GameEngine implements Observer {
     	List<Carta> manoNuova = g.getMano();
     	manoNuova.remove(manoNuova.indexOf(c));
     	g.setMano(manoNuova);
-    	p.aggiungiAlTerreno(c);
+        p.getTerreno().add(c);
+        gameView.setTerreno(p.getTerreno());
+        gameView.refreshTerreno(p.getTerreno());
+        gameView.refreshHands(playerUmano.getMano(), ai.getMano());
     }
 
+    public void iniziaPartita1v1(Partita1v1 p) {
+        gameView = GameView.getInstance(
+            this,
+            player.getUsername(),
+            new ImageIcon(player.getAvatarPath()),
+            p.getGiocatori().get(1).getNome(),
+            new ImageIcon("images/avatars/avatar5.png"),
+            p.getGiocatori().get(0).getMano(),
+            p.getGiocatori().get(1).getMano()
+        );
 
-    public String iniziaPartita1v1(Partita1v1 p) {
-        List<Giocatore> giocatori = p.getGiocatori();
-        List<Carta> terreno = new ArrayList<>();
-        String vincitore = null;
-        int indiceVincitore = 0;
-        int carteGiocate = 0;
-        // mani giocate per capire quando sono all'ultima mano / quando ho finito il mazzo
-        while(true){
-            System.out.println("Tocca a te");
-            for (int i = indiceVincitore; i < 2; i = (i + 1) % 2) {
-                if(carteGiocate == 2){
-                    carteGiocate = 0;
-                    break;
-                }
-                Giocatore gioc = giocatori.get(i);
-                if(gioc instanceof GiocatoreUmano) {
-                    Carta scelta = ((GiocatoreUmano) gioc).scegliCarta();
-                    giocaCarta(gioc, scelta, p); // mi aggiorna mano e terreno
-                    carteGiocate++;
-                    if (gioc == giocatori.get(giocatori.size() - 1) && gioc.getMano().isEmpty()) {
-                        vincitore = p.manoVintaDa(terreno);
-                        terreno.clear();
-                        if (p.isMazzoVuoto()) {
-                            p.setFinita(true);
-                        }
-                    }
-                } else {
-                    Carta scelta = ((GiocatoreAI) gioc).scegliCarta(p);
-                    giocaCarta(gioc, scelta, p);
-                    carteGiocate++;
-                    if (gioc == giocatori.get(giocatori.size() - 1)) {
-                        vincitore = p.manoVintaDa(terreno);
-                        terreno.clear();
-                        if (p.isMazzoVuoto()) {
-                            p.setFinita(true);
-                        }
-                    }
+        playerUmano = (GiocatoreUmano) p.getGiocatori().get(0);
+        ai = (GiocatoreAI) p.getGiocatori().get(1);
+
+        // Avvia il primo turno: parte l’umano
+        giocaTurnoUmano(p, playerUmano, ai);
+    }
+
+    private void giocaTurnoUmano(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
+        umano.setOnCartaSceltaListener(carta -> {
+            giocaCarta(umano, carta, partita);
+            giocaCarta(ai, ai.scegliCarta(partita), partita);
+
+            Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
+            vincente.aggiungiPunti(partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum());
+
+            if (!partita.isMazzoVuoto()) {
+                if (vincente.equals(ai)) {
+                    ai.riceviCarta(partita.getMazzo().pesca());
+                    umano.riceviCarta(partita.getMazzo().pesca());
+                }else if (vincente.equals(umano)) {
+                    umano.riceviCarta(partita.getMazzo().pesca());
+                    ai.riceviCarta(partita.getMazzo().pesca());
                 }
             }
-            indiceVincitore = giocatori.indexOf(vincitore);
 
-            if(p.isFinita()) {
-                System.out.println("Il vincitore è: ");
-                return p.vincitore1v1();
-            }
+            partita.clearTerreno();
+            gameView.setTerreno(partita.getTerreno());
+            gameView.refreshTerreno(partita.getTerreno());
+            gameView.refreshHands(umano.getMano(), ai.getMano());
             
-        }
+            // Verifica fine partita
+            if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
+                finePartita(partita);
+                return;
+            }
+
+            // Avvia il turno successivo
+            if (vincente instanceof GiocatoreUmano) {
+                giocaTurnoUmano(partita, umano, ai); // riparte umano
+            } else {
+                giocaTurnoAI(partita, umano, ai);    // parte AI
+            }
+        });
     }
+    private void giocaTurnoAI(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
+        umano.setOnCartaSceltaListener(carta -> {
+            giocaCarta(ai, ai.scegliCarta(partita), partita);
+            giocaCarta(umano, carta, partita);
+
+            Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
+            vincente.aggiungiPunti(partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum());
+
+            if (!partita.isMazzoVuoto()) {
+                umano.riceviCarta(partita.getMazzo().pesca());
+                ai.riceviCarta(partita.getMazzo().pesca());
+            }
+
+            partita.clearTerreno();
+            gameView.setTerreno(partita.getTerreno());
+            gameView.refreshHands(umano.getMano(), ai.getMano());
+            
+            // Verifica fine partita
+            if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
+                finePartita(partita);
+                return;
+            }
+
+            // Avvia il turno successivo
+            if (vincente instanceof GiocatoreUmano) {
+                giocaTurnoUmano(partita, umano, ai); // riparte umano
+            } else {
+                giocaTurnoAI(partita, umano, ai);    // parte AI
+            }
+        });
+    }
+
+    private void finePartita(Partita1v1 p) {
+        String vincitore = p.vincitore1v1();
+        JOptionPane.showMessageDialog(
+            mainFrame,
+            "La partita è finita! Il vincitore è: " + vincitore,
+            "Partita Terminata",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+        visualizzaMenu();
+    }
+
 
     /** Inizia una nuova partita 2v2 */
     public String iniziaPartita2v2(Partita2v2 p) {
@@ -228,4 +275,13 @@ public class GameEngine implements Observer {
         return player;
     }
 
+    public GiocatoreUmano getGiocatoreUmano() {
+    // supponendo che in avviaNuovaPartita tu abbia già salvato il riferimento
+    return this.playerUmano;
+    }
+
+    public GiocatoreAI getGiocatoreAI() {
+        // supponendo che in avviaNuovaPartita tu abbia già salvato il riferimento
+        return this.ai;
+    }
 }
