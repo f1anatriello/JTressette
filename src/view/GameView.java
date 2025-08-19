@@ -1,13 +1,14 @@
 package view;
 
 import controller.GameEngine;
+import model.Carta;
+
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
-import model.Carta;
 
-public class GameView extends JFrame {
+public class GameView extends JPanel {
 
     private static GameView instance = null;
 
@@ -36,7 +37,8 @@ public class GameView extends JFrame {
             List<Carta> player1Hand, List<Carta> player2Hand) {
 
         if (instance == null) {
-            instance = new GameView(gameEngine, player1Name, player1Avatar, player2Name, player2Avatar, player1Hand, player2Hand);
+            instance = new GameView(gameEngine, player1Name, player1Avatar,
+                    player2Name, player2Avatar, player1Hand, player2Hand);
         }
         return instance;
     }
@@ -55,24 +57,11 @@ public class GameView extends JFrame {
         this.player1Hand = player1Hand;
         this.player2Hand = player2Hand;
 
-        setTitle("JTressette - 1v1");
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(new Dimension(960, 640));
-        setResizable(false);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+        setBackground(BACKGROUND_GREEN);
 
         buildUI();
         render(); // primo disegno
-
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override public void windowClosed(java.awt.event.WindowEvent e) {
-                // torna al menu e libera il singleton
-                gameEngine.visualizzaMenu();
-                instance = null;
-            }
-        });
-
-        setVisible(true);
     }
 
     /* ================= UI ================= */
@@ -81,7 +70,7 @@ public class GameView extends JFrame {
         // root con BorderLayout
         root = new JPanel(new BorderLayout());
         root.setBackground(BACKGROUND_GREEN);
-        setContentPane(root);
+        add(root, BorderLayout.CENTER);
 
         // --- TOP HUD: avversario ---
         topHUD = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
@@ -116,11 +105,10 @@ public class GameView extends JFrame {
 
         // --- CENTER: GamePane (canvas carte) ---
         gameSupp = new GameSupport(player1Hand, player2Hand);
-        // niente setBounds: BorderLayout lo ridimensiona in automatico
         root.add(gameSupp, BorderLayout.CENTER);
-        // (opzionale) se vuoi mostrare il terreno, aggiungi un metodo setTerreno
+
+        // terreno iniziale vuoto
         gameSupp.setTerreno(new ArrayList<>());
-        paintComponents(getGraphics());
     }
 
     private ImageIcon scale(ImageIcon icon, int w, int h) {
@@ -134,33 +122,9 @@ public class GameView extends JFrame {
     /** Aggiorna mani e (se lo disegni nel GamePane) anche il terreno. */
     public void render() {
         gameSupp.setHands(player1Hand, player2Hand);
-        // se il tuo GamePane mostra anche il terreno, passa la lista:
-        try {
-            gameSupp.getClass().getMethod("setTerreno", java.util.List.class)
-                    .invoke(gameSupp, getTerrenoSafe());
-        } catch (Exception ignore) {}
-
         gameSupp.setTerreno(terreno);
         gameSupp.repaint();
     }
-
-    @SuppressWarnings("unchecked")
-    private java.util.List<Carta> getTerrenoSafe() {
-        try {
-            // se Partita1v1 ha getTerreno(), usalo. Altrimenti torna lista vuota.
-            java.lang.reflect.Method m = findPartitaTerrenoGetter();
-            if (m != null) {
-                Object list = m.invoke(findPartitaInstance());
-                return (java.util.List<Carta>) list;
-            }
-        } catch (Exception ignored) {}
-        return java.util.Collections.emptyList();
-    }
-
-    // Stub per mantenere compatibilità: se non vuoi reflection,
-    // passa direttamente il terreno dal chiamante e rimuovi questi metodi.
-    private Object findPartitaInstance() { return null; }
-    private java.lang.reflect.Method findPartitaTerrenoGetter() { return null; }
 
     /** Chiamala quando il model cambia le mani. */
     public void refreshHands(List<Carta> newP1, List<Carta> newP2) {
@@ -178,48 +142,22 @@ public class GameView extends JFrame {
         this.terreno = terreno;
         render();
     }
-    
 
     /* ============== Azioni ============== */
 
-    /* Non so qua cosa si sia fumato chatGPT
-     * a breve stacco tutto
-     * 
     private void giocaCartaSelezionata() {
         Carta sel = gameSupp.getSelected();
         if (sel == null) {
-            JOptionPane.showMessageDialog(this, "Seleziona una carta prima di giocare.", "Nessuna carta selezionata", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Seleziona una carta prima di giocare.",
+                    "Nessuna carta selezionata",
+                    JOptionPane.WARNING_MESSAGE
+            );
             return;
         }
-        // recupera i riferimenti reali ai giocatori se li hai altrove
-        GiocatoreUmano p1 = new GiocatoreUmano(player1Name); // <-- se già creato altrove, usa quello
-        GiocatoreAI      p2 = new GiocatoreAI() {};               // placeholder se ti serve
 
-        // applica la mossa al model
-        // (usa i tuoi oggetti reali: p1/p2/partita)
-        // engine.giocaCarta(p1, sel, partita);
-
-        // aggiorna le mani dal model; se non hai ancora il model qui, togli questi 2 e usa refreshHands dal controller
-        // player1Hand = p1.getMano();
-        // player2Hand = p2.getMano();
-        render();
+        // 👉 notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta
+        gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
     }
-    */
-
-    private void giocaCartaSelezionata() {
-    Carta sel = gameSupp.getSelected();
-    if (sel == null) {
-        JOptionPane.showMessageDialog(
-            this,
-            "Seleziona una carta prima di giocare.",
-            "Nessuna carta selezionata",
-            JOptionPane.WARNING_MESSAGE
-        );
-        return;
-    }
-
-    // 👉 notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta
-    gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
-}
-
 }

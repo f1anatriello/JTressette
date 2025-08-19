@@ -96,6 +96,8 @@ public class GameEngine implements Observer {
             p.getGiocatori().get(1).getMano()
         );
 
+        setScreen(gameView);
+
         playerUmano = (GiocatoreUmano) p.getGiocatori().get(0);
         ai = (GiocatoreAI) p.getGiocatori().get(1);
 
