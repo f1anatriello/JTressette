@@ -2,17 +2,23 @@ package view;
 
 import controller.GameEngine;
 import model.Carta;
+import ui.UISettings;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Vista principale della partita 1v1. Mostra la mano del giocatore e quella
+ * dell'avversario, oltre ai nomi/avatars. Delegando il disegno delle carte
+ * al componente {@link GameSupport} e notificando il controller quando
+ * l'utente seleziona e gioca una carta.
+ */
 public class GameView extends JPanel {
 
     private static GameView instance = null;
 
-    // === campi preesistenti ===
     private String player1Name;
     private ImageIcon player1Avatar;
     private String player2Name;
@@ -21,10 +27,9 @@ public class GameView extends JPanel {
     private List<Carta> player2Hand;
     private GameEngine gameEngine;
 
-    // === nuovi ===
     private JPanel root;       // BorderLayout
     private JPanel topHUD;     // avatar/nome avversario
-    private JPanel bottomHUD;  // avatar/nome giocatore + pulsanti (se vuoi)
+    private JPanel bottomHUD;  // avatar/nome giocatore + pulsanti
     private GameSupport gameSupp; // canvas centrale
     private List<Carta> terreno;  // terreno di gioco
 
@@ -72,16 +77,44 @@ public class GameView extends JPanel {
         root.setBackground(BACKGROUND_GREEN);
         add(root, BorderLayout.CENTER);
 
-        // --- TOP HUD: avversario ---
-        topHUD = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
+        // --- TOP HUD: avversario (sx) + bottone Menù (dx) ---
+        topHUD = new JPanel(new BorderLayout(8, 8));
         topHUD.setOpaque(false);
 
+        // sinistra: avatar + nome avversario
+        JPanel leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
+        leftTop.setOpaque(false);
         JLabel avatar2 = new JLabel(scale(player2Avatar, 60, 60));
         JLabel name2   = new JLabel(player2Name, SwingConstants.LEFT);
         name2.setFont(name2.getFont().deriveFont(Font.BOLD, 14f));
-        topHUD.add(avatar2);
-        topHUD.add(name2);
+        JLabel score2Label = new JLabel(" - Punti: " + gameEngine.getGiocatoreAI().getPunti());
+        leftTop.add(avatar2);
+        leftTop.add(name2);
+        leftTop.add(score2Label);
 
+        // destra: bottone Menù
+        JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
+        rightTop.setOpaque(false);
+        JButton btnMenu = new JButton("⬅ Torna al Menù");
+        btnMenu.addActionListener(e -> {
+            int scl = JOptionPane.showConfirmDialog(
+                    this,
+                    "Tornare al menù principale?\nLa partita in corso andrà persa.",
+                    "Abbandonare la nave..",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            if (scl == JOptionPane.YES_OPTION) {
+                try { gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null); } catch (Exception ignore) {}
+                GameView.disposeInstance();      // <— importantissimo: azzera il singleton
+                gameEngine.visualizzaMenu();     // torna al menu
+            }
+        });
+
+        rightTop.add(btnMenu);
+
+        topHUD.add(leftTop, BorderLayout.WEST);
+        topHUD.add(rightTop, BorderLayout.EAST);
         root.add(topHUD, BorderLayout.NORTH);
 
         // --- BOTTOM HUD: giocatore ---
@@ -92,7 +125,6 @@ public class GameView extends JPanel {
         JLabel name1   = new JLabel(player1Name, SwingConstants.LEFT);
         name1.setFont(name1.getFont().deriveFont(Font.BOLD, 14f));
 
-        // (opzionale) pulsante Gioca che usa la selezione del GamePane
         JButton btnGioca = new JButton("Gioca");
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
 
@@ -103,13 +135,14 @@ public class GameView extends JPanel {
 
         root.add(bottomHUD, BorderLayout.SOUTH);
 
-        // --- CENTER: GamePane (canvas carte) ---
+        // --- CENTER: GameSupport (canvas carte) ---
         gameSupp = new GameSupport(player1Hand, player2Hand);
         root.add(gameSupp, BorderLayout.CENTER);
 
         // terreno iniziale vuoto
         gameSupp.setTerreno(new ArrayList<>());
     }
+
 
     private ImageIcon scale(ImageIcon icon, int w, int h) {
         if (icon == null || icon.getImage() == null) return icon;
@@ -119,29 +152,48 @@ public class GameView extends JPanel {
 
     /* ============== RENDER/UPDATE ============== */
 
-    /** Aggiorna mani e (se lo disegni nel GamePane) anche il terreno. */
+    /**
+     * Aggiorna le mani e il terreno sul GameSupport. Richiama sempre
+     * {@link GameSupport#refresh()} affinché il layout venga ricalcolato e
+     * ridisegnato.
+     */
     public void render() {
         gameSupp.setHands(player1Hand, player2Hand);
         gameSupp.setTerreno(terreno);
-        gameSupp.repaint();
+        gameSupp.refresh();
+        // dopo il refresh assicuriamo una selezione valida
+        SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone());
     }
 
-    /** Chiamala quando il model cambia le mani. */
+    /**
+     * Aggiorna le mani del giocatore e dell'avversario e ridisegna.
+     */
     public void refreshHands(List<Carta> newP1, List<Carta> newP2) {
         this.player1Hand = newP1;
         this.player2Hand = newP2;
         render();
     }
 
+    /**
+     * Imposta la lista di carte sul terreno e ridisegna. Se il terreno è null,
+     * verrà considerato vuoto.
+     */
     public void setTerreno(List<Carta> terreno) {
         this.terreno = terreno;
         render();
     }
 
+    /**
+     * Aggiornamento del terreno (mantiene compatibilità con il codice esistente).
+     * Si limita a impostare la nuova lista e ridisegnare.
+     */
     public void refreshTerreno(List<Carta> terreno) {
         this.terreno = terreno;
         render();
     }
+
+    public static void disposeInstance() { instance = null; }
+
 
     /* ============== Azioni ============== */
 
@@ -157,7 +209,7 @@ public class GameView extends JPanel {
             return;
         }
 
-        // 👉 notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta
+        // notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta
         gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
     }
 }

@@ -9,18 +9,23 @@ import javax.swing.*;
 import model.Carta;
 import ui.UIAssets;
 
-/** Classe di aiuto per grafica leggera durante la partita. */
+/**
+ * Classe di aiuto per grafica leggera durante la partita.
+ * Responsabile del disegno della mano del giocatore, della mano dell'avversario
+ * e del terreno di gioco. Inoltre gestisce la selezione di una carta nella mano
+ * del giocatore tramite un semplice listener di mouse.
+ */
 public class GameSupport extends JPanel {
 
     // ====== CONFIG FISSA (schermata 960x640) ======
-    private static final int CARD_H       = 90;        // altezza carta
-    private static final double RATIO     = 0.66;      // ~ 2:3
-    private static final int CARD_W       = (int) (CARD_H * RATIO);
-    private static final int X_DELTA      = 50;        // sovrapposizione orizzontale
-    private static final int PAD_X        = 10;        // padding laterale
-    private static final int TOP_Y        = 10;        // y mano avversario
-    private static final int BOTTOM_PAD   = 10;        // margine basso
-    private static final int LIFT_SELECTED= 20;        // sollevamento selezione
+    private static final int CARD_H        = 90;        // altezza carta
+    private static final double RATIO      = 0.66;      // ~ 2:3
+    private static final int CARD_W        = (int) (CARD_H * RATIO);
+    private static final int X_DELTA       = 50;        // sovrapposizione orizzontale
+    private static final int PAD_X         = 10;        // padding laterale
+    private static final int TOP_Y         = 10;        // y mano avversario
+    private static final int BOTTOM_PAD    = 10;        // margine basso
+    private static final int LIFT_SELECTED = 20;        // sollevamento selezione
 
     private List<Carta> manoGiocatore;
     private List<Carta> manoAvversario;
@@ -38,11 +43,15 @@ public class GameSupport extends JPanel {
         setDoubleBuffered(true);
 
         addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                // riabbassa la precedente
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // riabbassa la precedente selezione
                 if (selected != null) {
                     Rectangle r = mapCards.get(selected);
-                    if (r != null) { r.y += LIFT_SELECTED; repaint(); }
+                    if (r != null) {
+                        r.y += LIFT_SELECTED;
+                        repaint();
+                    }
                     selected = null;
                 }
                 // cerca dall'ultima alla prima (z-order)
@@ -60,19 +69,36 @@ public class GameSupport extends JPanel {
         });
     }
 
-    /** Aggiorna le mani dall'esterno, poi chiama refresh(). */
+    /**
+     * Aggiorna le mani dall'esterno. Dopo aver impostato le mani, chiama {@link #refresh()}
+     * dalla vista per forzare il ricalcolo del layout e il ridisegno.
+     */
     public void setHands(List<Carta> manoGiocatore, List<Carta> manoAvversario) {
         this.manoGiocatore = (manoGiocatore != null) ? manoGiocatore : Collections.emptyList();
         this.manoAvversario = (manoAvversario != null) ? manoAvversario : Collections.emptyList();
     }
 
-    /** Carta attualmente selezionata. */
-    public Carta getSelected() { return selected; }
+    /**
+     * Restituisce la carta attualmente selezionata dall'utente. Può essere null se nessuna
+     * carta è selezionata.
+     */
+    public Carta getSelected() {
+        return selected;
+    }
 
-    /** Ricalcola layout + repaint (da chiamare dopo setHands). */
-    public void refresh() { revalidate(); repaint(); }
+    /**
+     * Ricalcola il layout e ridisegna il componente. Da chiamare dopo aver
+     * modificato le mani o il terreno.
+     */
+    public void refresh() {
+        revalidate();
+        repaint();
+    }
 
-    @Override public Dimension getPreferredSize() { return new Dimension(900, 700); }
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(900, 700);
+    }
 
     @Override
     public void invalidate() {
@@ -80,6 +106,10 @@ public class GameSupport extends JPanel {
         recomputeLayout();
     }
 
+    /**
+     * Calcola le posizioni delle carte della mano del giocatore nella parte bassa
+     * del pannello. Viene richiamato automaticamente da {@link #invalidate()}.
+     */
     private void recomputeLayout() {
         mapCards.clear();
         if (getHeight() <= 0) return;
@@ -116,11 +146,10 @@ public class GameSupport extends JPanel {
                 x += X_DELTA;
             }
         }
-        // dentro paintComponent, PRIMA di disegnare la mano giocatore
         // ===== terreno (carte sul tavolo, al centro) =====
         if (!terreno.isEmpty()) {
             int totW = CARD_W + (terreno.size() - 1) * X_DELTA;
-            int x = Math.max(PAD_X, (getWidth() - totW) / 2); // centraggio dinamico
+            int x = Math.max(PAD_X, (getWidth() - totW) / 2);
             int y = getHeight() / 2 - CARD_H / 2;
             for (Carta c : terreno) {
                 Image img = assets.getImmagineCarta(c);
@@ -150,10 +179,41 @@ public class GameSupport extends JPanel {
         g2.dispose();
     }
 
+    // dentro GameSupport.java (aggiungi in fondo alla classe, prima della chiusura)
 
-    // === NUOVO METODO ===
+    public boolean selectAtIndex(int idx) {
+        if (manoGiocatore == null || manoGiocatore.isEmpty()) return false;
+        if (idx < 0 || idx >= manoGiocatore.size()) return false;
+
+        // abbassa l’eventuale selezione precedente
+        if (selected != null) {
+            Rectangle old = mapCards.get(selected);
+            if (old != null) old.y += LIFT_SELECTED;
+        }
+
+        selected = manoGiocatore.get(idx);
+        Rectangle r = mapCards.get(selected);
+        if (r != null) r.y -= LIFT_SELECTED;
+
+        repaint();
+        return true;
+    }
+
+    /** Se non c'è selezione (o la carta selezionata non è più in mano) seleziona l’indice 0. */
+    public boolean selectFirstIfNone() {
+        if (selected == null || !manoGiocatore.contains(selected)) {
+            return selectAtIndex(0);
+        }
+        return true; // già valida
+    }
+
+
+    /**
+     * Imposta l'elenco delle carte sul terreno. Se viene passato null, il terreno
+     * viene considerato vuoto.
+     * @param terreno elenco di carte attualmente sul tavolo
+     */
     public void setTerreno(List<Carta> terreno) {
         this.terreno = (terreno != null) ? terreno : Collections.emptyList();
     }
-
 }

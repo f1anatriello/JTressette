@@ -22,10 +22,10 @@ import view.MenuPrincipaleView;
 import view.ProfiloView;
 
 /**
- * Controller: gestisce le azioni sui pulsanti.
+ * Controller dell'applicazione: gestisce le azioni dell'interfaccia utente,
+ * l'avvio delle partite e il ciclo di gioco. È un Observer in attesa
+ * dell'evoluzione del modello (non ancora implementato completamente).
  */
-
-
 public class GameEngine implements Observer {
 
     private static GameEngine instance = null;
@@ -36,7 +36,7 @@ public class GameEngine implements Observer {
     private GiocatoreAI ai;
     GiocatoreUmano playerUmano;
     private GameView gameView;
-    private JFrame mainFrame;  // mi serve per switchare da una finestra all'altra
+    private JFrame mainFrame;
 
     @Override
     public void update(java.util.Observable o, Object arg) {
@@ -54,9 +54,14 @@ public class GameEngine implements Observer {
         return instance;
     }
 
-	public void avviaNuovaPartita(int numPlayer) {
-        if(numPlayer == 2){
-            List<Giocatore> giocatori = new ArrayList();
+    /**
+     * Avvia una nuova partita. Se {@code numPlayer == 2} avvia una 1v1; altrimenti
+     * prepara una 2v2 (non ancora implementata). Inizializza i giocatori e
+     * l'oggetto {@link Partita1v1}, quindi chiama {@link #iniziaPartita1v1}.
+     */
+    public void avviaNuovaPartita(int numPlayer) {
+        if (numPlayer == 2) {
+            List<Giocatore> giocatori = new ArrayList<>();
             playerUmano = new GiocatoreUmano(this.player.getUsername());
             ai = new GiocatoreAI();
             giocatori.add(playerUmano);
@@ -74,17 +79,30 @@ public class GameEngine implements Observer {
             // chiamo il campo del 2v2
         }
     }
-    
+
+    /**
+     * Fa giocare una carta al giocatore specificato, rimuovendola dalla sua mano
+     * e aggiungendola al terreno della partita. Non aggiorna la vista: l'aggiornamento
+     * deve essere eseguito a fine turno dopo che entrambi i giocatori hanno
+     * giocato e il terreno viene svuotato.
+     */
+    // GameEngine.java
+
     public void giocaCarta(Giocatore g, Carta c, Partita p) {
-    	List<Carta> manoNuova = g.getMano();
-    	manoNuova.remove(manoNuova.indexOf(c));
-    	g.setMano(manoNuova);
-        p.getTerreno().add(c);
-        gameView.setTerreno(p.getTerreno());
-        gameView.refreshTerreno(p.getTerreno());
-        gameView.refreshHands(playerUmano.getMano(), ai.getMano());
+        // solo logica di stato, nessun refresh grafico qui
+        List<Carta> mano = g.getMano();
+        if (c == null) return;            
+        mano.remove(c);                   
+        g.setMano(mano);
+        p.getTerreno().add(c);            
     }
 
+
+    /**
+     * Avvia la partita 1v1 inizializzando la GameView e il primo turno. Prepara
+     * i riferimenti a {@link GiocatoreUmano} e {@link GiocatoreAI} e lascia
+     * partire il turno dell'umano.
+     */
     public void iniziaPartita1v1(Partita1v1 p) {
         gameView = GameView.getInstance(
             this,
@@ -105,75 +123,118 @@ public class GameEngine implements Observer {
         giocaTurnoUmano(p, playerUmano, ai);
     }
 
+    /**
+     * Gestisce un turno in cui l'umano inizia. Imposta il listener di selezione
+     * della carta sul GiocatoreUmano; quando la carta viene scelta vengono
+     * eseguite le mosse dell'umano e dell'AI, calcolato il vincitore della mano,
+     * attribuiti i punti e gestite le pescate. Infine viene ripulito il terreno
+     * e la vista aggiornata.
+     */
+    // GameEngine.java
+
     private void giocaTurnoUmano(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
-        umano.setOnCartaSceltaListener(carta -> {
-            giocaCarta(umano, carta, partita);
-            giocaCarta(ai, ai.scegliCarta(partita), partita);
+    umano.setOnCartaSceltaListener(carta -> {
+        if (carta == null) return;
 
-            Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
-            vincente.aggiungiPunti(partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum());
+        // 1) l'umano gioca e mostri SUBITO la 1ª carta sul terreno
+        giocaCarta(umano, carta, partita);
+        showTerreno(partita);
 
-            if (!partita.isMazzoVuoto()) {
-                if (vincente.equals(ai)) {
-                    ai.riceviCarta(partita.getMazzo().pesca());
-                    umano.riceviCarta(partita.getMazzo().pesca());
-                }else if (vincente.equals(umano)) {
-                    umano.riceviCarta(partita.getMazzo().pesca());
-                    ai.riceviCarta(partita.getMazzo().pesca());
+        // 2) dopo un attimo, gioca l'AI e mostri entrambe
+        after(180, () -> {
+            Carta cartaAI = ai.scegliCarta(partita);
+            giocaCarta(ai, cartaAI, partita);
+            showTerreno(partita);
+
+            // 3) dopo un altro attimo, risolvi la mano (punti, pesca, clear)
+            after(260, () -> {
+                Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
+                double puntiMano = partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum();
+                vincente.aggiungiPunti(puntiMano);
+
+                if (!partita.isMazzoVuoto()) {
+                    if (vincente.equals(umano)) {
+                        umano.riceviCarta(partita.getMazzo().pesca());
+                        ai.riceviCarta(partita.getMazzo().pesca());
+                    } else {
+                        ai.riceviCarta(partita.getMazzo().pesca());
+                        umano.riceviCarta(partita.getMazzo().pesca());
+                    }
                 }
-            }
 
-            partita.clearTerreno();
-            gameView.setTerreno(partita.getTerreno());
-            gameView.refreshTerreno(partita.getTerreno());
-            gameView.refreshHands(umano.getMano(), ai.getMano());
-            
-            // Verifica fine partita
-            if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
-                finePartita(partita);
-                return;
-            }
+                partita.clearTerreno();
+                showTerreno(partita);
+                gameView.refreshHands(umano.getMano(), ai.getMano());
 
-            // Avvia il turno successivo
-            if (vincente instanceof GiocatoreUmano) {
-                giocaTurnoUmano(partita, umano, ai); // riparte umano
-            } else {
-                giocaTurnoAI(partita, umano, ai);    // parte AI
-            }
+                if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
+                    finePartita(partita);
+                    return;
+                }
+
+                if (vincente instanceof GiocatoreUmano) giocaTurnoUmano(partita, umano, ai);
+                else                                     giocaTurnoAI(partita, umano, ai);
+            });
         });
-    }
+    });
+}
+
+
+
+    /**
+     * Gestisce un turno in cui l'AI inizia. Il resto della logica è identica
+     * a {@link #giocaTurnoUmano}, ma l'ordine delle giocate è invertito.
+     */
+    // GameEngine.java
+
     private void giocaTurnoAI(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
+        Carta cartaAI = ai.scegliCarta(partita);
+        giocaCarta(ai, cartaAI, partita);
+        showTerreno(partita);
+
+        // poi attendi l'umano
         umano.setOnCartaSceltaListener(carta -> {
-            giocaCarta(ai, ai.scegliCarta(partita), partita);
+            if (carta == null) return; // safety
+
+            // 1) gioca l'umano e mostra entrambe
             giocaCarta(umano, carta, partita);
+            showTerreno(partita);
 
-            Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
-            vincente.aggiungiPunti(partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum());
+            // 2) dopo un attimo, risolvi
+            after(260, () -> {
+                Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
+                double puntiMano = partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum();
+                vincente.aggiungiPunti(puntiMano);
 
-            if (!partita.isMazzoVuoto()) {
-                umano.riceviCarta(partita.getMazzo().pesca());
-                ai.riceviCarta(partita.getMazzo().pesca());
-            }
+                if (!partita.isMazzoVuoto()) {
+                    if (vincente.equals(umano)) {
+                        umano.riceviCarta(partita.getMazzo().pesca());
+                        ai.riceviCarta(partita.getMazzo().pesca());
+                    } else {
+                        ai.riceviCarta(partita.getMazzo().pesca());
+                        umano.riceviCarta(partita.getMazzo().pesca());
+                    }
+                }
 
-            partita.clearTerreno();
-            gameView.setTerreno(partita.getTerreno());
-            gameView.refreshHands(umano.getMano(), ai.getMano());
-            
-            // Verifica fine partita
-            if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
-                finePartita(partita);
-                return;
-            }
+                partita.clearTerreno();
+                showTerreno(partita);
+                gameView.refreshHands(umano.getMano(), ai.getMano());
 
-            // Avvia il turno successivo
-            if (vincente instanceof GiocatoreUmano) {
-                giocaTurnoUmano(partita, umano, ai); // riparte umano
-            } else {
-                giocaTurnoAI(partita, umano, ai);    // parte AI
-            }
+                if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
+                    finePartita(partita);
+                    return;
+                }
+
+                if (vincente instanceof GiocatoreUmano) giocaTurnoUmano(partita, umano, ai);
+                else                                     giocaTurnoAI(partita, umano, ai);
+            });
         });
     }
 
+
+
+    /**
+     * Mostra un dialogo di fine partita indicando il vincitore e torna al menu.
+     */
     private void finePartita(Partita1v1 p) {
         String vincitore = p.vincitore1v1();
         JOptionPane.showMessageDialog(
@@ -185,24 +246,28 @@ public class GameEngine implements Observer {
         visualizzaMenu();
     }
 
-
-    /** Inizia una nuova partita 2v2 */
+    /**
+     * Inizia una nuova partita 2v2 (non implementato). Viene mantenuto per
+     * compatibilità con l'interfaccia ma restituisce il vincitore in stampa.
+     */
     public String iniziaPartita2v2(Partita2v2 p) {
-        while(true){
+        while (true) {
             System.out.println("Tocca a te");
 
-            if(p.isFinita()) {
+            if (p.isFinita()) {
                 System.out.println("Il vincitore è: ");
                 return p.vincitore2v2();
             }
-
         }
     }
 
-    /** Crea il login (finestra principale) e mostra il menu dopo esser loggato*/
+    /**
+     * Crea il frame principale e visualizza il menu dopo il login. Imposta il comportamento
+     * della finestra alla chiusura.
+     */
     public void avviaUIPrincipale() {
         SwingUtilities.invokeLater(() -> {
-        	if (mainFrame != null) return;
+            if (mainFrame != null) return;
             mainFrame = new JFrame("JTressette");
             mainFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             mainFrame.setMinimumSize(new Dimension(400, 600));
@@ -218,72 +283,100 @@ public class GameEngine implements Observer {
                     if (scl == JOptionPane.YES_OPTION) System.exit(0);
                 }
             });
-            visualizzaMenu();                
+            visualizzaMenu();
         });
     }
 
+    /** Avvia la view di modifica profilo. */
     public void avviaModificaProfilo() {
         pv = new ProfiloView(this);
         pv.modificaProfilo(player);
         setScreen(pv);
     }
-    
-    
+
+    /** Visualizza il profilo dell'utente. */
     public void visualizzaProfilo() {
         pv = new ProfiloView(this);
         pv.mostraProfilo(player);
         setScreen(pv);
     }
 
+    /** Visualizza la classifica. */
     public void visualizzaStatistiche() {
-    	cv = new ClassificaView(this);
-    	cv.mostraClassifica(UserRepository.getClassifica()); 
-    	setScreen(cv);
+        cv = new ClassificaView(this);
+        cv.mostraClassifica(UserRepository.getClassifica());
+        setScreen(cv);
     }
-    
+
+    /** Visualizza il menu principale. */
     public void visualizzaMenu() {
-    	mpv = MenuPrincipaleView.getInstance(this);
-    	setScreen(mpv);
-    } 
-    
+        mpv = MenuPrincipaleView.getInstance(this);
+        setScreen(mpv);
+    }
+
     /* ===== UTILITIES ===== */
     private boolean isFixedSizedView(JPanel panel) {
         return !(panel instanceof MenuPrincipaleView);
     }
 
-    public void registerMainFrame(JFrame frame) { this.mainFrame = frame; }
+    public void registerMainFrame(JFrame frame) {
+        this.mainFrame = frame;
+    }
 
+    /**
+     * Cambia la schermata mostrata nel frame principale adattando le dimensioni
+     * in base al tipo di vista (fissa o menu).
+     */
     private void setScreen(JPanel panel) {
-	    boolean fixed = isFixedSizedView(panel);
+        boolean fixed = isFixedSizedView(panel);
 
-	    // Imposta le dimensioni preferite del pannello
-	    if (fixed) {
-	        panel.setPreferredSize(UIConstants.FIXED_VIEW_SIZE);
-	        mainFrame.setMinimumSize(UIConstants.FIXED_VIEW_SIZE);
-	        mainFrame.setResizable(false);                
-	    } else {
-	        panel.setPreferredSize(UIConstants.MENU_SIZE);
-	        mainFrame.setMinimumSize(UIConstants.MENU_SIZE);
-	        mainFrame.setResizable(false);                  
-	    }
-	
-	    mainFrame.setContentPane(panel);
-	    mainFrame.pack();                 // rispetta le preferred size impostate
-	    mainFrame.setLocationRelativeTo(null);
+        // Imposta le dimensioni preferite del pannello
+        if (fixed) {
+            panel.setPreferredSize(UIConstants.FIXED_VIEW_SIZE);
+            mainFrame.setMinimumSize(UIConstants.FIXED_VIEW_SIZE);
+            mainFrame.setResizable(false);
+        } else {
+            panel.setPreferredSize(UIConstants.MENU_SIZE);
+            mainFrame.setMinimumSize(UIConstants.MENU_SIZE);
+            mainFrame.setResizable(false);
+        }
+
+        mainFrame.setContentPane(panel);
+        mainFrame.pack();                 // rispetta le preferred size impostate
+        mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);       // nel caso sia la prima volta
     }
 
+    /**
+     * Ritorna alla schermata principale dopo un'azione, con un piccolo delay
+     * per evitare flickering.
+     */
+    // Avvia un'azione dopo un piccolo delay, eseguita sull'EDT
+    private void after(int ms, Runnable action) {
+        new javax.swing.Timer(ms, e -> {
+            ((javax.swing.Timer) e.getSource()).stop();
+            action.run();
+        }).start();
+    }
+
+    // Mostra lo stato attuale del terreno (usa già il tuo render della GameView)
+    private void showTerreno(Partita p) {
+        gameView.setTerreno(p.getTerreno());
+    }
+
+
+    /** Restituisce l'utente loggato. */
     public UtentePojo getPlayer() {
         return player;
     }
 
+    /** Restituisce il riferimento al GiocatoreUmano della partita corrente. */
     public GiocatoreUmano getGiocatoreUmano() {
-    // supponendo che in avviaNuovaPartita tu abbia già salvato il riferimento
-    return this.playerUmano;
+        return this.playerUmano;
     }
 
+    /** Restituisce il riferimento al GiocatoreAI della partita corrente. */
     public GiocatoreAI getGiocatoreAI() {
-        // supponendo che in avviaNuovaPartita tu abbia già salvato il riferimento
         return this.ai;
     }
 }
