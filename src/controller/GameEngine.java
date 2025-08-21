@@ -310,37 +310,36 @@ public class GameEngine implements Observer {
             if (carta == null) return;
 
             giocaCarta(umano, carta, partita);
+            gameView2v2.setTerreno(partita.getTerreno());
             showTerreno2v2(partita);
 
             // Dopo che l’umano ha giocato, gli altri giocano in sequenza
-            giocaSequenzaAvversari(partita, 1, umano, altri);
+            giocaSequenzaAvversari(partita, altri);
         });
     }
 
-    private void giocaSequenzaAvversari(Partita2v2 partita, int index, Giocatore primo, List<Giocatore> giocatori) {
-        if (index >= giocatori.size()) {
-            // Tutti hanno giocato → risolvi la mano
-            after(260, () -> risolviMano(partita, giocatori));
-            return;
-        }
+    private void giocaSequenzaAvversari(Partita2v2 partita, List<Giocatore> giocatori) {
 
-        Giocatore corrente = giocatori.get(index);
-        if (corrente instanceof GiocatoreAI) {
-            after(180, () -> {
+        for (int i = 1; i < giocatori.size(); i++) {
+            Giocatore corrente = giocatori.get(i);
+            if (corrente instanceof GiocatoreAI) {
                 Carta cartaAI = ((GiocatoreAI) corrente).scegliCarta(partita);
                 giocaCarta(corrente, cartaAI, partita);
+                gameView2v2.setTerreno(partita.getTerreno());
                 showTerreno2v2(partita);
-                giocaSequenzaAvversari(partita, index + 1, primo, giocatori);
-            });
-        } else if (corrente instanceof GiocatoreUmano) {
-            ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
-                if (carta == null) return;
-                giocaCarta(corrente, carta, partita);
-                showTerreno2v2(partita);
-                giocaSequenzaAvversari(partita, index + 1, primo, giocatori);
-            });
+
+            } else if (corrente instanceof GiocatoreUmano) {
+                ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
+                    if (carta == null) return;
+                    giocaCarta(corrente, carta, partita);
+                    gameView2v2.setTerreno(partita.getTerreno());
+                    showTerreno2v2(partita);
+                });
+            }
         }
+        risolviMano(partita, giocatori);
     }
+
 
     private void risolviMano(Partita2v2 partita, List<Giocatore> giocatori) {
         Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
@@ -386,31 +385,28 @@ public class GameEngine implements Observer {
     }
 
     private void giocaTurnoAI2v2(Partita2v2 partita, List<Giocatore> giocatori) {
-        Carta cartaAI = ((GiocatoreAI) ai).scegliCarta(partita);
-        giocaCarta(ai, cartaAI, partita);
+        GiocatoreAI aiCorrente = (GiocatoreAI) giocatori.get(0);
+        Carta cartaAI = aiCorrente.scegliCarta(partita);
+        giocaCarta(aiCorrente, cartaAI, partita);
         showTerreno2v2(partita);
 
         // Poi gli altri a giro
-        giocaSequenzaAvversari(partita, 1, ai, giocatori);
+        giocaSequenzaAvversari(partita, giocatori);
     }
 
     private List<Giocatore> giocatoriSenza(Giocatore vincente, List<Giocatore> giocatori) {
+
         List<Giocatore> result = new ArrayList<>();
-        int startIndex = giocatori.indexOf(vincente);
-        if (startIndex == -1) return new ArrayList<>(giocatori); // sicurezza
-
-        // Aggiungi tutti i giocatori a partire dal vincente fino alla fine
-        for (int i = startIndex; i < giocatori.size(); i++) {
-            result.add(giocatori.get(i));
+        int index = giocatori.indexOf(vincente);
+        for (int i = 0; i < giocatori.size(); i++) {
+            result.add(giocatori.get((index + i) % giocatori.size()));
         }
-
-        // Aggiungi quelli che stavano prima del vincente
-        for (int i = 0; i < startIndex; i++) {
-            result.add(giocatori.get(i));
+        for(Giocatore g : result){
+            System.out.println(g.getNome());
         }
-
         return result;
     }
+
 
 
 

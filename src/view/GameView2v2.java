@@ -212,16 +212,18 @@ public class GameView2v2 extends JPanel {
     }
 
     public void setTerreno(List<Carta> terreno) {
-        this.terreno = terreno != null ? terreno : new ArrayList<>();
+        this.terreno = terreno;
         render();
     }
 
     public void refreshTerreno(List<Carta> terreno) {
-        this.terreno = terreno != null ? terreno : new ArrayList<>();
+        this.terreno = terreno;
         render();
     }
 
-    public static void disposeInstance() { instance = null; }
+    public static void disposeInstance() { 
+        instance = null; 
+    }
 
     /* ============== Azioni ============== */
 
@@ -236,6 +238,17 @@ public class GameView2v2 extends JPanel {
             );
             return;
         }
+        // Notifica al motore di gioco
         gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
+
+        // Aggiorna il terreno
+        terreno.add(sel);
+
+        // Rimuovi la carta dalla mano dell'umano
+        playerSouthHand.remove(sel);
+
+        // Refresh grafico
+        render();
     }
+    
 }

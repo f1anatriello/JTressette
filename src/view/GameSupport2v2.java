@@ -120,6 +120,20 @@ public class GameSupport2v2 extends JPanel {
         UIAssets assets = UIAssets.getInstance();
         Image retro = assets.getImmagineRetroCarta();
 
+        // ===== Terreno =====
+        if (!terreno.isEmpty()) {
+            int totW = CARD_W + (terreno.size() - 1) * X_DELTA;
+            int x = Math.max(PAD_X, (getWidth() - totW) / 2);
+            int y = getHeight() / 2 - CARD_H / 2;
+            for (Carta c : terreno) {
+                Image img = assets.getImmagineCarta(c);
+                g2.drawImage(img, x, y, CARD_W, CARD_H, this);
+                g2.setColor(Color.BLACK);
+                g2.drawRect(x, y, CARD_W, CARD_H);
+                x += X_DELTA;
+            }
+        }
+
         // ===== Nord (in alto, retro) =====
         if (!manoNord.isEmpty()) {
             int totW = CARD_W + (manoNord.size() - 1) * X_DELTA;

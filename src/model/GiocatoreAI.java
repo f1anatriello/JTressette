@@ -30,12 +30,12 @@ public class GiocatoreAI extends Giocatore{
             boolean haSeme = getMano().stream().anyMatch(c -> c.getSeme().equals(semeDaSeguire));
             if (haSeme) {
                 if (carta.getSeme().equals(semeDaSeguire)) {
-                    System.out.println("Carta giocata: " + carta);
+                    System.out.println("Carta giocata: " + carta + " da " + getNome());
                     return carta;
                 }
             } else {
                 // Se non ha il seme, può giocare qualsiasi carta
-                System.out.println("Carta diverso seme: " + carta);
+                System.out.println("Carta diverso seme: " + carta + " da " + getNome());
                 return carta;
             }
         }

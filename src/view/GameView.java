@@ -58,25 +58,31 @@ import model.Carta;
         String player1Name, ImageIcon player1Avatar, 
         String player2Name, ImageIcon player2Avatar, 
         List<Carta> player1Hand, List<Carta> player2Hand) { 
-            
-            this.gameEngine = gameEngine; 
-            this.player1Name = player1Name; 
-            this.player1Avatar = player1Avatar; 
-            this.player2Name = player2Name; 
-            this.player2Avatar = player2Avatar; 
-            this.player1Hand = player1Hand; 
-            this.player2Hand = player2Hand; 
-            this.score1Label = new JLabel(); 
-            this.score2Label = new JLabel(); 
-            
-            leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8)); 
-            leftTop.setOpaque(false); 
-            leftTop.add(score2Label); 
-            setLayout(new BorderLayout()); 
-            setBackground(BACKGROUND_GREEN); 
-            buildUI(); 
-            render(); 
-        }
+        
+        this.gameEngine = gameEngine; 
+
+        this.player1Name = player1Name; 
+        this.player1Avatar = player1Avatar; 
+
+        this.player2Name = player2Name; 
+        this.player2Avatar = player2Avatar; 
+
+        this.player1Hand = player1Hand; 
+        this.player2Hand = player2Hand; 
+
+        this.score1Label = new JLabel(); 
+        this.score2Label = new JLabel(); 
+        
+        leftTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8)); 
+        leftTop.setOpaque(false); 
+        leftTop.add(score2Label); 
+
+        setLayout(new BorderLayout()); 
+        setBackground(BACKGROUND_GREEN); 
+        
+        buildUI(); 
+        render(); 
+    }
     // primo disegno  
     /* ================= UI ================= */ 
     private void buildUI() { 
