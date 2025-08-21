@@ -407,8 +407,9 @@ public class GameEngine implements Observer {
 
         List<Giocatore> result = new ArrayList<>();
         int index = giocatori.indexOf(vincente);
-        for (int i = 0; i < giocatori.size(); i++) {
-            result.add(giocatori.get((index + i) % giocatori.size()));
+        result.add(vincente);
+        for (int i = 0; i < 3; i++) {
+            result.add(giocatori.get((index + i + 1) % giocatori.size()));
         }
         for(Giocatore g : result){
             System.out.println(g.getNome());
