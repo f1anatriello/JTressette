@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Observer;
 import javax.swing.ImageIcon;
@@ -18,6 +19,7 @@ import model.*;
 import ui.UIConstants;
 import view.ClassificaView;
 import view.GameView;
+import view.GameView2v2;
 import view.MenuPrincipaleView;
 import view.ProfiloView;
 
@@ -34,8 +36,11 @@ public class GameEngine implements Observer {
     private ProfiloView pv;
     private UtentePojo player;
     private GiocatoreAI ai;
-    GiocatoreUmano playerUmano;
+    private GiocatoreUmano playerUmano;
+    private GiocatoreAI playerEst;
+    private GiocatoreAI playerOvest;
     private GameView gameView;
+    private GameView2v2 gameView2v2;
     private JFrame mainFrame;
 
     @Override
@@ -45,6 +50,9 @@ public class GameEngine implements Observer {
 
     private GameEngine(UtentePojo player) {
         this.player = player;
+        this.ai = new GiocatoreAI();
+        this.playerEst = new GiocatoreAI();
+        this.playerOvest = new GiocatoreAI();
     }
 
     public static GameEngine getInstance(UtentePojo player) {
@@ -63,7 +71,6 @@ public class GameEngine implements Observer {
         if (numPlayer == 2) {
             List<Giocatore> giocatori = new ArrayList<>();
             playerUmano = new GiocatoreUmano(this.player.getUsername());
-            ai = new GiocatoreAI();
             giocatori.add(playerUmano);
             giocatori.add(ai);
             Partita1v1 partita = new Partita1v1(giocatori);
@@ -71,10 +78,11 @@ public class GameEngine implements Observer {
             iniziaPartita1v1(partita);
         } else {
             List<Giocatore> giocatori = new ArrayList<>();
-            for (int i = 0; i < 3; i++) {
-                giocatori.add(new GiocatoreAI());
-            }
-            giocatori.add(new GiocatoreUmano(player.getUsername()));
+            playerUmano = new GiocatoreUmano(this.player.getUsername());
+            giocatori.add(playerUmano);
+            giocatori.add(ai);
+            giocatori.add(playerEst);
+            giocatori.add(playerOvest);
             Partita2v2 partita = new Partita2v2(giocatori);
             // chiamo il campo del 2v2
             partita.inizializzaPartita();
@@ -248,20 +256,154 @@ public class GameEngine implements Observer {
         visualizzaMenu();
     }
 
+    private void finePartita2v2(Partita2v2 p) {
+        String vincitore = p.vincitore2v2();
+        JOptionPane.showMessageDialog(
+            mainFrame,
+            "La partita è finita! Il vincitore è: " + vincitore,
+            "Partita Terminata",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+        visualizzaMenu();
+    }
+
     /**
      * Inizia una nuova partita 2v2 (non implementato). Viene mantenuto per
      * compatibilità con l'interfaccia ma restituisce il vincitore in stampa.
      */
-    public String iniziaPartita2v2(Partita2v2 p) {
-        while (true) {
-            System.out.println("Tocca a te");
+    public void iniziaPartita2v2(Partita2v2 p) {
+        gameView2v2 = GameView2v2.getInstance(
+            this,
+            // Giocatore Sud (umano principale)
+            player.getUsername(),
+            new ImageIcon(player.getAvatarPath()),
+            p.getGiocatori().get(0).getMano(),
+            // Giocatore Nord (compagno di squadra, può essere AI o altro umano)
+            p.getGiocatori().get(1).getNome(),
+            new ImageIcon("images/avatars/avatar5.png"),
+            p.getGiocatori().get(1).getMano(),
+            // Giocatore Est (avversario 1)
+            p.getGiocatori().get(2).getNome(),
+            new ImageIcon("images/avatars/avatar4.png"),
+            p.getGiocatori().get(2).getMano(),
+            // Giocatore Ovest (avversario 2)
+            p.getGiocatori().get(3).getNome(),
+            new ImageIcon("images/avatars/avatar3.png"),
+            p.getGiocatori().get(3).getMano()
+        );
 
-            if (p.isFinita()) {
-                System.out.println("Il vincitore è: ");
-                return p.vincitore2v2();
-            }
+        setScreen(gameView2v2);
+
+        // Cast a seconda di chi è umano/AI
+        GiocatoreUmano giocatoreSud  = (GiocatoreUmano) p.getGiocatori().get(0);
+        Giocatore aiNord               = p.getGiocatori().get(1); // può essere AI o umano
+        Giocatore aiEst               = p.getGiocatori().get(2);
+        Giocatore aiOvest             = p.getGiocatori().get(3);
+
+        // Avvia il primo turno: parte il giocatore Sud (umano)
+        giocaTurnoUmano2v2(p, giocatoreSud, aiNord, aiEst, aiOvest);
+    }
+
+    private void giocaTurnoUmano2v2(Partita2v2 partita, GiocatoreUmano umano, Giocatore... altri) {
+    umano.setOnCartaSceltaListener(carta -> {
+        if (carta == null) return;
+
+        giocaCarta(umano, carta, partita);
+        showTerreno(partita);
+
+        // Dopo che l’umano ha giocato, gli altri giocano in sequenza
+        giocaSequenzaAvversari(partita, 1, umano, altri);
+        });
+    }
+
+    private void giocaSequenzaAvversari(Partita2v2 partita, int index, Giocatore primo, Giocatore... giocatori) {
+        if (index >= giocatori.length + 1) {
+            // Tutti hanno giocato → risolvi la mano
+            after(260, () -> risolviMano(partita, giocatori));
+            return;
+        }
+
+        Giocatore corrente = giocatori[index - 1];
+        if (corrente instanceof GiocatoreAI) {
+            after(180, () -> {
+                Carta cartaAI = ((GiocatoreAI) corrente).scegliCarta(partita);
+                giocaCarta(corrente, cartaAI, partita);
+                showTerreno(partita);
+                giocaSequenzaAvversari(partita, index + 1, primo, giocatori);
+            });
+        } else if (corrente instanceof GiocatoreUmano) {
+            ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
+                if (carta == null) return;
+                giocaCarta(corrente, carta, partita);
+                showTerreno(partita);
+                giocaSequenzaAvversari(partita, index + 1, primo, giocatori);
+            });
         }
     }
+
+    private void risolviMano(Partita2v2 partita, Giocatore... giocatori) {
+        Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
+        double puntiMano = partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum();
+        vincente.aggiungiPunti(puntiMano);
+
+        // pesca carte
+        if (!partita.isMazzoVuoto()) {
+            for (int i = 0; i < giocatori.length; i++) {
+                Giocatore g = giocatori[(i + indexOf(vincente, giocatori)) % giocatori.length];
+                g.riceviCarta(partita.getMazzo().pesca());
+            }
+        }
+
+        partita.clearTerreno();
+        showTerreno(partita);
+        gameView2v2.refreshHands(
+            giocatori[0].getMano(),
+            giocatori[1].getMano(),
+            giocatori[2].getMano(),
+            giocatori[3].getMano()
+        );
+
+        // Fine partita?
+        boolean finita = partita.isMazzoVuoto() && 
+                        giocatori[0].getMano().isEmpty() &&
+                        giocatori[1].getMano().isEmpty() &&
+                        giocatori[2].getMano().isEmpty() &&
+                        giocatori[3].getMano().isEmpty();
+        if (finita) {
+            finePartita2v2(partita);
+            return;
+        }
+
+        // Nuovo turno: parte il vincente
+        if (vincente instanceof GiocatoreUmano) {
+            giocaTurnoUmano2v2(partita, (GiocatoreUmano) vincente, giocatoriSenza(vincente, giocatori));
+        } else {
+            giocaTurnoAI2v2(partita, vincente, giocatoriSenza(vincente, giocatori));
+        }
+    }
+
+    private void giocaTurnoAI2v2(Partita2v2 partita, Giocatore ai, Giocatore... altri) {
+        Carta cartaAI = ((GiocatoreAI) ai).scegliCarta(partita);
+        giocaCarta(ai, cartaAI, partita);
+        showTerreno(partita);
+
+        // Poi gli altri a giro
+        giocaSequenzaAvversari(partita, 1, ai, altri);
+    }
+
+    private int indexOf(Giocatore g, Giocatore... giocatori) {
+        for (int i = 0; i < giocatori.length; i++) {
+            if (giocatori[i].equals(g)) return i;
+        }
+        return -1; // non trovato
+    }
+
+    private Giocatore[] giocatoriSenza(Giocatore escluso, Giocatore... giocatori) {
+        return Arrays.stream(giocatori)
+                    .filter(g -> !g.equals(escluso))
+                    .toArray(Giocatore[]::new);
+    }
+
 
     /**
      * Crea il frame principale e visualizza il menu dopo il login. Imposta il comportamento
@@ -380,5 +522,13 @@ public class GameEngine implements Observer {
     /** Restituisce il riferimento al GiocatoreAI della partita corrente. */
     public GiocatoreAI getGiocatoreAI() {
         return this.ai;
+    }
+
+    public GiocatoreAI getGiocatoreEst() {
+        return this.playerEst;
+    }
+
+    public GiocatoreAI getGiocatoreOvest() {
+        return this.playerOvest;
     }
 }
