@@ -77,6 +77,8 @@ public class GameEngine implements Observer {
             giocatori.add(new GiocatoreUmano(player.getUsername()));
             Partita2v2 partita = new Partita2v2(giocatori);
             // chiamo il campo del 2v2
+            partita.inizializzaPartita();
+            iniziaPartita2v2(partita);
         }
     }
 
