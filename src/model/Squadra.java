@@ -7,8 +7,9 @@ public class Squadra {
     private List<Giocatore> membri = new ArrayList<>(2);
     private int punteggioTotale;
 
-    public Squadra(String nome) {
+    public Squadra(String nome, Giocatore g1, Giocatore g2) {
         this.nome = nome;
+        aggiungiGiocatore(nome, g1, g2);
     }
 
     public void aggiungiGiocatore(String nome, Giocatore g1, Giocatore g2) {
