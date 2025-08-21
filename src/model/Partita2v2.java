@@ -64,7 +64,7 @@ public class Partita2v2 extends Partita {
             Carta cartaAttuale = terr.get(i);
 
             if (cartaAttuale.getSeme() == semeRegnante) {
-                if (cartaAttuale.getValore().getPunti() > cartaVincente.getValore().getPunti()) {
+                if (cartaAttuale.getValore().getOrdinePresa() > cartaVincente.getValore().getOrdinePresa()) {
                     cartaVincente = cartaAttuale;
                     vincitore = giocatori.get(i);
                 }

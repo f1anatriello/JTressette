@@ -34,35 +34,33 @@ public class Partita1v1 extends Partita {
 
 	@Override
 	public Giocatore manoVintaDa(List<Carta> terr) {
-    if (terr == null || terr.size() < 2) {
-        throw new IllegalArgumentException("Terreno non valido: devono esserci almeno 2 carte");
-    }
+        if (terr == null || terr.size() < 2) {
+            throw new IllegalArgumentException("Terreno non valido: devono esserci almeno 2 carte");
+        }
 
-    // La prima carta appartiene al giocatore che ha iniziato
-    Carta cartaPrima = terr.get(0);
-    Carta cartaSeconda = terr.get(1);
+        // La prima carta appartiene al giocatore che ha iniziato
+        Carta cartaPrima = terr.get(0);
+        Carta cartaSeconda = terr.get(1);
 
-    // Recupero i due giocatori
-    Giocatore primoGiocatore = giocatori.get(0);  // assumo che l'ordine sia Umano = 0, AI = 1
-    Giocatore secondoGiocatore = giocatori.get(1);
+        // Recupero i due giocatori
+        Giocatore primoGiocatore = giocatori.get(0);  // assumo che l'ordine sia Umano = 0, AI = 1
+        Giocatore secondoGiocatore = giocatori.get(1);
 
-    Seme semeRegnante = cartaPrima.getSeme();
-    Giocatore vincitore;
+        Seme semeRegnante = cartaPrima.getSeme();
+        Giocatore vincitore;
 
-    if (cartaSeconda.getSeme() != semeRegnante) {
-        // Vince automaticamente chi ha giocato la prima carta
-        vincitore = primoGiocatore;
-    } else {
-        // Entrambi hanno lo stesso seme → vince chi ha il valore più alto
-        if (cartaPrima.getValore().getPunti() >= cartaSeconda.getValore().getPunti()) {
+        if (cartaSeconda.getSeme() != semeRegnante) {
+            // Vince automaticamente chi ha giocato la prima carta
             vincitore = primoGiocatore;
         } else {
-            vincitore = secondoGiocatore;
+            // Entrambi hanno lo stesso seme → vince chi ha il valore più alto
+            if (cartaPrima.getValore().getOrdinePresa() >= cartaSeconda.getValore().getOrdinePresa()) {
+                vincitore = primoGiocatore;
+            } else {
+                vincitore = secondoGiocatore;
+            }
         }
+        return vincitore;
     }
-
-    return vincitore;
-}
-
 }
     

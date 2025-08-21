@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Observer;
 import javax.swing.ImageIcon;
@@ -180,8 +181,12 @@ public class GameEngine implements Observer {
                     return;
                 }
 
-                if (vincente instanceof GiocatoreUmano) giocaTurnoUmano(partita, umano, ai);
-                else                                     giocaTurnoAI(partita, umano, ai);
+                if (vincente instanceof GiocatoreUmano) {
+                    giocaTurnoUmano(partita, umano, ai);
+                } else {
+                    Collections.reverse(partita.getGiocatori());
+                    giocaTurnoAI(partita, umano, ai);
+                }
             });
         });
     });
@@ -233,8 +238,12 @@ public class GameEngine implements Observer {
                     return;
                 }
 
-                if (vincente instanceof GiocatoreUmano) giocaTurnoUmano(partita, umano, ai);
-                else                                     giocaTurnoAI(partita, umano, ai);
+                if (vincente instanceof GiocatoreUmano) {
+                    Collections.reverse(partita.getGiocatori());
+                    giocaTurnoUmano(partita, umano, ai);
+                } else {
+                    giocaTurnoAI(partita, umano, ai);
+                }
             });
         });
     }
