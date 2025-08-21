@@ -128,59 +128,59 @@ import model.Carta;
                 gameSupp.setTerreno(new ArrayList<>()); 
         }
 
-        private ImageIcon scale(ImageIcon icon, int w, int h) { 
-            if (icon == null || icon.getImage() == null) return icon; 
-            Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH); 
-            return new ImageIcon(scaled); 
+    private ImageIcon scale(ImageIcon icon, int w, int h) { 
+        if (icon == null || icon.getImage() == null) return icon; 
+        Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH); 
+        return new ImageIcon(scaled); 
+    } 
+    /* ============== RENDER/UPDATE ============== */ 
+    /** * Aggiorna le mani e il terreno sul GameSupport. Richiama sempre 
+     * * {@link GameSupport#refresh()} affinché il layout venga ricalcolato e * ridisegnato. 
+     * */ 
+    public void render() { 
+        gameSupp.setHands(player1Hand, player2Hand); 
+        gameSupp.setTerreno(terreno); 
+        gameSupp.refresh(); // aggiorna i punteggi 
+        bottomHUD.remove(score1Label); 
+        leftTop.remove(score2Label); 
+        score1Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti())); 
+        score2Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti())); 
+        bottomHUD.add(score1Label); 
+        leftTop.add(score2Label); // dopo il refresh assicuriamo una selezione valida 
+        SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone()); 
+    } 
+    /** * Aggiorna le mani del giocatore e dell'avversario e ridisegna. */ 
+    public void refreshHands(List<Carta> newP1, List<Carta> newP2) { 
+        this.player1Hand = newP1; 
+        this.player2Hand = newP2; 
+        render(); 
+    } 
+    /** * Imposta la lista di carte sul terreno e ridisegna. Se il terreno è null, * verrà considerato vuoto. */ 
+    public void setTerreno(List<Carta> terreno) { 
+        this.terreno = terreno; 
+        render(); 
+    } 
+    /** * Aggiornamento del terreno (mantiene compatibilità con il codice esistente). * Si limita a impostare la nuova lista e ridisegnare. */ 
+    public void refreshTerreno(List<Carta> terreno) { 
+        this.terreno = terreno; 
+        render(); 
+    } 
+    public static void disposeInstance() { 
+        instance = null; 
+    } 
+    /* ============== Azioni ============== */ 
+    private void giocaCartaSelezionata() { 
+        Carta sel = gameSupp.getSelected(); 
+        if (sel == null) { 
+            JOptionPane.showMessageDialog( 
+                this, 
+                "Seleziona una carta prima di giocare.", 
+                "Nessuna carta selezionata", 
+                JOptionPane.WARNING_MESSAGE 
+            ); 
+            return; 
         } 
-        /* ============== RENDER/UPDATE ============== */ 
-        /** * Aggiorna le mani e il terreno sul GameSupport. Richiama sempre 
-         * * {@link GameSupport#refresh()} affinché il layout venga ricalcolato e * ridisegnato. 
-         * */ 
-        public void render() { 
-            gameSupp.setHands(player1Hand, player2Hand); 
-            gameSupp.setTerreno(terreno); 
-            gameSupp.refresh(); // aggiorna i punteggi 
-            bottomHUD.remove(score1Label); 
-            leftTop.remove(score2Label); 
-            score1Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti())); 
-            score2Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti())); 
-            bottomHUD.add(score1Label); 
-            leftTop.add(score2Label); // dopo il refresh assicuriamo una selezione valida 
-            SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone()); 
-        } 
-        /** * Aggiorna le mani del giocatore e dell'avversario e ridisegna. */ 
-        public void refreshHands(List<Carta> newP1, List<Carta> newP2) { 
-            this.player1Hand = newP1; 
-            this.player2Hand = newP2; 
-            render(); 
-        } 
-        /** * Imposta la lista di carte sul terreno e ridisegna. Se il terreno è null, * verrà considerato vuoto. */ 
-        public void setTerreno(List<Carta> terreno) { 
-            this.terreno = terreno; 
-            render(); 
-        } 
-        /** * Aggiornamento del terreno (mantiene compatibilità con il codice esistente). * Si limita a impostare la nuova lista e ridisegnare. */ 
-        public void refreshTerreno(List<Carta> terreno) { 
-            this.terreno = terreno; 
-            render(); 
-        } 
-        public static void disposeInstance() { 
-            instance = null; 
-        } 
-        /* ============== Azioni ============== */ 
-        private void giocaCartaSelezionata() { 
-            Carta sel = gameSupp.getSelected(); 
-            if (sel == null) { 
-                JOptionPane.showMessageDialog( 
-                    this, 
-                    "Seleziona una carta prima di giocare.", 
-                    "Nessuna carta selezionata", 
-                    JOptionPane.WARNING_MESSAGE 
-                ); 
-                return; 
-            } 
-            // notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta 
-            gameEngine.getGiocatoreUmano().notificaCartaScelta(sel); 
-        } 
-    }
+        // notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta 
+        gameEngine.getGiocatoreUmano().notificaCartaScelta(sel); 
+    } 
+}

@@ -9,7 +9,7 @@ public class GiocatoreAI extends Giocatore{
     private static String generaNomeCasuale() {
         String[] nomi = { "Bob", "Matteo", "Alice"};
         int i = (int) (Math.random() * nomi.length);
-        return nomi[i] + "_" + (100 + (int)(Math.random() * 900));
+        return nomi[i] + (100 + (int)(Math.random() * 900));
     }
 
     public Carta scegliCarta(Partita p) {

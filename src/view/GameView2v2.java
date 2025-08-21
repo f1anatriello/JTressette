@@ -134,30 +134,51 @@ public class GameView2v2 extends JPanel {
         root.add(bottomHUD, BorderLayout.SOUTH);
 
         // --- LEFT HUD (OVEST) ---
-        leftHUD = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
+        leftHUD = new JPanel();
         leftHUD.setOpaque(false);
+        leftHUD.setLayout(new BoxLayout(leftHUD, BoxLayout.Y_AXIS));
+        leftHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0)); // <-- abbassa di 150px
+
         JLabel avatarW = new JLabel(scale(playerWestAvatar, 50, 50));
+        avatarW.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameW = new JLabel(playerWestName);
+        nameW.setAlignmentX(Component.CENTER_ALIGNMENT);
         scoreWestLabel = new JLabel(" - Punti: 0");
+        scoreWestLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         leftHUD.add(avatarW);
+        leftHUD.add(Box.createVerticalStrut(8));
         leftHUD.add(nameW);
+        leftHUD.add(Box.createVerticalStrut(8));
         leftHUD.add(scoreWestLabel);
+
         root.add(leftHUD, BorderLayout.WEST);
 
+
         // --- RIGHT HUD (EST) ---
-        rightHUD = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
+        rightHUD = new JPanel();
+        rightHUD.setLayout(new BoxLayout(rightHUD, BoxLayout.Y_AXIS));
         rightHUD.setOpaque(false);
+        rightHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0)); // <-- abbassa di 150px
+
         JLabel avatarE = new JLabel(scale(playerEastAvatar, 50, 50));
+        avatarE.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameE = new JLabel(playerEastName);
+        nameE.setAlignmentX(Component.CENTER_ALIGNMENT);
         scoreEastLabel = new JLabel(" - Punti: 0");
+        scoreEastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
         rightHUD.add(avatarE);
+        rightHUD.add(Box.createVerticalStrut(8)); // Spacing
         rightHUD.add(nameE);
+        rightHUD.add(Box.createVerticalStrut(8)); // Spacing
         rightHUD.add(scoreEastLabel);
         root.add(rightHUD, BorderLayout.EAST);
 
         // --- CENTER: GameSupport ---
         gameSupp = new GameSupport2v2(playerSouthHand, playerNorthHand, playerEastHand, playerWestHand);
         root.add(gameSupp, BorderLayout.CENTER);
+        gameSupp.setTerreno(terreno);
     }
 
     private ImageIcon scale(ImageIcon icon, int w, int h) {
