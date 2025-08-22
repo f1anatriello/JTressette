@@ -319,7 +319,7 @@ public class GameEngine implements Observer {
             if (carta == null) return;
 
             giocaCarta(umano, carta, partita);
-
+            
             // Dopo che l’umano ha giocato, fanno le mosse gli altri (dal secondo in poi)
             giocaSequenzaRec(partita, ordineTurno, 1);
         });
@@ -350,7 +350,7 @@ public class GameEngine implements Observer {
             ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
                 if (carta == null) return;
                 giocaCarta(corrente, carta, partita);
-                showTerreno2v2(partita);
+                
                 giocaSequenzaRec(partita, giocatori, index + 1);
             });
         }
@@ -421,7 +421,7 @@ public class GameEngine implements Observer {
         showTerreno2v2(partita);
 
         // Poi gli altri a giro
-        giocaSequenzaAvversari(partita, giocatori);
+        giocaSequenzaRec(partita, giocatori, 1);
     }
 
     private List<Giocatore> giocatoriSenza(Giocatore vincente, List<Giocatore> giocatori) {
