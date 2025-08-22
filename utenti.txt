@@ -1,2 +1,2 @@
-Lore;images/avatars/avatar3.png;5;1;4
+Lore;images/avatars/avatar2.png;5;1;4
 lll;/images/avatars/avatar1.png;4;2;2

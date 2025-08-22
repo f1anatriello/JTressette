@@ -128,6 +128,7 @@ public class GameEngine implements Observer {
 
         playerUmano = (GiocatoreUmano) p.getGiocatori().get(0);
         ai = (GiocatoreAI) p.getGiocatori().get(1);
+        setOrder(p, playerUmano, ai); // parte l'umano per la prima mano
 
         // Avvia il primo turno: parte l’umano
         giocaTurnoUmano(p, playerUmano, ai);
@@ -143,54 +144,54 @@ public class GameEngine implements Observer {
     // GameEngine.java
 
     private void giocaTurnoUmano(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
-    umano.setOnCartaSceltaListener(carta -> {
-        if (carta == null) return;
+        setOrder(partita, umano, ai);
+        umano.setOnCartaSceltaListener(carta -> {
+            if (carta == null) return;
 
-        // 1) l'umano gioca e mostri SUBITO la 1ª carta sul terreno
-        giocaCarta(umano, carta, partita);
-        showTerreno(partita);
-
-        // 2) dopo un attimo, gioca l'AI e mostri entrambe
-        after(180, () -> {
-            Carta cartaAI = ai.scegliCarta(partita);
-            giocaCarta(ai, cartaAI, partita);
+            // 1) l'umano gioca e mostri SUBITO la 1ª carta sul terreno
+            giocaCarta(umano, carta, partita);
             showTerreno(partita);
 
-            // 3) dopo un altro attimo, risolvi la mano (punti, pesca, clear)
-            after(260, () -> {
-                Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
-                double puntiMano = partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum();
-                vincente.aggiungiPunti(puntiMano);
-
-                if (!partita.isMazzoVuoto()) {
-                    if (vincente.equals(umano)) {
-                        umano.riceviCarta(partita.getMazzo().pesca());
-                        ai.riceviCarta(partita.getMazzo().pesca());
-                    } else {
-                        ai.riceviCarta(partita.getMazzo().pesca());
-                        umano.riceviCarta(partita.getMazzo().pesca());
-                    }
-                }
-
-                partita.clearTerreno();
+            // 2) dopo un attimo, gioca l'AI e mostri entrambe
+            after(180, () -> {
+                Carta cartaAI = ai.scegliCarta(partita);
+                giocaCarta(ai, cartaAI, partita);
                 showTerreno(partita);
-                gameView.refreshHands(umano.getMano(), ai.getMano());
 
-                if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
-                    finePartita(partita);
-                    return;
-                }
+                // 3) dopo un altro attimo, risolvi la mano (punti, pesca, clear)
+                after(260, () -> {
+                    Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
+                    double puntiMano = partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum();
+                    vincente.aggiungiPunti(puntiMano);
 
-                if (vincente instanceof GiocatoreUmano) {
-                    giocaTurnoUmano(partita, umano, ai);
-                } else {
-                    Collections.reverse(partita.getGiocatori());
-                    giocaTurnoAI(partita, umano, ai);
-                }
+                    if (!partita.isMazzoVuoto()) {
+                        if (vincente.equals(umano)) {
+                            umano.riceviCarta(partita.getMazzo().pesca());
+                            ai.riceviCarta(partita.getMazzo().pesca());
+                        } else {
+                            ai.riceviCarta(partita.getMazzo().pesca());
+                            umano.riceviCarta(partita.getMazzo().pesca());
+                        }
+                    }
+
+                    partita.clearTerreno();
+                    showTerreno(partita);
+                    gameView.refreshHands(umano.getMano(), ai.getMano());
+
+                    if (partita.isMazzoVuoto() && umano.getMano().isEmpty() && ai.getMano().isEmpty()) {
+                        finePartita(partita);
+                        return;
+                    }
+
+                    if (vincente instanceof GiocatoreUmano) {
+                        giocaTurnoUmano(partita, umano, ai);
+                    } else {
+                        giocaTurnoAI(partita, umano, ai);
+                    }
+                });
             });
         });
-    });
-}
+    }
 
 
 
@@ -201,6 +202,7 @@ public class GameEngine implements Observer {
     // GameEngine.java
 
     private void giocaTurnoAI(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
+        setOrder(partita, ai, umano);
         Carta cartaAI = ai.scegliCarta(partita);
         giocaCarta(ai, cartaAI, partita);
         showTerreno(partita);
@@ -239,7 +241,6 @@ public class GameEngine implements Observer {
                 }
 
                 if (vincente instanceof GiocatoreUmano) {
-                    Collections.reverse(partita.getGiocatori());
                     giocaTurnoUmano(partita, umano, ai);
                 } else {
                     giocaTurnoAI(partita, umano, ai);
@@ -323,11 +324,6 @@ public class GameEngine implements Observer {
             // Dopo che l’umano ha giocato, fanno le mosse gli altri (dal secondo in poi)
             giocaSequenzaRec(partita, ordineTurno, 1);
         });
-    }
-
-
-    private void giocaSequenzaAvversari(Partita2v2 partita, List<Giocatore> giocatori) {
-        giocaSequenzaRec(partita, giocatori, 1); // parte dal secondo (il primo è l'umano)
     }
 
     private void giocaSequenzaRec(Partita2v2 partita, List<Giocatore> giocatori, int index) {
@@ -502,6 +498,22 @@ public class GameEngine implements Observer {
     public void registerMainFrame(JFrame frame) {
         this.mainFrame = frame;
     }
+
+
+    /**
+     * Imposta l'ordine dei giocatori in una partita (al momento solo 1v1) in modo che
+     * il giocatore "first" sia il primo a giocare e "second" il secondo
+     * @param p
+     * @param first
+     * @param second
+     */
+    private void setOrder(Partita p, Giocatore first, Giocatore second) {
+    List<Giocatore> g = p.getGiocatori();
+    if (g.size() == 2 && (g.get(0) != first || g.get(1) != second)) {
+        g.set(0, first);
+        g.set(1, second);
+    }
+}
 
     /**
      * Cambia la schermata mostrata nel frame principale adattando le dimensioni
