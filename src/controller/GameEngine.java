@@ -262,6 +262,8 @@ public class GameEngine implements Observer {
             "Partita Terminata",
             JOptionPane.INFORMATION_MESSAGE
         );
+        GameView.disposeInstance();
+
         visualizzaMenu();
     }
 
