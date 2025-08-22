@@ -313,85 +313,106 @@ public class GameEngine implements Observer {
         giocaTurnoUmano2v2(p, g);
     }
 
-    private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> altri) {
-        GiocatoreUmano umano = (GiocatoreUmano) partita.getGiocatori().get(0);
+    private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> ordineTurno) {
+        GiocatoreUmano umano = (GiocatoreUmano) ordineTurno.get(0); // il primo è sempre l’umano di turno
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
 
             giocaCarta(umano, carta, partita);
-            gameView2v2.setTerreno(partita.getTerreno());
-            showTerreno2v2(partita);
 
-            // Dopo che l’umano ha giocato, gli altri giocano in sequenza
-            giocaSequenzaAvversari(partita, altri);
+            // Dopo che l’umano ha giocato, fanno le mosse gli altri (dal secondo in poi)
+            giocaSequenzaRec(partita, ordineTurno, 1);
         });
     }
 
+
     private void giocaSequenzaAvversari(Partita2v2 partita, List<Giocatore> giocatori) {
-
-        for (int i = 1; i < giocatori.size(); i++) {
-            Giocatore corrente = giocatori.get(i);
-            if (corrente instanceof GiocatoreAI) {
-                Carta cartaAI = ((GiocatoreAI) corrente).scegliCarta(partita);
-                giocaCarta(corrente, cartaAI, partita);
-                gameView2v2.setTerreno(partita.getTerreno());
-                showTerreno2v2(partita);
-
-            } else if (corrente instanceof GiocatoreUmano) {
-                ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
-                    if (carta == null) return;
-                    giocaCarta(corrente, carta, partita);
-                    gameView2v2.setTerreno(partita.getTerreno());
-                    showTerreno2v2(partita);
-                });
-            }
-        }
-        risolviMano(partita, giocatori);
+        giocaSequenzaRec(partita, giocatori, 1); // parte dal secondo (il primo è l'umano)
     }
 
-
-    private void risolviMano(Partita2v2 partita, List<Giocatore> giocatori) {
-        Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
-        double puntiMano = partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum();
-        vincente.aggiungiPunti(puntiMano);
-
-        // pesca carte
-        if (!partita.isMazzoVuoto()) {
-            for (int i = 0; i < giocatori.size(); i++) {
-                Giocatore g = giocatori.get((i + giocatori.indexOf(vincente)) % giocatori.size());
-                g.riceviCarta(partita.getMazzo().pesca());
-            }
-        }
-
-        partita.clearTerreno();
-        showTerreno2v2(partita);
-        gameView2v2.refreshHands(
-            giocatori.get(0).getMano(),
-            giocatori.get(1).getMano(),
-            giocatori.get(2).getMano(),
-            giocatori.get(3).getMano()
-        );
-
-        // Fine partita?
-        boolean finita = partita.isMazzoVuoto() && 
-                        giocatori.get(0).getMano().isEmpty() &&
-                        giocatori.get(1).getMano().isEmpty() &&
-                        giocatori.get(2).getMano().isEmpty() &&
-                        giocatori.get(3).getMano().isEmpty();
-        if (finita) {
-            finePartita2v2(partita);
+    private void giocaSequenzaRec(Partita2v2 partita, List<Giocatore> giocatori, int index) {
+        if (index >= giocatori.size()) {
+            after(400, () -> risolviMano(partita, giocatori));
             return;
         }
 
-        // Nuovo turno: parte il vincente
-        if (vincente instanceof GiocatoreUmano) {
-            List<Giocatore> gioc = giocatoriSenza(vincente, giocatori);
-            giocaTurnoUmano2v2(partita, gioc);
-        } else {
-            List<Giocatore> gioc = giocatoriSenza(vincente, giocatori);
-            giocaTurnoAI2v2(partita, gioc);
+        Giocatore corrente = giocatori.get(index);
+
+        if (corrente instanceof GiocatoreAI) {
+            after(400, () -> {
+                Carta cartaAI = ((GiocatoreAI) corrente).scegliCarta(partita);
+                giocaCarta(corrente, cartaAI, partita);
+                showTerreno2v2(partita);
+                giocaSequenzaRec(partita, giocatori, index + 1);
+            });
+
+        } else if (corrente instanceof GiocatoreUmano) {
+            ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
+                if (carta == null) return;
+                giocaCarta(corrente, carta, partita);
+                showTerreno2v2(partita);
+                giocaSequenzaRec(partita, giocatori, index + 1);
+            });
         }
     }
+
+
+
+
+    private void risolviMano(Partita2v2 partita, List<Giocatore> giocatori) {
+        // Lascia visibili le carte sul terreno per un po'
+        after(400, () -> {
+            Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
+            double puntiMano = partita.getTerreno().stream()
+                    .mapToDouble(Carta::getPunti)
+                    .sum();
+            vincente.aggiungiPunti(puntiMano);
+
+            partita.getTerreno().clear();
+
+            // pesca carte
+            if (!partita.isMazzoVuoto()) {
+                for (int i = 0; i < giocatori.size(); i++) {
+                    Giocatore g = giocatori.get((i + giocatori.indexOf(vincente)) % giocatori.size());
+                    g.riceviCarta(partita.getMazzo().pesca());
+                }
+            }
+
+            // aggiorna le mani dei 4 giocatori
+            gameView2v2.refreshHands(
+                giocatori.get(0).getMano(),
+                giocatori.get(1).getMano(),
+                giocatori.get(2).getMano(),
+                giocatori.get(3).getMano()
+            );
+
+            // Dopo un altro attimo, pulisci il terreno e avvia il nuovo turno
+            after(400, () -> {
+                partita.clearTerreno();
+                showTerreno2v2(partita);
+
+                // Fine partita?
+                boolean finita = partita.isMazzoVuoto() && 
+                                giocatori.get(0).getMano().isEmpty() &&
+                                giocatori.get(1).getMano().isEmpty() &&
+                                giocatori.get(2).getMano().isEmpty() &&
+                                giocatori.get(3).getMano().isEmpty();
+                if (finita) {
+                    finePartita2v2(partita);
+                    return;
+                }
+
+                // Nuovo turno: parte il vincente
+                List<Giocatore> gioc = giocatoriSenza(vincente, giocatori);
+                if (vincente instanceof GiocatoreUmano) {
+                    giocaTurnoUmano2v2(partita, gioc);
+                } else {
+                    giocaTurnoAI2v2(partita, gioc);
+                }
+            });
+        });
+    }
+
 
     private void giocaTurnoAI2v2(Partita2v2 partita, List<Giocatore> giocatori) {
         GiocatoreAI aiCorrente = (GiocatoreAI) giocatori.get(0);
