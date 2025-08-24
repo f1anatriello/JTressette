@@ -39,7 +39,7 @@ public class GameView2v2 extends JPanel {
     private JPanel leftHUD;
     private JPanel rightHUD;
 
-    private GameSett gameSupp;
+    private HelperGrafico gameSupp;
     private List<Carta> terreno;
 
     private JLabel scoreSouthLabel;
@@ -175,7 +175,7 @@ public class GameView2v2 extends JPanel {
         root.add(rightHUD, BorderLayout.EAST);
 
         // --- CENTER: GameSupport2v2 (2v2) ---
-        gameSupp = new GameSett(playerSouthHand, playerNorthHand, playerEastHand, playerWestHand);
+        gameSupp = new HelperGrafico(playerSouthHand, playerNorthHand, playerEastHand, playerWestHand);
         root.add(gameSupp, BorderLayout.CENTER);
         gameSupp.setTerreno(terreno);
     }

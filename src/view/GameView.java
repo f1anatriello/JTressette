@@ -31,7 +31,7 @@ public class GameView extends JPanel {
     private JPanel topHUD;      // avatar/nome avversario
     private JPanel bottomHUD;   // avatar/nome giocatore + pulsanti
 
-    private GameSett gameSupp;   // canvas centrale
+    private HelperGrafico gameSupp;   // canvas centrale
 
     private List<Carta> terreno;    // terreno di gioco
 
@@ -148,9 +148,8 @@ public class GameView extends JPanel {
         bottomHUD.add(score1Label);
         root.add(bottomHUD, BorderLayout.SOUTH);
 
-        // --- CENTER: GameSett2v2 (canvas carte) ---
-        // ⬇️ istanziamo la versione 1v1; se in futuro passi al 2v2, ti basta usare l'altro overload
-        gameSupp = new GameSett(player1Hand, player2Hand);
+        // --- CENTER: HelperGrafico (canvas carte) ---
+        gameSupp = new HelperGrafico(player1Hand, player2Hand);
         root.add(gameSupp, BorderLayout.CENTER);
 
         // terreno iniziale vuoto

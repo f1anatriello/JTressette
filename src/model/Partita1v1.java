@@ -19,11 +19,11 @@ public class Partita1v1 extends Partita {
 		return instance;
 	}
 
-    public String vincitore1v1(){
-    	Map<String,Double> mappa = new HashMap<>();
+    public Giocatore vincitore1v1(){
+    	Map<Giocatore,Double> mappa = new HashMap<>();
     	
     	for (Giocatore g : giocatori) {
-			mappa.put(g.nome, g.puntiOttenuti);
+			mappa.put(g, g.puntiOttenuti);
 		}
     	
     	return mappa.entrySet().stream()

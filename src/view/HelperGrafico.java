@@ -5,37 +5,37 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ImageObserver;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import javax.swing.*;
+
 import model.Carta;
 import ui.UIAssets;
 
 /**
  * Canvas grafico leggero per partite 1v1 e 2v2.
- * - Sud cliccabile con sollevamento e bordo dorato clippato.
- * - Nord/Est/Ovest a retro (o fronte in debug), Est/Ovest ruotate orizzontali.
+ * - Sud cliccabile con sollevamento e bordo dorato (disegnata per ultima, sopra).
+ * - Nord/Est/Ovest con retro (o fronte in debug); Est/Ovest ruotate orizzontali.
  * - Terreno al centro.
+ * - Layout e hit-test basati su INDICI, non su identità/equals() di Carta.
  */
-public class GameSett extends JPanel {
+public class HelperGrafico extends JPanel {
 
     /* ====== CONFIG FISSA (schermata 960x640) ====== */
-    private static final int CARD_H        = 90;        // altezza carta
-    private static final double RATIO      = 0.66;      // ~ 2:3
+    private static final int CARD_H        = 90;         // altezza carta "in piedi"
+    private static final double RATIO      = 0.66;       // ~2:3
     private static final int CARD_W        = (int) (CARD_H * RATIO);
-    private static final int X_DELTA       = 50;        // sovrapposizione orizzontale
+    private static final int X_DELTA       = 50;         // sovrapposizione orizzontale (Nord/Sud)
     private static final int Y_DELTA       = CARD_W / 2; // sovrapposizione verticale (Est/Ovest)
-    private static final int PAD_X         = 10;        // padding laterale
-    private static final int PAD_Y         = 10;        // padding alto
-    private static final int BOTTOM_PAD    = 10;        // margine basso
-    private static final int LIFT_SELECTED = 20;        // sollevamento selezione
+    private static final int PAD_X         = 10;         // padding laterale
+    private static final int PAD_Y         = 10;         // padding alto
+    private static final int BOTTOM_PAD    = 10;         // margine basso
+    private static final int LIFT_SELECTED = 20;         // sollevamento selezione
 
-    // bounding box per carte ruotate (Est/Ovest)
-    private static final int SIDE_CARD_W   = CARD_H;    // larghezza bbox ruotata
-    private static final int SIDE_CARD_H   = CARD_W;    // altezza  bbox ruotata
+    // bounding box per carte ruotate (Est/Ovest), sdraiate orizzontali
+    private static final int SIDE_CARD_W   = CARD_H;     // larghezza bbox ruotata
+    private static final int SIDE_CARD_H   = CARD_W;     // altezza  bbox ruotata
 
     /* ===== Stato mani ===== */
     private List<Carta> manoSud   = Collections.emptyList();
@@ -47,32 +47,39 @@ public class GameSett extends JPanel {
     private List<Carta> terreno   = Collections.emptyList();
 
     /* ===== Selezione (solo Sud) ===== */
-    private final Map<Carta, Rectangle> mapCardsSud = new LinkedHashMap<>();
-    private Carta selected = null;
+    private int selectedIndex = -1; // indice nella mano Sud
 
-    /* ===== Bounds ausiliari per disegno ===== */
+    /* ===== Bounds (per indici) ===== */
+    private final List<Rectangle> southBounds = new ArrayList<>();
     private final List<Rectangle> northBounds = new ArrayList<>();
     private final List<Rectangle> eastBounds  = new ArrayList<>();
     private final List<Rectangle> westBounds  = new ArrayList<>();
 
-    /* ===== Debug: mostra fronte degli avversari ===== */
-    private boolean showOpponentsFaceUp = false;
+    /* ===== Altro ===== */
+    private boolean showOpponentsFaceUp = false;      // debug
+    private Dimension lastLaidOutSize = new Dimension(0, 0);
 
-    public GameSett(List<Carta> manoSud, List<Carta> manoNord, List<Carta> manoEst, List<Carta> manoOvest) {
+    /* ===== Costruttori ===== */
+    public HelperGrafico(List<Carta> manoSud, List<Carta> manoNord, List<Carta> manoEst, List<Carta> manoOvest) {
         setHands(manoSud, manoNord, manoEst, manoOvest);
 
         setBackground(new Color(0, 128, 0));
         setDoubleBuffered(true);
 
         addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                handleSouthClick(e.getPoint());
+            @Override public void mouseClicked(MouseEvent e) { handleSouthClick(e.getPoint()); }
+        });
+
+        // Re-layout sicuro su resize
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override public void componentResized(java.awt.event.ComponentEvent e) {
+                if (!getSize().equals(lastLaidOutSize)) { recomputeLayout(); repaint(); }
             }
         });
     }
 
     /** Overload 1v1. */
-    public GameSett(List<Carta> manoSud, List<Carta> manoNord) {
+    public HelperGrafico(List<Carta> manoSud, List<Carta> manoNord) {
         this(manoSud, manoNord, Collections.emptyList(), Collections.emptyList());
     }
 
@@ -84,6 +91,8 @@ public class GameSett extends JPanel {
         this.manoNord  = (manoNord  != null) ? new ArrayList<>(manoNord)  : Collections.emptyList();
         this.manoEst   = (manoEst   != null) ? new ArrayList<>(manoEst)   : Collections.emptyList();
         this.manoOvest = (manoOvest != null) ? new ArrayList<>(manoOvest) : Collections.emptyList();
+
+        if (selectedIndex >= this.manoSud.size()) selectedIndex = -1;
         recomputeLayout();
         repaint();
     }
@@ -102,27 +111,39 @@ public class GameSett extends JPanel {
 
     /** Se nessuna carta è selezionata, seleziona la prima della mano Sud. */
     public void selectFirstIfNone() {
-        if (selected == null && !manoSud.isEmpty()) {
-            selected = manoSud.get(0);
-            repaint();
-        }
+        if (selectedIndex < 0 && !manoSud.isEmpty()) { selectedIndex = 0; repaint(); }
     }
 
-    /** Seleziona una carta per indice nella mano Sud (solleva visivamente). */
+    /** Seleziona una carta per indice nella mano Sud. */
     public boolean selectAtIndex(int idx) {
-        if (manoSud.isEmpty() || idx < 0 || idx >= manoSud.size()) return false;
-        selected = manoSud.get(idx);
-        repaint();
-        return true;
+        if (idx < 0 || idx >= manoSud.size()) return false;
+        selectedIndex = idx; repaint(); return true;
     }
 
     /** Carta attualmente selezionata nella mano Sud (può essere null). */
-    public Carta getSelected() { return selected; }
+    public Carta getSelected() {
+        return (selectedIndex >= 0 && selectedIndex < manoSud.size()) ? manoSud.get(selectedIndex) : null;
+    }
+
+    /** Mostra fronte avversari (debug). */
+    public void setShowOpponentsFaceUp(boolean show) { this.showOpponentsFaceUp = show; repaint(); }
+
+    @Override public Dimension getPreferredSize() { return new Dimension(900, 700); }
+
+    @Override public void addNotify() {
+        super.addNotify();
+        SwingUtilities.invokeLater(() -> { recomputeLayout(); repaint(); });
+    }
+
+    @Override public void invalidate() {
+        super.invalidate();
+        recomputeLayout();
+    }
 
     /* ================= Layout ================= */
 
     private void recomputeLayout() {
-        mapCardsSud.clear();
+        southBounds.clear();
         northBounds.clear();
         eastBounds.clear();
         westBounds.clear();
@@ -133,8 +154,8 @@ public class GameSett extends JPanel {
         int totW_S = CARD_W + Math.max(0, (manoSud.size() - 1)) * X_DELTA;
         int sx = Math.max(PAD_X, (getWidth() - totW_S) / 2);
         int sy = getHeight() - BOTTOM_PAD - CARD_H;
-        for (Carta c : manoSud) {
-            mapCardsSud.put(c, new Rectangle(sx, sy, CARD_W, CARD_H));
+        for (int i = 0; i < manoSud.size(); i++) {
+            southBounds.add(new Rectangle(sx, sy, CARD_W, CARD_H));
             sx += X_DELTA;
         }
 
@@ -164,6 +185,8 @@ public class GameSett extends JPanel {
             westBounds.add(new Rectangle(wx, wy, SIDE_CARD_W, SIDE_CARD_H));
             wy += Y_DELTA;
         }
+
+        lastLaidOutSize = getSize();
     }
 
     /* ================= Rendering ================= */
@@ -171,13 +194,15 @@ public class GameSett extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (!getSize().equals(lastLaidOutSize)) recomputeLayout();
+
         final Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         final UIAssets assets = UIAssets.getInstance();
         final Image back = assets.getImmagineRetroCarta();
 
-        // Terreno
+        // Terreno (fila orizzontale al centro)
         if (!terreno.isEmpty()) {
             int totW = CARD_W + (terreno.size() - 1) * X_DELTA;
             int x = Math.max(PAD_X, (getWidth() - totW) / 2);
@@ -218,34 +243,27 @@ public class GameSett extends JPanel {
             g2.drawRect(r.x, r.y, r.width, r.height);
         }
 
-        // === Sud: disegna prima TUTTE le non selezionate, poi la selezionata sopra ===
-        Carta sel = selected;
-        // non selezionate (z-order “dietro”)
-        for (Carta c : manoSud) {
-            if (c == null || c == sel) continue;
-            Rectangle r = mapCardsSud.get(c);
-            if (r == null) continue;
-            Image img = assets.getImmagineCarta(c);
+        // === Sud: prima non selezionate (dietro), poi la selezionata (sopra, sollevata) ===
+        for (int i = 0; i < manoSud.size(); i++) {
+            if (i == selectedIndex) continue;
+            Rectangle r = southBounds.get(i);
+            Image img = assets.getImmagineCarta(manoSud.get(i));
             g2.drawImage(img, r.x, r.y, r.width, r.height, this);
             g2.setColor(Color.BLACK);
             g2.drawRect(r.x, r.y, r.width, r.height);
         }
+        if (selectedIndex >= 0 && selectedIndex < manoSud.size()) {
+            Rectangle r = southBounds.get(selectedIndex);
+            int drawY = r.y - LIFT_SELECTED;
+            Image img = assets.getImmagineCarta(manoSud.get(selectedIndex));
+            g2.drawImage(img, r.x, drawY, r.width, r.height, this);
+            g2.setColor(Color.BLACK);
+            g2.drawRect(r.x, drawY, r.width, r.height);
 
-        // selezionata (in primo piano, sollevata)
-        if (sel != null) {
-            Rectangle r = mapCardsSud.get(sel);
-            if (r != null) {
-                int drawY = r.y - LIFT_SELECTED;
-                Image img = assets.getImmagineCarta(sel);
-                g2.drawImage(img, r.x, drawY, r.width, r.height, this);
-                g2.setColor(Color.BLACK);
-                g2.drawRect(r.x, drawY, r.width, r.height);
-
-                // highlight pieno intorno alla carta (NIENTE clip, è sopra a tutto)
-                g2.setColor(new Color(255, 215, 0));
-                g2.setStroke(new BasicStroke(3f));
-                g2.drawRect(r.x + 1, drawY + 1, r.width - 3, r.height - 3);
-            }
+            // bordo dorato completo intorno alla carta selezionata (sta sopra, niente clip)
+            g2.setColor(new Color(255, 215, 0));
+            g2.setStroke(new BasicStroke(3f));
+            g2.drawRect(r.x + 1, drawY + 1, r.width - 3, r.height - 3);
         }
 
         g2.dispose();
@@ -254,41 +272,37 @@ public class GameSett extends JPanel {
     /* ================= Helpers ================= */
 
     private void handleSouthClick(Point p) {
-        // reset selezione
-        Carta newSelected = null;
-        for (int i = manoSud.size() - 1; i >= 0; i--) {
-            Carta c = manoSud.get(i);
-            Rectangle r = mapCardsSud.get(c);
-            if (r != null && r.contains(p)) {
-                newSelected = c;
-                break;
-            }
+        int newSel = -1;
+        // cerca da destra a sinistra per rispettare lo z-order dell'overlap
+        for (int i = southBounds.size() - 1; i >= 0; i--) {
+            Rectangle r = southBounds.get(i);
+            // se è quella selezionata, considera anche l'area sollevata
+            Rectangle hit = (i == selectedIndex)
+                    ? new Rectangle(r.x, r.y - LIFT_SELECTED, r.width, r.height)
+                    : r;
+            if (hit.contains(p)) { newSel = i; break; }
         }
-        selected = newSelected;
-        repaint();
+        if (newSel != selectedIndex) { selectedIndex = newSel; repaint(); }
     }
 
-    /** Disegna una carta ruotata di 90° (orario se clockwise, antiorario se false). */
+    /** Disegna una carta ruotata di 90° (clockwise se true, anti se false). */
     private void drawCardRotated(Graphics2D g2, Image img, Rectangle r, boolean clockwise) {
-        if (img == null) {
-            g2.setColor(Color.WHITE);
-            g2.fillRect(r.x, r.y, r.width, r.height);
+        if (img == null) { // fallback semplice
+            g2.setColor(Color.WHITE); g2.fillRect(r.x, r.y, r.width, r.height);
             return;
         }
-        double cx = r.getCenterX();
-        double cy = r.getCenterY();
+        double cx = r.getCenterX(), cy = r.getCenterY();
         double theta = clockwise ? Math.PI / 2 : -Math.PI / 2;
 
         AffineTransform old = g2.getTransform();
         g2.rotate(theta, cx, cy);
 
-        // Dopo la rotazione l'immagine "dritta" ha dimensioni (CARD_W, CARD_H)
-        int w = CARD_W;
-        int h = CARD_H;
+        // Dopo la rotazione, l'immagine "dritta" ha dimensioni (CARD_W, CARD_H)
+        int w = CARD_W, h = CARD_H;
         int x = (int) Math.round(cx - w / 2.0);
         int y = (int) Math.round(cy - h / 2.0);
 
-        g2.drawImage(img, x, y, w, h, null);
+        g2.drawImage(img, x, y, w, h, this);
         g2.setTransform(old);
     }
 }

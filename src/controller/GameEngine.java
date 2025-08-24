@@ -6,9 +6,10 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Observer;
+import javax.swing.Timer;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -96,7 +97,6 @@ public class GameEngine implements Observer {
      * deve essere eseguito a fine turno dopo che entrambi i giocatori hanno
      * giocato e il terreno viene svuotato.
      */
-    // GameEngine.java
 
     public void giocaCarta(Giocatore g, Carta c, Partita p) {
         // solo logica di stato, nessun refresh grafico qui
@@ -255,10 +255,17 @@ public class GameEngine implements Observer {
      * Mostra un dialogo di fine partita indicando il vincitore e torna al menu.
      */
     private void finePartita(Partita1v1 p) {
-        String vincitore = p.vincitore1v1();
+        Giocatore vincitore = p.vincitore1v1();
+        if(vincitore.getClass() == GiocatoreUmano.class)
+        {
+            player.incrementaVinte();  
+            System.out.println("HAI VINTO!!!!");
+        } 
+        else player.incrementaPerse();
+
         JOptionPane.showMessageDialog(
             mainFrame,
-            "La partita è finita! Il vincitore è: " + vincitore,
+            "La partita è finita! Il vincitore è: " + vincitore.getNome(),
             "Partita Terminata",
             JOptionPane.INFORMATION_MESSAGE
         );
@@ -545,13 +552,13 @@ public class GameEngine implements Observer {
      * Ritorna alla schermata principale dopo un'azione, con un piccolo delay
      * per evitare flickering.
      */
-    // Avvia un'azione dopo un piccolo delay, eseguita sull'EDT
     private void after(int ms, Runnable action) {
-        new javax.swing.Timer(ms, e -> {
-            ((javax.swing.Timer) e.getSource()).stop();
+        new Timer(ms, e -> {
+            ((Timer) e.getSource()).stop();
             action.run();
         }).start();
     }
+
 
     // Mostra lo stato attuale del terreno (usa già il tuo render della GameView)
     private void showTerreno(Partita p) {
