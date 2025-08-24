@@ -8,8 +8,8 @@ import javax.swing.*;
 import model.Carta;
 
 /**
- * Vista principale della partita 2v2. Mostra la mano del giocatore
- * e i pannelli HUD dei 3 compagni/avversari attorno al tavolo.
+ * Vista principale della partita 2v2.
+ * Usa GameSupport2v2 (overload 2v2) come canvas centrale.
  */
 public class GameView2v2 extends JPanel {
 
@@ -33,13 +33,14 @@ public class GameView2v2 extends JPanel {
 
     private GameEngine gameEngine;
 
-    private JPanel root;     
-    private JPanel topHUD;     
-    private JPanel bottomHUD;  
-    private JPanel leftHUD;    
-    private JPanel rightHUD;   
-    private GameSupport2v2 gameSupp; 
-    private List<Carta> terreno;  
+    private JPanel root;
+    private JPanel topHUD;
+    private JPanel bottomHUD;
+    private JPanel leftHUD;
+    private JPanel rightHUD;
+
+    private GameSett gameSupp;
+    private List<Carta> terreno;
 
     private JLabel scoreSouthLabel;
     private JLabel scoreNorthLabel;
@@ -137,7 +138,7 @@ public class GameView2v2 extends JPanel {
         leftHUD = new JPanel();
         leftHUD.setOpaque(false);
         leftHUD.setLayout(new BoxLayout(leftHUD, BoxLayout.Y_AXIS));
-        leftHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0)); // <-- abbassa di 150px
+        leftHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
 
         JLabel avatarW = new JLabel(scale(playerWestAvatar, 50, 50));
         avatarW.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -151,15 +152,13 @@ public class GameView2v2 extends JPanel {
         leftHUD.add(nameW);
         leftHUD.add(Box.createVerticalStrut(8));
         leftHUD.add(scoreWestLabel);
-
         root.add(leftHUD, BorderLayout.WEST);
-
 
         // --- RIGHT HUD (EST) ---
         rightHUD = new JPanel();
         rightHUD.setLayout(new BoxLayout(rightHUD, BoxLayout.Y_AXIS));
         rightHUD.setOpaque(false);
-        rightHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0)); // <-- abbassa di 150px
+        rightHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
 
         JLabel avatarE = new JLabel(scale(playerEastAvatar, 50, 50));
         avatarE.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -167,16 +166,16 @@ public class GameView2v2 extends JPanel {
         nameE.setAlignmentX(Component.CENTER_ALIGNMENT);
         scoreEastLabel = new JLabel(" - Punti: 0");
         scoreEastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
         rightHUD.add(avatarE);
-        rightHUD.add(Box.createVerticalStrut(8)); // Spacing
+        rightHUD.add(Box.createVerticalStrut(8));
         rightHUD.add(nameE);
-        rightHUD.add(Box.createVerticalStrut(8)); // Spacing
+        rightHUD.add(Box.createVerticalStrut(8));
         rightHUD.add(scoreEastLabel);
         root.add(rightHUD, BorderLayout.EAST);
 
-        // --- CENTER: GameSupport ---
-        gameSupp = new GameSupport2v2(playerSouthHand, playerNorthHand, playerEastHand, playerWestHand);
+        // --- CENTER: GameSupport2v2 (2v2) ---
+        gameSupp = new GameSett(playerSouthHand, playerNorthHand, playerEastHand, playerWestHand);
         root.add(gameSupp, BorderLayout.CENTER);
         gameSupp.setTerreno(terreno);
     }
@@ -194,7 +193,7 @@ public class GameView2v2 extends JPanel {
         gameSupp.setTerreno(terreno);
         gameSupp.refresh();
 
-        // TODO: aggiornare i punteggi dai giocatori del gameEngine
+        // aggiornamento punteggi (adatta ai nomi/metodi del tuo GameEngine)
         scoreSouthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
         scoreNorthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
         scoreEastLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreEst().getPunti()));
@@ -212,18 +211,16 @@ public class GameView2v2 extends JPanel {
     }
 
     public void setTerreno(List<Carta> terreno) {
-        this.terreno = terreno;
+        this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
     }
 
     public void refreshTerreno(List<Carta> terreno) {
-        this.terreno = terreno;
+        this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
     }
 
-    public static void disposeInstance() { 
-        instance = null; 
-    }
+    public static void disposeInstance() { instance = null; }
 
     /* ============== Azioni ============== */
 
@@ -231,24 +228,18 @@ public class GameView2v2 extends JPanel {
         Carta sel = gameSupp.getSelected();
         if (sel == null) {
             JOptionPane.showMessageDialog(
-                this,
-                "Seleziona una carta prima di giocare.",
-                "Nessuna carta selezionata",
-                JOptionPane.WARNING_MESSAGE
-            );
+                this, "Seleziona una carta prima di giocare.",
+                "Nessuna carta selezionata", JOptionPane.WARNING_MESSAGE);
             return;
         }
         // Notifica al motore di gioco
         gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
 
-        // Aggiorna il terreno
+        // Aggiorna il terreno e rimuovi la carta dalla mano dell'umano
         terreno.add(sel);
-
-        // Rimuovi la carta dalla mano dell'umano
         playerSouthHand.remove(sel);
 
         // Refresh grafico
         render();
     }
-    
 }
