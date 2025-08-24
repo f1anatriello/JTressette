@@ -99,9 +99,14 @@ public class LoginView extends JFrame{
                     "Accesso", JOptionPane.INFORMATION_MESSAGE);
 
             GameEngine engine = GameEngine.getInstance(existed);
-            engine.avviaUIPrincipale();  // crea la JFrame principale e mostra il menu
+            engine.avviaUIPrincipale();    // crea la JFrame principale e mostra il menu
             dispose();                    // chiudi il login
         });
+
+        btnEsci.addActionListener(e -> {
+                System.exit(0);
+        });
+
         setSize(400, 240);
         setResizable(false);
         getRootPane().setDefaultButton(btnEntra);

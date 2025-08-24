@@ -25,7 +25,7 @@ public class DialogModificaProfilo {
         dialog = new JDialog();
         dialog.setTitle("Modifica Profilo");
         dialog.setModal(true);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
     public void showDialog() {
         JPanel panel = new JPanel();

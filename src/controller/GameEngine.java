@@ -259,7 +259,6 @@ public class GameEngine implements Observer {
         if(vincitore.getClass() == GiocatoreUmano.class)
         {
             player.incrementaVinte();  
-            System.out.println("HAI VINTO!!!!");
         } 
         else player.incrementaPerse();
 
@@ -501,7 +500,8 @@ public class GameEngine implements Observer {
 
     /* ===== UTILITIES ===== */
     private boolean isFixedSizedView(JPanel panel) {
-        return !(panel instanceof MenuPrincipaleView);
+        return !(panel instanceof MenuPrincipaleView ||
+                 panel instanceof ProfiloView);
     }
 
     public void registerMainFrame(JFrame frame) {

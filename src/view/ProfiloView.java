@@ -120,7 +120,6 @@ public class ProfiloView extends JPanel {
 
     public void modificaProfilo(UtentePojo player) {
         // Apri un dialogo per modificare il profilo
-        Window parentWindow = SwingUtilities.getWindowAncestor(this);
         DialogModificaProfilo dialog = new DialogModificaProfilo(controller);
         dialog.showDialog();
     }

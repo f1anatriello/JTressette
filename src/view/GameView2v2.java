@@ -9,7 +9,7 @@ import model.Carta;
 
 /**
  * Vista principale della partita 2v2.
- * Usa GameSupport2v2 (overload 2v2) come canvas centrale.
+ * Usa HelperGrafico come canvas centrale.
  */
 public class GameView2v2 extends JPanel {
 
@@ -114,10 +114,28 @@ public class GameView2v2 extends JPanel {
         topHUD.setOpaque(false);
         JLabel avatarN = new JLabel(scale(playerNorthAvatar, 50, 50));
         JLabel nameN = new JLabel(playerNorthName);
-        scoreNorthLabel = new JLabel(" - Punti: 0");
+        scoreNorthLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreAI().getPunti());
+        JButton btnMenu = new JButton("⬅ Torna al Menù");
+        btnMenu.addActionListener(e -> {
+            int scl = JOptionPane.showConfirmDialog(
+                    this,
+                    "Tornare al menù principale?\nLa partita in corso andrà persa.",
+                    "Abbandonare la nave..",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+            if (scl == JOptionPane.YES_OPTION) {
+                try {
+                    gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null);
+                } catch (Exception ignore) {}
+                GameView2v2.disposeInstance(); // <— importantissimo: azzera il singleton
+                gameEngine.visualizzaMenu(); // torna al menu
+            }
+        });
         topHUD.add(avatarN);
         topHUD.add(nameN);
         topHUD.add(scoreNorthLabel);
+        
         root.add(topHUD, BorderLayout.NORTH);
 
         // --- BOTTOM HUD (SUD, umano) ---
@@ -125,7 +143,7 @@ public class GameView2v2 extends JPanel {
         bottomHUD.setOpaque(false);
         JLabel avatarS = new JLabel(scale(playerSouthAvatar, 60, 60));
         JLabel nameS = new JLabel(playerSouthName);
-        scoreSouthLabel = new JLabel(" - Punti: 0");
+        scoreSouthLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreUmano().getPunti());
         JButton btnGioca = new JButton("Gioca");
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
         bottomHUD.add(avatarS);
@@ -144,7 +162,7 @@ public class GameView2v2 extends JPanel {
         avatarW.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameW = new JLabel(playerWestName);
         nameW.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scoreWestLabel = new JLabel(" - Punti: 0");
+        scoreWestLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreOvest().getPunti());
         scoreWestLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         leftHUD.add(avatarW);
@@ -158,20 +176,25 @@ public class GameView2v2 extends JPanel {
         rightHUD = new JPanel();
         rightHUD.setLayout(new BoxLayout(rightHUD, BoxLayout.Y_AXIS));
         rightHUD.setOpaque(false);
-        rightHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
+        rightHUD.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); // meno spazio dall'alto
 
+        // avatar + info
         JLabel avatarE = new JLabel(scale(playerEastAvatar, 50, 50));
         avatarE.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameE = new JLabel(playerEastName);
         nameE.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scoreEastLabel = new JLabel(" - Punti: 0");
+        scoreEastLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreEst().getPunti());
         scoreEastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // aggiunta in ordine verticale
+        rightHUD.add(btnMenu);
+        rightHUD.add(Box.createVerticalStrut(12));
         rightHUD.add(avatarE);
         rightHUD.add(Box.createVerticalStrut(8));
         rightHUD.add(nameE);
         rightHUD.add(Box.createVerticalStrut(8));
         rightHUD.add(scoreEastLabel);
+
         root.add(rightHUD, BorderLayout.EAST);
 
         // --- CENTER: GameSupport2v2 (2v2) ---
