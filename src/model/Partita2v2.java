@@ -57,8 +57,8 @@ public class Partita2v2 extends Partita {
         // La prima carta giocata stabilisce il seme dominante
         Seme semeRegnante = terr.get(0).getSeme();
 
-        Giocatore vincitore = giocatori.get(0); // inizio con il primo
         Carta cartaVincente = terr.get(0);
+        Giocatore vincitore = cartaVincente.getGiocatore();
 
         // confronto le altre 3 carte
         for (int i = 1; i < terr.size(); i++) {
@@ -67,11 +67,11 @@ public class Partita2v2 extends Partita {
             if (cartaAttuale.getSeme() == semeRegnante) {
                 if (cartaAttuale.getValore().getOrdinePresa() > cartaVincente.getValore().getOrdinePresa()) {
                     cartaVincente = cartaAttuale;
-                    vincitore = giocatori.get(i);
+                    vincitore = cartaAttuale.getGiocatore();
                 }
             }
         }
-
+        System.out.println("Vincitore della mano: " + vincitore.getNome() + " con " + cartaVincente.toString());
         return vincitore;
     }
 }

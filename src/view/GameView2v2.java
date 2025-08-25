@@ -259,7 +259,7 @@ public class GameView2v2 extends JPanel {
         gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
 
         // Aggiorna il terreno e rimuovi la carta dalla mano dell'umano
-        terreno.add(sel);
+        // terreno.add(sel);
         playerSouthHand.remove(sel);
 
         // Refresh grafico

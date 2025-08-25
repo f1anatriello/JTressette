@@ -8,13 +8,12 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
-import javax.swing.Timer;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import model.*;
 import ui.UIConstants;
@@ -101,7 +100,8 @@ public class GameEngine implements Observer {
     public void giocaCarta(Giocatore g, Carta c, Partita p) {
         // solo logica di stato, nessun refresh grafico qui
         List<Carta> mano = g.getMano();
-        if (c == null) return;            
+        if (c == null) return;  
+        c.setGiocatore(g);          
         mano.remove(c);                   
         g.setMano(mano);
         p.getTerreno().add(c);            
@@ -320,6 +320,7 @@ public class GameEngine implements Observer {
         // Avvia il primo turno: parte il giocatore Sud (umano)
         List<Giocatore> g = List.of(giocatoreSud, aiOvest, aiNord, aiEst);
         giocaTurnoUmano2v2(p, g);
+        showTerreno2v2(p);
     }
 
     private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> ordineTurno) {

@@ -6,6 +6,7 @@ package model;
 public class Carta {
     private final Seme seme;
     private final Valore valore;
+    private Giocatore giocatore;
 
     /**
      * Costruisce una nuova istanza di Carta.
@@ -47,6 +48,14 @@ public class Carta {
      */
     public double getPunti() {
         return valore.getPunti();
+    }
+
+    public void setGiocatore(Giocatore g) {
+        this.giocatore = g;
+    }
+
+    public Giocatore getGiocatore() {
+        return giocatore;
     }
 
     /**
