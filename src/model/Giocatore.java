@@ -2,7 +2,7 @@ package model;
 
 import java.util.*;
 
-public abstract class Giocatore {
+public abstract class Giocatore extends Observable{
 	protected String nome;
 	protected List<Carta> mano = new ArrayList<>(10);
 	protected double puntiOttenuti;

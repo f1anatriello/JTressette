@@ -49,7 +49,22 @@ public class GameEngine implements Observer {
 
     @Override
     public void update(java.util.Observable o, Object arg) {
-        // TODO: implement update logic if needed
+        
+        if (arg instanceof Partita1v1) {
+            Giocatore vincitore = (Giocatore) o;
+            if (vincitore instanceof GiocatoreUmano) {
+                player.incrementaVinte();
+            } else {
+                player.incrementaPerse();
+            }
+        } else if (arg instanceof Partita2v2) {
+            Giocatore vincitore = (Giocatore) o;
+            if (vincitore instanceof GiocatoreUmano) {
+                player.incrementaVinte();
+            } else {
+                player.incrementaPerse();
+            }
+        }
     }
 
     private GameEngine(UtentePojo player) {
@@ -260,11 +275,8 @@ public class GameEngine implements Observer {
      */
     private void finePartita(Partita1v1 p) {
         Giocatore vincitore = p.vincitore1v1();
-        if(vincitore.getClass() == GiocatoreUmano.class)
-        {
-            player.incrementaVinte();  
-        } 
-        else player.incrementaPerse();
+
+        update(vincitore, p);
 
         JOptionPane.showMessageDialog(
             mainFrame,
@@ -278,10 +290,25 @@ public class GameEngine implements Observer {
     }
 
     private void finePartita2v2(Partita2v2 p) {
-        String vincitore = p.vincitore2v2();
+        Giocatore vincitore = p.vincitore2v2();
+
+        if (vincitore == null) {
+            JOptionPane.showMessageDialog(
+                mainFrame,
+                "La partita è finita! La partita è finita in pareggio!",
+                "Partita Terminata",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            GameView2v2.disposeInstance();
+            visualizzaMenu();
+            return;
+        }
+
+        update(vincitore, p);
+
         JOptionPane.showMessageDialog(
             mainFrame,
-            "La partita è finita! Il vincitore è: " + vincitore,
+            "La partita è finita! Il vincitore è: " + vincitore.getSquadra().getNome(),
             "Partita Terminata",
             JOptionPane.INFORMATION_MESSAGE
         );

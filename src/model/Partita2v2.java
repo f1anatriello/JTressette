@@ -31,7 +31,7 @@ public class Partita2v2 extends Partita {
     /**
      * Restituisce il nome della squadra vincente (Nord-Sud o Est-Ovest)
      */
-    public String vincitore2v2() {
+    public Giocatore vincitore2v2() {
         // Squadra Nord-Sud = giocatori 0 e 2
         double puntiNS = squadra1.getPunteggioTotale();
 
@@ -39,11 +39,11 @@ public class Partita2v2 extends Partita {
         double puntiEO = squadra2.getPunteggioTotale();
 
         if (puntiNS > puntiEO) {
-            return squadra1.getNome();
+            return giocatori.get(0);
         } else if (puntiEO > puntiNS) {
-            return squadra2.getNome();
+            return giocatori.get(2);
         } else {
-            return "Pareggio";
+            return null;
         }
     }
 
