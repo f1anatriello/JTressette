@@ -133,6 +133,7 @@ public class GameView2v2 extends JPanel {
                 } catch (Exception ignore) {}
                 GameView2v2.disposeInstance(); // <— importantissimo: azzera il singleton
                 gameEngine.visualizzaMenu(); // torna al menu
+                gameEngine.reset();
             }
         });
         topHUD.add(Box.createHorizontalStrut(200));

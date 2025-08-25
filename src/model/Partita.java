@@ -13,7 +13,9 @@ public abstract class Partita {
 	protected Partita(List<Giocatore> giocatori) {
 		this.giocatori = giocatori;
 	}
-	
+
+	public abstract void reset();
+
 	public void inizializzaPartita() {
 		this.mazzo = new Mazzo();
 		this.mazzo.mescola();

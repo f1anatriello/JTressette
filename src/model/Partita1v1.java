@@ -19,6 +19,15 @@ public class Partita1v1 extends Partita {
 		return instance;
 	}
 
+    @Override
+    public void reset() {
+        giocatori.clear();
+        mazzo = null;
+        finita = false;
+        terreno = null;
+        instance = null;
+    }
+
     public Giocatore vincitore1v1(){
     	Map<Giocatore,Double> mappa = new HashMap<>();
     	

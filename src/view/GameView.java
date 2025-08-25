@@ -124,6 +124,7 @@ public class GameView extends JPanel {
                 } catch (Exception ignore) {}
                 GameView.disposeInstance(); // <— importantissimo: azzera il singleton
                 gameEngine.visualizzaMenu(); // torna al menu
+                gameEngine.reset();
             }
         });
         rightTop.add(btnMenu);

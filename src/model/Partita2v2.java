@@ -28,6 +28,17 @@ public class Partita2v2 extends Partita {
         return instance;
     }
 
+    @Override
+    public void reset() {
+        giocatori.clear();
+        mazzo = null;
+        finita = false;
+        terreno = null;
+        squadra1 = null;
+        squadra2 = null;
+        instance = null;
+    }
+
     /**
      * Restituisce il nome della squadra vincente (Nord-Sud o Est-Ovest)
      */

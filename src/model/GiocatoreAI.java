@@ -1,6 +1,9 @@
 package model;
 
+import java.util.Random;
+
 public class GiocatoreAI extends Giocatore{
+
 
     public GiocatoreAI() {
         super(generaNomeCasuale());
@@ -9,7 +12,8 @@ public class GiocatoreAI extends Giocatore{
     private static String generaNomeCasuale() {
         String[] nomi = { "Bob", "Matteo", "Alice"};
         int i = (int) (Math.random() * nomi.length);
-        return nomi[i] + (100 + (int)(Math.random() * 900));
+        Random rand = new Random();
+        return nomi[i] + rand.nextInt(900);
     }
 
     public Carta scegliCarta(Partita p) {

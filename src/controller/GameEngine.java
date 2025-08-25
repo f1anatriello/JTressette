@@ -69,9 +69,6 @@ public class GameEngine implements Observer {
 
     private GameEngine(UtentePojo player) {
         this.player = player;
-        this.ai = new GiocatoreAI();
-        this.playerEst = new GiocatoreAI();
-        this.playerOvest = new GiocatoreAI();
     }
 
     public static GameEngine getInstance(UtentePojo player) {
@@ -91,6 +88,7 @@ public class GameEngine implements Observer {
             List<Giocatore> giocatori = new ArrayList<>();
             playerUmano = new GiocatoreUmano(this.player.getUsername());
             giocatori.add(playerUmano);
+            ai = new GiocatoreAI();
             giocatori.add(ai);
             partita = new Partita1v1(giocatori);
             partita.inizializzaPartita();
@@ -98,6 +96,9 @@ public class GameEngine implements Observer {
         } else {
             List<Giocatore> giocatori = new ArrayList<>();
             playerUmano = new GiocatoreUmano(this.player.getUsername());
+            ai = new GiocatoreAI();
+            playerEst = new GiocatoreAI();
+            playerOvest = new GiocatoreAI();
             giocatori.add(playerUmano);
             giocatori.add(playerEst);
             giocatori.add(ai);
@@ -287,6 +288,8 @@ public class GameEngine implements Observer {
         GameView.disposeInstance();
 
         visualizzaMenu();
+        reset();
+        return;
     }
 
     private void finePartita2v2(Partita2v2 p) {
@@ -301,6 +304,7 @@ public class GameEngine implements Observer {
             );
             GameView2v2.disposeInstance();
             visualizzaMenu();
+            reset();
             return;
         }
 
@@ -313,6 +317,7 @@ public class GameEngine implements Observer {
             JOptionPane.INFORMATION_MESSAGE
         );
         visualizzaMenu();
+        reset();
     }
 
     /**
@@ -479,6 +484,13 @@ public class GameEngine implements Observer {
 
     public Partita getPartita() {
         return this.partita;
+    }
+
+    public void reset() {
+        this.partita.reset();
+        this.ai = null;
+        this.playerEst = null;
+        this.playerOvest = null;
     }
 
     /**
