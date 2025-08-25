@@ -13,8 +13,12 @@ public class Partita2v2 extends Partita {
         if (giocatori.size() != 4) {
             throw new IllegalArgumentException("Una partita 2v2 richiede esattamente 4 giocatori");
         }
-        squadra1 = new Squadra("Squadra1", giocatori.get(0), giocatori.get(2));
-        squadra2 = new Squadra("Squadra2", giocatori.get(1), giocatori.get(3));
+        squadra1 = new Squadra("Squadra1", giocatori.get(0), giocatori.get(1));
+        squadra2 = new Squadra("Squadra2", giocatori.get(2), giocatori.get(3));
+        giocatori.get(0).setSquadra(squadra1);
+        giocatori.get(1).setSquadra(squadra1);
+        giocatori.get(2).setSquadra(squadra2);
+        giocatori.get(3).setSquadra(squadra2);
     }
 
     public static Partita2v2 getInstance(List<Giocatore> giocatori) {

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import model.Carta;
+import model.Giocatore;
 
 /**
  * Vista principale della partita 2v2.
@@ -115,6 +116,8 @@ public class GameView2v2 extends JPanel {
         JLabel avatarN = new JLabel(scale(playerNorthAvatar, 50, 50));
         JLabel nameN = new JLabel(playerNorthName);
         scoreNorthLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreAI().getPunti());
+        JLabel squadLabel = new JLabel(" -" + gameEngine.getGiocatoreEst().getSquadra().getNome());
+
         JButton btnMenu = new JButton("⬅ Torna al Menù");
         btnMenu.addActionListener(e -> {
             int scl = JOptionPane.showConfirmDialog(
@@ -135,7 +138,8 @@ public class GameView2v2 extends JPanel {
         topHUD.add(avatarN);
         topHUD.add(nameN);
         topHUD.add(scoreNorthLabel);
-        
+        topHUD.add(squadLabel);
+
         root.add(topHUD, BorderLayout.NORTH);
 
         // --- BOTTOM HUD (SUD, umano) ---
@@ -144,12 +148,14 @@ public class GameView2v2 extends JPanel {
         JLabel avatarS = new JLabel(scale(playerSouthAvatar, 60, 60));
         JLabel nameS = new JLabel(playerSouthName);
         scoreSouthLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreUmano().getPunti());
+        JLabel squadLabelBot = new JLabel(" -" + gameEngine.getGiocatoreUmano().getSquadra().getNome());
         JButton btnGioca = new JButton("Gioca");
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
         bottomHUD.add(avatarS);
         bottomHUD.add(nameS);
         bottomHUD.add(btnGioca);
         bottomHUD.add(scoreSouthLabel);
+        bottomHUD.add(squadLabelBot);
         root.add(bottomHUD, BorderLayout.SOUTH);
 
         // --- LEFT HUD (OVEST) ---
@@ -164,12 +170,15 @@ public class GameView2v2 extends JPanel {
         nameW.setAlignmentX(Component.CENTER_ALIGNMENT);
         scoreWestLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreOvest().getPunti());
         scoreWestLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel squadLabelLeft = new JLabel(" -" + gameEngine.getGiocatoreOvest().getSquadra().getNome());
+        squadLabelLeft.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         leftHUD.add(avatarW);
         leftHUD.add(Box.createVerticalStrut(8));
         leftHUD.add(nameW);
         leftHUD.add(Box.createVerticalStrut(8));
         leftHUD.add(scoreWestLabel);
+        leftHUD.add(squadLabelLeft);
         root.add(leftHUD, BorderLayout.WEST);
 
         // --- RIGHT HUD (EST) ---
@@ -183,8 +192,10 @@ public class GameView2v2 extends JPanel {
         avatarE.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameE = new JLabel(playerEastName);
         nameE.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scoreEastLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreEst().getPunti());
+        scoreEastLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreAI().getPunti());
         scoreEastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel squadLabelRight = new JLabel(" -" + gameEngine.getGiocatoreAI().getSquadra().getNome());
+        squadLabelRight.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // aggiunta in ordine verticale
         rightHUD.add(btnMenu);
@@ -194,6 +205,7 @@ public class GameView2v2 extends JPanel {
         rightHUD.add(nameE);
         rightHUD.add(Box.createVerticalStrut(8));
         rightHUD.add(scoreEastLabel);
+        rightHUD.add(squadLabelRight);
 
         root.add(rightHUD, BorderLayout.EAST);
 
@@ -212,14 +224,15 @@ public class GameView2v2 extends JPanel {
     /* ============== RENDER/UPDATE ============== */
 
     public void render() {
-        gameSupp.setHands(playerSouthHand, playerNorthHand, playerEastHand, playerWestHand);
+        List<Giocatore> giocatori = gameEngine.getPartita().getGiocatori();
+        gameSupp.setHands(giocatori.get(0).getMano(), giocatori.get(1).getMano(), giocatori.get(2).getMano(), giocatori.get(3).getMano());
         gameSupp.setTerreno(terreno);
         gameSupp.refresh();
 
         // aggiornamento punteggi (adatta ai nomi/metodi del tuo GameEngine)
         scoreSouthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
-        scoreNorthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
-        scoreEastLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreEst().getPunti()));
+        scoreNorthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreEst().getPunti()));
+        scoreEastLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
         scoreWestLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreOvest().getPunti()));
 
         SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone());
@@ -258,8 +271,7 @@ public class GameView2v2 extends JPanel {
         // Notifica al motore di gioco
         gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
 
-        // Aggiorna il terreno e rimuovi la carta dalla mano dell'umano
-        // terreno.add(sel);
+        // Rimuovi la carta dalla mano dell'umano
         playerSouthHand.remove(sel);
 
         // Refresh grafico

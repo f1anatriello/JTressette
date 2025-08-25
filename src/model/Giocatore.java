@@ -6,6 +6,7 @@ public abstract class Giocatore {
 	protected String nome;
 	protected List<Carta> mano = new ArrayList<>(10);
 	protected double puntiOttenuti;
+	protected Squadra squadra;
 
 
 	public Giocatore(String nome) {
@@ -44,5 +45,12 @@ public abstract class Giocatore {
 		this.mano = mano;
 	}
 	
+	public Squadra getSquadra() {
+		return squadra;
+	}
+
+	public void setSquadra(Squadra squadra) {
+		this.squadra = squadra;
+	}
 
 }

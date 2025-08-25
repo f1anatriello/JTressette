@@ -44,6 +44,12 @@ public abstract class Partita {
 		return giocatori;
 	}
 
+	public List<Giocatore> setGiocatori(List<Giocatore> giocatori) {
+		this.giocatori.clear();
+		this.giocatori.addAll(giocatori);
+		return this.giocatori;
+	}
+
 	public Mazzo getMazzo() {
 		return mazzo;
 	}
