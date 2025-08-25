@@ -351,7 +351,7 @@ public class GameEngine implements Observer {
         // Avvia il primo turno: parte il giocatore Sud (umano)
         List<Giocatore> g = List.of(giocatoreSud, aiOvest, aiNord, aiEst);
         giocaTurnoUmano2v2(p, g, giocatoreSud);
-        showTerreno2v2(p);
+        showTerreno(p);
     }
 
     private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> ordineTurno, GiocatoreUmano umano) {
@@ -377,7 +377,7 @@ public class GameEngine implements Observer {
             after(400, () -> {
                 Carta cartaAI = ((GiocatoreAI) corrente).scegliCarta(partita);
                 giocaCarta(corrente, cartaAI, partita);
-                showTerreno2v2(partita);
+                showTerreno(partita);
                 giocaSequenzaRec(partita, giocatori, index + 1);
             });
 
@@ -429,7 +429,7 @@ public class GameEngine implements Observer {
             // Dopo un altro attimo, pulisci il terreno e avvia il nuovo turno
             after(400, () -> {
                 partita.clearTerreno();
-                showTerreno2v2(partita);
+                showTerreno(partita);
 
                 // Fine partita?
                 boolean finita = partita.isMazzoVuoto() && 
@@ -457,7 +457,7 @@ public class GameEngine implements Observer {
         Carta cartaAI = aiCorrente.scegliCarta(partita);
         giocaCarta(aiCorrente, cartaAI, partita);
 
-        showTerreno2v2(partita);
+        showTerreno(partita);
 
         // Poi gli altri a giro
         giocaSequenzaRec(partita, giocatori, 1);
@@ -598,11 +598,11 @@ public class GameEngine implements Observer {
 
     // Mostra lo stato attuale del terreno (usa già il tuo render della GameView)
     private void showTerreno(Partita p) {
-        gameView.setTerreno(p.getTerreno());
-    }
-
-    private void showTerreno2v2(Partita p) {
-        gameView2v2.setTerreno(p.getTerreno());
+        if(p instanceof Partita1v1) {
+            gameView.setTerreno(p.getTerreno());
+        } else {
+            gameView2v2.setTerreno(p.getTerreno());
+        }
     }
 
     /** Restituisce l'utente loggato. */

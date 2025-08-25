@@ -135,10 +135,13 @@ public class GameView2v2 extends JPanel {
                 gameEngine.visualizzaMenu(); // torna al menu
             }
         });
+        topHUD.add(Box.createHorizontalStrut(200));
         topHUD.add(avatarN);
         topHUD.add(nameN);
         topHUD.add(scoreNorthLabel);
         topHUD.add(squadLabel);
+        topHUD.add(Box.createHorizontalStrut(200));
+        topHUD.add(btnMenu);
 
         root.add(topHUD, BorderLayout.NORTH);
 
@@ -151,6 +154,8 @@ public class GameView2v2 extends JPanel {
         JLabel squadLabelBot = new JLabel(" -" + gameEngine.getGiocatoreUmano().getSquadra().getNome());
         JButton btnGioca = new JButton("Gioca");
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
+
+        bottomHUD.add(Box.createHorizontalStrut(200));
         bottomHUD.add(avatarS);
         bottomHUD.add(nameS);
         bottomHUD.add(btnGioca);
@@ -173,6 +178,7 @@ public class GameView2v2 extends JPanel {
         JLabel squadLabelLeft = new JLabel(" -" + gameEngine.getGiocatoreOvest().getSquadra().getNome());
         squadLabelLeft.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        leftHUD.add(Box.createVerticalStrut(50));
         leftHUD.add(avatarW);
         leftHUD.add(Box.createVerticalStrut(8));
         leftHUD.add(nameW);
@@ -188,6 +194,7 @@ public class GameView2v2 extends JPanel {
         rightHUD.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); // meno spazio dall'alto
 
         // avatar + info
+        rightHUD.add(Box.createVerticalStrut(150));
         JLabel avatarE = new JLabel(scale(playerEastAvatar, 50, 50));
         avatarE.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameE = new JLabel(playerEastName);
@@ -198,7 +205,7 @@ public class GameView2v2 extends JPanel {
         squadLabelRight.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // aggiunta in ordine verticale
-        rightHUD.add(btnMenu);
+        // rightHUD.add(btnMenu);
         rightHUD.add(Box.createVerticalStrut(12));
         rightHUD.add(avatarE);
         rightHUD.add(Box.createVerticalStrut(8));

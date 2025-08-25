@@ -42,22 +42,18 @@ public class Partita1v1 extends Partita {
         Carta cartaPrima = terr.get(0);
         Carta cartaSeconda = terr.get(1);
 
-        // Recupero i due giocatori
-        Giocatore primoGiocatore = giocatori.get(0);  // assumo che l'ordine sia Umano = 0, AI = 1
-        Giocatore secondoGiocatore = giocatori.get(1);
-
         Seme semeRegnante = cartaPrima.getSeme();
         Giocatore vincitore;
 
         if (cartaSeconda.getSeme() != semeRegnante) {
             // Vince automaticamente chi ha giocato la prima carta
-            vincitore = primoGiocatore;
+            vincitore = cartaPrima.getGiocatore();
         } else {
             // Entrambi hanno lo stesso seme → vince chi ha il valore più alto
             if (cartaPrima.getValore().getOrdinePresa() >= cartaSeconda.getValore().getOrdinePresa()) {
-                vincitore = primoGiocatore;
+                vincitore = cartaPrima.getGiocatore();
             } else {
-                vincitore = secondoGiocatore;
+                vincitore = cartaSeconda.getGiocatore();
             }
         }
         return vincitore;
