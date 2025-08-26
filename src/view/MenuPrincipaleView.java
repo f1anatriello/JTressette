@@ -24,11 +24,9 @@ public class MenuPrincipaleView extends JPanel {
     }
 
     private MenuPrincipaleView(GameEngine gameEngine) {
-        // Removed assignment to unused field
 
         setLayout(new BorderLayout());
-        setBackground(UIConstants.BACKGROUND_DARK);
-        setPreferredSize(new Dimension(400, 600));
+        setBackground(UIConstants.BACKGROUND_PANEL);
 
         // Header con logo
         BufferedImage logo = UIAssets.getInstance().getMenuLogo();
@@ -41,8 +39,9 @@ public class MenuPrincipaleView extends JPanel {
 
         JPanel header = UISettings.createPanel(null);
         header.setLayout(new BorderLayout());
-        header.setOpaque(false);
+        header.setOpaque(true);
         header.add(logoLabel, BorderLayout.CENTER);
+        header.setBackground(UIConstants.BACKGROUND_DARK);
         add(header, BorderLayout.NORTH);
 
         // Centro con i pulsanti (stack verticale)

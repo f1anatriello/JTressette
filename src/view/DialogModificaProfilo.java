@@ -59,10 +59,10 @@ public class DialogModificaProfilo {
             );
             JRadioButton avatarButton = new JRadioButton(icon);
             avatarButton.addActionListener(e -> {
-                controller.getPlayer().setAvatarPath(avatarPath);
+                controller.getUtente().setAvatarPath(avatarPath);
                 dialog.dispose();
                 controller.visualizzaProfilo();
-                UtentePojo utente = controller.getPlayer();
+                UtentePojo utente = controller.getUtente();
                 UserRepository.getInstance().aggiornaAvatar(utente.getUsername(), avatarPath);
             });
             avatarsPanel.add(avatarButton);

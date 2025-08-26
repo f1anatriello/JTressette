@@ -20,23 +20,24 @@ public final class UIConstants {
     // =========================
     // PALETTE Standard Applic.
     // =========================
-    public static final Color BACKGROUND_DARK        = new Color(255,215,0); 
-    public static final Color BACKGROUND_PANEL       = new Color(230,190,0); 
+    public static final Color BACKGROUND_DARK        = new Color(102, 2, 60); 
+    public static final Color BACKGROUND_PANEL       = new Color(128, 0, 64); 
     public static final Color TEXT_COLOR             = new Color(17, 17, 17);    
     public static final Color TEXT_MUTED             = new Color(80, 72, 60);
-    public static final Color ACCENT_COLOR           = new Color(0,0,0);   
+    public static final Color ACCENT_COLOR           = new Color(0,0,0);
+    public static final Color TITLE_COLOR            = new Color(255, 255, 255);   
 
     // Colori simili alle carte napoletane
     public static final Color ACCENT_RED             = new Color(198, 51, 43);   
-    public static final Color ACCENT_GREEN           = new Color(15, 138, 95);   
-    public static final Color ACCENT_BLUE            = new Color(4,113,252);   
+    public static final Color ACCENT_GREEN           = new Color(89, 189, 66);   
+    public static final Color ACCENT_YELLOW            = new Color(218, 155, 18);   
 
     // Bottoni
     public static final Color BUTTON_PRIMARY         = ACCENT_GREEN;
-    public static final Color BUTTON_PRIMARY_HOVER   = new Color(8, 127, 87);
+    public static final Color BUTTON_PRIMARY_HOVER   = new Color(82, 182, 59);
 
-    public static final Color BUTTON_SECONDARY       = ACCENT_BLUE;
-    public static final Color BUTTON_SECONDARY_HOVER = new Color(0, 106, 245);
+    public static final Color BUTTON_SECONDARY       = ACCENT_YELLOW;
+    public static final Color BUTTON_SECONDARY_HOVER = new Color(211, 148, 11);
 
     public static final Color BUTTON_TERTIARY          = ACCENT_RED;
     public static final Color BUTTON_TERTIARY_HOVER    = new Color(176, 40, 35);
@@ -48,7 +49,7 @@ public final class UIConstants {
     public static final Color INPUT_BORDER_COLOR     = ACCENT_COLOR;
 
     // Font misto tra un serif elegante e mono, simil LateX
-    public static final Font FONT_MAIN_TITLE = new Font("Georgia", Font.BOLD, 36);
+    public static final Font FONT_MAIN_TITLE = new Font("Papyrus", Font.BOLD, 36);
     public static final Font FONT_SUB_TITLE  = new Font("Georgia", Font.BOLD, 24);
     public static final Font FONT_REGULAR    = new Font("Georgia", Font.PLAIN, 16);
     public static final Font FONT_MONOSPACE  = new Font("Monospaced", Font.PLAIN, 14);
@@ -81,7 +82,7 @@ public final class UIConstants {
             BorderFactory.createLineBorder(INPUT_BORDER_COLOR, 2, true);
 
     public static final Border BORDER_INPUT_FOCUSED =
-            BorderFactory.createLineBorder(ACCENT_BLUE, 2, true);
+            BorderFactory.createLineBorder(ACCENT_YELLOW, 2, true);
 
     // Cursori
     public static final Cursor CURSOR_HAND    = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);

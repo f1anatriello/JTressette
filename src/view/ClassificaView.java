@@ -27,28 +27,28 @@ public class ClassificaView extends JPanel {
 
         titolo = new JLabel("Classifica");
         titolo.setFont(UIConstants.FONT_MAIN_TITLE);
-        titolo.setForeground(UIConstants.ACCENT_COLOR);
+        titolo.setForeground(UIConstants.TITLE_COLOR);
         add(titolo, BorderLayout.NORTH);
 
         classificaArea = new JTextArea(20, 40);
         classificaArea.setEditable(false);
         classificaArea.setFont(UIConstants.FONT_MONOSPACE);
-        classificaArea.setBackground(UIConstants.BACKGROUND_DARK);
+        classificaArea.setBackground(UIConstants.ACCENT_YELLOW);    
         classificaArea.setForeground(UIConstants.TEXT_COLOR);
+        classificaArea.setBorder(BorderFactory.createLineBorder(UIConstants.BACKGROUND_PANEL, 2));
 
         JScrollPane scroll = new JScrollPane(classificaArea);
         scroll.setBorder(BorderFactory.createEmptyBorder());
         add(scroll, BorderLayout.CENTER);
 
         btnMenu = new JButton("Torna al Menù");
-        UISettings.applyButtonStyle(btnMenu);
+        UISettings.applyButtonStyle(btnMenu, UISettings.ButtonVariant.TERTIARY);
         JPanel south = new JPanel();
         south.setOpaque(false);
         south.add(btnMenu);
         add(south, BorderLayout.SOUTH);
         btnMenu.addActionListener(e -> gameEngine.visualizzaMenu());
         
-        setSize(1000, 500);
     }
 
     /**

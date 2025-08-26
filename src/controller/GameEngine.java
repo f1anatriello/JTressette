@@ -18,7 +18,7 @@ import javax.swing.WindowConstants;
 import model.*;
 import ui.UIConstants;
 import view.ClassificaView;
-import view.GameView;
+import view.GameView1v1;
 import view.GameView2v2;
 import view.MenuPrincipaleView;
 import view.ProfiloView;
@@ -34,12 +34,12 @@ public class GameEngine implements Observer {
     private ClassificaView cv;
     private MenuPrincipaleView mpv;
     private ProfiloView pv;
-    private UtentePojo player;
-    private GiocatoreAI ai;
+    private UtentePojo utente;
+    private GiocatoreAI playerNord;
     private GiocatoreUmano playerUmano;
     private GiocatoreAI playerEst;
     private GiocatoreAI playerOvest;
-    private GameView gameView;
+    private GameView1v1 gameView;
     private GameView2v2 gameView2v2;
     private JFrame mainFrame;
     private Partita partita;
@@ -53,23 +53,23 @@ public class GameEngine implements Observer {
         if (arg instanceof Partita1v1) {
             Giocatore vincitore = (Giocatore) o;
             if (vincitore instanceof GiocatoreUmano) {
-                player.incrementaVinte();
+                utente.incrementaVinte();
             } else {
-                player.incrementaPerse();
+                utente.incrementaPerse();
             }
         } else if (arg instanceof Partita2v2) {
             Giocatore vincitore = (Giocatore) o;
             if (vincitore instanceof GiocatoreUmano) {
-                player.incrementaVinte();
+                utente.incrementaVinte();
             } else {
-                player.incrementaPerse();
+                utente.incrementaPerse();
             }
         }
     }
 
     private GameEngine(UtentePojo player) {
-        this.player = player;
-        this.ai = new GiocatoreAI();
+        this.utente = player;
+        this.playerNord = new GiocatoreAI();
         this.playerEst = new GiocatoreAI();
         this.playerOvest = new GiocatoreAI();
     }
@@ -89,18 +89,18 @@ public class GameEngine implements Observer {
     public void avviaNuovaPartita(int numPlayer) {
         if (numPlayer == 2) {
             List<Giocatore> giocatori = new ArrayList<>();
-            playerUmano = new GiocatoreUmano(this.player.getUsername());
+            playerUmano = new GiocatoreUmano(this.utente.getUsername());
             giocatori.add(playerUmano);
-            giocatori.add(ai);
+            giocatori.add(playerNord);
             partita = new Partita1v1(giocatori);
             partita.inizializzaPartita();
             iniziaPartita1v1((Partita1v1) partita);
         } else {
             List<Giocatore> giocatori = new ArrayList<>();
-            playerUmano = new GiocatoreUmano(this.player.getUsername());
+            playerUmano = new GiocatoreUmano(this.utente.getUsername());
             giocatori.add(playerUmano);
             giocatori.add(playerEst);
-            giocatori.add(ai);
+            giocatori.add(playerNord);
             giocatori.add(playerOvest);
             partita = new Partita2v2(giocatori);
             // chiamo il campo del 2v2
@@ -115,7 +115,6 @@ public class GameEngine implements Observer {
      * deve essere eseguito a fine turno dopo che entrambi i giocatori hanno
      * giocato e il terreno viene svuotato.
      */
-
     public void giocaCarta(Giocatore g, Carta c, Partita p) {
         // solo logica di stato, nessun refresh grafico qui
         List<Carta> mano = g.getMano();
@@ -133,10 +132,10 @@ public class GameEngine implements Observer {
      * partire il turno dell'umano.
      */
     public void iniziaPartita1v1(Partita1v1 p) {
-        gameView = GameView.getInstance(
+        gameView = GameView1v1.getInstance(
             this,
-            player.getUsername(),
-            new ImageIcon(player.getAvatarPath()),
+            utente.getUsername(),
+            new ImageIcon(utente.getAvatarPath()),
             p.getGiocatori().get(1).getNome(),
             new ImageIcon("images/avatars/avatar5.png"),
             p.getGiocatori().get(0).getMano(),
@@ -146,11 +145,11 @@ public class GameEngine implements Observer {
         setScreen(gameView);
 
         playerUmano = (GiocatoreUmano) p.getGiocatori().get(0);
-        ai = (GiocatoreAI) p.getGiocatori().get(1);
-        setOrder(p, playerUmano, ai); // parte l'umano per la prima mano
+        playerNord = (GiocatoreAI) p.getGiocatori().get(1);
+        setOrder(p, playerUmano, playerNord); // parte l'umano per la prima mano
 
         // Avvia il primo turno: parte l’umano
-        giocaTurnoUmano(p, playerUmano, ai);
+        giocaTurnoUmano(p, playerUmano, playerNord);
     }
 
     /**
@@ -160,14 +159,12 @@ public class GameEngine implements Observer {
      * attribuiti i punti e gestite le pescate. Infine viene ripulito il terreno
      * e la vista aggiornata.
      */
-    // GameEngine.java
-
     private void giocaTurnoUmano(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
         setOrder(partita, umano, ai);
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
 
-            // 1) l'umano gioca e mostri SUBITO la 1ª carta sul terreno
+            // 1) l'umano gioca e mostra SUBITO la 1° carta sul terreno
             giocaCarta(umano, carta, partita);
             showTerreno(partita);
 
@@ -284,7 +281,7 @@ public class GameEngine implements Observer {
             "Partita Terminata",
             JOptionPane.INFORMATION_MESSAGE
         );
-        GameView.disposeInstance();
+        GameView1v1.disposeInstance();
 
         visualizzaMenu();
     }
@@ -323,8 +320,8 @@ public class GameEngine implements Observer {
         gameView2v2 = GameView2v2.getInstance(
             this,
             // Giocatore Sud (umano principale)
-            player.getUsername(),
-            new ImageIcon(player.getAvatarPath()),
+            utente.getUsername(),
+            new ImageIcon(utente.getAvatarPath()),
             p.getGiocatori().get(0).getMano(),
             // Giocatore est (avversario 1)
             p.getGiocatori().get(1).getNome(),
@@ -477,10 +474,6 @@ public class GameEngine implements Observer {
         return result;
     }
 
-    public Partita getPartita() {
-        return this.partita;
-    }
-
     /**
      * Crea il frame principale e visualizza il menu dopo il login. Imposta il comportamento
      * della finestra alla chiusura.
@@ -510,14 +503,14 @@ public class GameEngine implements Observer {
     /** Avvia la view di modifica profilo. */
     public void avviaModificaProfilo() {
         pv = new ProfiloView(this);
-        pv.modificaProfilo(player);
+        pv.modificaProfilo(utente);
         setScreen(pv);
     }
 
     /** Visualizza il profilo dell'utente. */
     public void visualizzaProfilo() {
         pv = new ProfiloView(this);
-        pv.mostraProfilo(player);
+        pv.mostraProfilo(utente);
         setScreen(pv);
     }
 
@@ -537,7 +530,7 @@ public class GameEngine implements Observer {
     /* ===== UTILITIES ===== */
     private boolean isFixedSizedView(JPanel panel) {
         return !(panel instanceof MenuPrincipaleView ||
-                 panel instanceof ProfiloView);
+                 panel instanceof ProfiloView );
     }
 
     public void registerMainFrame(JFrame frame) {
@@ -606,8 +599,8 @@ public class GameEngine implements Observer {
     }
 
     /** Restituisce l'utente loggato. */
-    public UtentePojo getPlayer() {
-        return player;
+    public UtentePojo getUtente() {
+        return utente;
     }
 
     /** Restituisce il riferimento al GiocatoreUmano della partita corrente. */
@@ -617,7 +610,7 @@ public class GameEngine implements Observer {
 
     /** Restituisce il riferimento al GiocatoreAI della partita corrente. */
     public GiocatoreAI getGiocatoreAI() {
-        return this.ai;
+        return this.playerNord;
     }
 
     public GiocatoreAI getGiocatoreEst() {
@@ -627,4 +620,9 @@ public class GameEngine implements Observer {
     public GiocatoreAI getGiocatoreOvest() {
         return this.playerOvest;
     }
+
+        public Partita getPartita() {
+        return this.partita;
+    }
+
 }

@@ -22,5 +22,6 @@ public class GiocatoreUmano extends Giocatore {
         if (listener != null) {
             listener.onCartaScelta(c);
         }
+        
     }
 }
