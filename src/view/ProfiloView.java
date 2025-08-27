@@ -37,7 +37,8 @@ public class ProfiloView extends JPanel {
         lblNickname.setFont(UIConstants.FONT_SUB_TITLE);
         lblNickname.setForeground(UIConstants.ACCENT_COLOR);
         // padding contenuto; se hai costanti in UISettings per gli spazi, puoi sostituirle qui
-        lblNickname.setBorder(BorderFactory.createEmptyBorder(16, 16, 8, 16));
+        // Sposta il nickname più in basso aggiungendo spazio sopra con un padding maggiore
+        lblNickname.setBorder(BorderFactory.createEmptyBorder(110, 16, 8, 16));
         add(lblNickname, BorderLayout.NORTH);
 
         // ====== CENTER: Avatar + Statistiche (colonna centrata) ======
@@ -146,7 +147,7 @@ public class ProfiloView extends JPanel {
             }
             System.out.println("Stampo le statistiche");
             // Statistiche
-            lblStatistiche.setText(String.format("Giocate: %d | Vinte: %d | Perse: %d",
+            lblStatistiche.setText(String.format("Partite » | Giocate: %d | Vinte: %d | Perse: %d |",
                     UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartiteGiocate(),
                     UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartiteVinte(),
                     UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartitePerse()));

@@ -48,6 +48,9 @@ public class GameView2v2 extends JPanel {
     private JLabel scoreEastLabel;
     private JLabel scoreWestLabel;
 
+    private JButton btnGioca; 
+    private boolean playLocked = false; // per evitare doppi click sul bottone Gioca
+
     public static final Color BACKGROUND_GREEN = new Color(0, 128, 0);
 
     public static GameView2v2 getInstance(
@@ -153,7 +156,7 @@ public class GameView2v2 extends JPanel {
         JLabel nameS = new JLabel(playerSouthName);
         scoreSouthLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreUmano().getPunti());
         JLabel squadLabelBot = new JLabel(" -" + gameEngine.getGiocatoreUmano().getSquadra().getNome());
-        JButton btnGioca = new JButton("Gioca");
+        btnGioca = new JButton("Gioca");
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
 
         bottomHUD.add(Box.createHorizontalStrut(200));
@@ -269,6 +272,9 @@ public class GameView2v2 extends JPanel {
     /* ============== Azioni ============== */
 
     private void giocaCartaSelezionata() {
+        // Debounce: se è già stato premuto, ignora
+        if (playLocked) return;
+
         Carta sel = gameSupp.getSelected();
         if (sel == null) {
             JOptionPane.showMessageDialog(
@@ -276,13 +282,24 @@ public class GameView2v2 extends JPanel {
                 "Nessuna carta selezionata", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // Notifica al motore di gioco
+        // blocca il pulsante Gioca finché non riceviamo l'aggiornamento dal controller
+        playLocked = true;
+
+        // notifico al GiocatoreUmano (vero) che l’utente ha scelto questa carta
         gameEngine.getGiocatoreUmano().notificaCartaScelta(sel);
 
-        // Rimuovi la carta dalla mano dell'umano
+        // se non faccio questi due comandi, non mi aggiorna la partita come dovrebbe
         playerSouthHand.remove(sel);
-
-        // Refresh grafico
         render();
+    }
+
+    /**
+     * Sblocca il pulsante "Gioca" dopo che il controller ha processato la mossa.
+     * Viene richiamato dal controller tramite {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
+     * Abilita il pulsante "Gioca" se esiste.
+     */
+    public void unlockPlay() {
+        playLocked = false;
+        if (btnGioca != null) btnGioca.setEnabled(true);
     }
 }

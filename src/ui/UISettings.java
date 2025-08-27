@@ -17,10 +17,6 @@ public final class UISettings {
     // Varianti per i pulsanti
     public enum ButtonVariant { PRIMARY, SECONDARY, TERTIARY }
 
-    // ---------------------------------------------------------
-    // CREATION METHODS
-    // ---------------------------------------------------------
-
     /** Crea un JButton già stilizzato (con varianti e hover/press). */
     public static JButton createButton(String text, ButtonVariant variant) {
         JButton b = new JButton(text);
@@ -142,8 +138,7 @@ public final class UISettings {
     }
 
     /** Schiarisce un colore di delta (0–255) senza superare i limiti. */
-    @SuppressWarnings("unused")
-    private static Color lighten(Color c, int delta) {
+    public static Color lighten(Color c, int delta) {
         int r = Math.min(255, c.getRed()   + delta);
         int g = Math.min(255, c.getGreen() + delta);
         int b = Math.min(255, c.getBlue()  + delta);
@@ -151,7 +146,7 @@ public final class UISettings {
     }
 
     /** Scurisce un colore di delta (0–255) senza scendere sotto zero. */
-    private static Color darken(Color c, int delta) {
+    public static Color darken(Color c, int delta) {
         int r = Math.max(0, c.getRed()   - delta);
         int g = Math.max(0, c.getGreen() - delta);
         int b = Math.max(0, c.getBlue()  - delta);

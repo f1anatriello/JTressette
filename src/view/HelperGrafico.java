@@ -305,4 +305,9 @@ public class HelperGrafico extends JPanel {
         g2.drawImage(img, x, y, w, h, this);
         g2.setTransform(old);
     }
+
+    public void clearSelection() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'clearSelection'");
+    }
 }

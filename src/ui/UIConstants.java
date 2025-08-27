@@ -18,12 +18,12 @@ public final class UIConstants {
     // =========================
     // PALETTE Standard Applic.
     // =========================
-    public static final Color BACKGROUND_DARK        = new Color(102, 2, 60); 
-    public static final Color BACKGROUND_PANEL       = new Color(128, 0, 64); 
+    public static final Color BACKGROUND_DARK        = new Color(122,83,162); 
+    public static final Color BACKGROUND_PANEL       = new Color(153,112,194); 
     public static final Color TEXT_COLOR             = new Color(17, 17, 17);    
     public static final Color TEXT_MUTED             = new Color(80, 72, 60);
     public static final Color ACCENT_COLOR           = new Color(0,0,0);
-    public static final Color TITLE_COLOR            = new Color(255, 255, 255);   
+    public static final Color TITLE_COLOR            = new Color(50,50,50);   
 
     // Colori simili alle carte napoletane
     public static final Color ACCENT_RED             = new Color(198, 51, 43);   
@@ -35,7 +35,7 @@ public final class UIConstants {
     public static final Color BUTTON_PRIMARY_HOVER   = new Color(82, 182, 59);
 
     public static final Color BUTTON_SECONDARY       = ACCENT_YELLOW;
-    public static final Color BUTTON_SECONDARY_HOVER = new Color(211, 148, 11);
+    public static final Color BUTTON_SECONDARY_HOVER = new Color(208, 145, 8);
 
     public static final Color BUTTON_TERTIARY          = ACCENT_RED;
     public static final Color BUTTON_TERTIARY_HOVER    = new Color(176, 40, 35);
