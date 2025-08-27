@@ -40,17 +40,17 @@ public class LoginView extends JFrame{
         });
 
         JPanel root = new JPanel(new BorderLayout());
-        root.setBackground(UIConstants.BACKGROUND_DARK);
+        root.setBackground(UIConstants.ACCENT_YELLOW);
         setContentPane(root);
 
         JLabel titolo = UISettings.createTitleLabel("Benvenuto!");
-        JPanel header = UISettings.createPanel(null);
+        JPanel header = new JPanel();
         header.setLayout(new BorderLayout());
         header.setOpaque(false);
         header.add(titolo, BorderLayout.CENTER);
         root.add(header, BorderLayout.NORTH);
 
-        JPanel center = UISettings.createPanel(null);
+        JPanel center = new JPanel();
         center.setOpaque(false);
         center.setLayout(new GridBagLayout());
 

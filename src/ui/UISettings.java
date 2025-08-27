@@ -32,7 +32,7 @@ public final class UISettings {
     public static JLabel createTitleLabel(String text) {
         JLabel label = new JLabel(text, SwingConstants.CENTER);
         label.setFont(UIConstants.FONT_MAIN_TITLE);
-        label.setForeground(UIConstants.ACCENT_COLOR);
+        label.setForeground(UIConstants.TITLE_COLOR);
         label.setBorder(BorderFactory.createEmptyBorder(UIConstants.PADDING, UIConstants.PADDING,
                                                         UIConstants.PADDING, UIConstants.PADDING));
         return label;
@@ -44,7 +44,7 @@ public final class UISettings {
         panel.setOpaque(true);
         panel.setBackground(UIConstants.BACKGROUND_PANEL);
         Border border = titleIfAny == null || titleIfAny.isEmpty()
-                ? UIConstants.BORDER_ROUNDED
+                ? UIConstants.BORDER_STANDARD
                 : BorderFactory.createTitledBorder(UIConstants.BORDER_TITLE_PANEL, titleIfAny);
         panel.setBorder(border);
         return panel;
@@ -62,7 +62,7 @@ public final class UISettings {
         button.setFocusPainted(false);
         button.setContentAreaFilled(true);
         button.setOpaque(true);
-        button.setBorder(UIConstants.BORDER_ROUNDED);
+        button.setBorder(UIConstants.BORDER_STANDARD);
         button.setPreferredSize(new Dimension(UIConstants.BUTTON_WIDTH, UIConstants.BUTTON_HEIGHT));
 
         Color base = baseColorFor(variant);
@@ -117,7 +117,7 @@ public final class UISettings {
         panel.setOpaque(true);
         panel.setBackground(UIConstants.BACKGROUND_PANEL);
         if (panel.getBorder() == null) {
-            panel.setBorder(UIConstants.BORDER_ROUNDED);
+            panel.setBorder(UIConstants.BORDER_STANDARD);
         }
     }
 

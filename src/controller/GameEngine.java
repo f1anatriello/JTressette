@@ -18,7 +18,7 @@ import javax.swing.WindowConstants;
 import model.*;
 import ui.UIConstants;
 import view.ClassificaView;
-import view.GameView;
+import view.GameView1v1;
 import view.GameView2v2;
 import view.MenuPrincipaleView;
 import view.ProfiloView;
@@ -39,7 +39,7 @@ public class GameEngine implements Observer {
     private GiocatoreUmano playerUmano;
     private GiocatoreAI playerEst;
     private GiocatoreAI playerOvest;
-    private GameView gameView;
+    private GameView1v1 gameView;
     private GameView2v2 gameView2v2;
     private JFrame mainFrame;
     private Partita partita;
@@ -134,7 +134,7 @@ public class GameEngine implements Observer {
      * partire il turno dell'umano.
      */
     public void iniziaPartita1v1(Partita1v1 p) {
-        gameView = GameView.getInstance(
+        gameView = GameView1v1.getInstance(
             this,
             player.getUsername(),
             new ImageIcon(player.getAvatarPath()),
@@ -285,7 +285,7 @@ public class GameEngine implements Observer {
             "Partita Terminata",
             JOptionPane.INFORMATION_MESSAGE
         );
-        GameView.disposeInstance();
+        GameView1v1.disposeInstance();
 
         visualizzaMenu();
         reset();

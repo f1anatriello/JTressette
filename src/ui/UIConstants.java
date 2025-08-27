@@ -61,26 +61,26 @@ public final class UIConstants {
     public static final Dimension MENU_SIZE = new Dimension(400, 600); 
     public static final Dimension FIXED_VIEW_SIZE = new Dimension(960,640);
 
-    // Bordi arrotondati e con un filo di colore
-    public static final Border BORDER_ROUNDED =
-            BorderFactory.createLineBorder(ACCENT_COLOR, 2, true);
+    // Bordi 
+    public static final Border BORDER_STANDARD =
+        BorderFactory.createLineBorder(ACCENT_COLOR, 2, false);
 
     public static final Border BORDER_TITLE_PANEL = BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(ACCENT_COLOR, 2, true),
-            "",
-            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
-            javax.swing.border.TitledBorder.DEFAULT_POSITION,
-            FONT_SUB_TITLE,
-            ACCENT_COLOR
-    );
+        BorderFactory.createLineBorder(ACCENT_COLOR, 2, false),
+        "",
+        javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+        javax.swing.border.TitledBorder.DEFAULT_POSITION,
+        FONT_SUB_TITLE,
+        ACCENT_COLOR
+        );
     
     
 
     public static final Border BORDER_INPUT =
-            BorderFactory.createLineBorder(INPUT_BORDER_COLOR, 2, true);
+            BorderFactory.createLineBorder(INPUT_BORDER_COLOR, 2, false);
 
     public static final Border BORDER_INPUT_FOCUSED =
-            BorderFactory.createLineBorder(ACCENT_YELLOW, 2, true);
+            BorderFactory.createLineBorder(ACCENT_COLOR, 2, false);
 
     // Cursori
     public static final Cursor CURSOR_HAND    = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);

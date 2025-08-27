@@ -48,7 +48,7 @@ public class MenuPrincipaleView extends JPanel {
         // Centro con i pulsanti (stack verticale)
         JPanel center = UISettings.createPanel(null);
         center.setLayout(new GridBagLayout());
-        center.setOpaque(false);
+        center.setOpaque(true);
 
         JPanel stack = new JPanel(new GridLayout(0, 1, UIConstants.GAP, UIConstants.GAP));
         stack.setOpaque(false);
@@ -72,6 +72,7 @@ public class MenuPrincipaleView extends JPanel {
         center.add(stack, gbc);
 
         add(center, BorderLayout.CENTER);
+        center.setBackground(UIConstants.BACKGROUND_PANEL);
 
         // Azioni
         btnPartita1v1.addActionListener(e -> {

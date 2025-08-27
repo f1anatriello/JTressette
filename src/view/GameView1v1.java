@@ -13,9 +13,9 @@ import model.Carta;
  * Delegando il disegno delle carte al componente {@link GameSett2v2} e notificando
  * il controller quando l'utente seleziona e gioca una carta.
  */
-public class GameView extends JPanel {
+public class GameView1v1 extends JPanel {
 
-    private static GameView instance = null;
+    private static GameView1v1 instance = null;
 
     private String player1Name;
     private ImageIcon player1Avatar;
@@ -41,14 +41,14 @@ public class GameView extends JPanel {
 
     public static final Color BACKGROUND_GREEN = new Color(0, 128, 0);
 
-    public static GameView getInstance(
+    public static GameView1v1 getInstance(
             GameEngine gameEngine,
             String player1Name, ImageIcon player1Avatar,
             String player2Name, ImageIcon player2Avatar,
             List<Carta> player1Hand, List<Carta> player2Hand) {
 
         if (instance == null) {
-            instance = new GameView(
+            instance = new GameView1v1(
                     gameEngine,
                     player1Name, player1Avatar,
                     player2Name, player2Avatar, player1Hand, player2Hand);
@@ -56,7 +56,7 @@ public class GameView extends JPanel {
         return instance;
     }
 
-    private GameView(
+    private GameView1v1(
             GameEngine gameEngine,
             String player1Name, ImageIcon player1Avatar,
             String player2Name, ImageIcon player2Avatar,
@@ -122,7 +122,7 @@ public class GameView extends JPanel {
                 try {
                     gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null);
                 } catch (Exception ignore) {}
-                GameView.disposeInstance(); // <— importantissimo: azzera il singleton
+                GameView1v1.disposeInstance(); // <— importantissimo: azzera il singleton
                 gameEngine.visualizzaMenu(); // torna al menu
                 gameEngine.reset();
             }
