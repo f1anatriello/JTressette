@@ -65,6 +65,9 @@ public class Partita2v2 extends Partita {
     @Override
     public Giocatore manoVintaDa(List<Carta> terr) {
         if (terr == null || terr.size() != 4) {
+            if (terr == null) {
+                throw new IllegalArgumentException("Terreno non valido: terreno è null");
+            }
             System.out.println(terr.size());
             throw new IllegalArgumentException("Terreno non valido: devono esserci esattamente 4 carte");
         }

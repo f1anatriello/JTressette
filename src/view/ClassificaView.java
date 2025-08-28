@@ -67,7 +67,7 @@ public class ClassificaView extends JPanel {
 
         // ScrollPane con bordo coerente
         JScrollPane scroll = new JScrollPane(classificaTable);
-        scroll.setBorder(UIConstants.BORDER_STANDARD);
+        scroll.setBorder(BorderFactory.createLineBorder(UIConstants.ACCENT_YELLOW, 1));
         scroll.setPreferredSize(new Dimension(800, 400)); 
 
         // Pannello contenitore per centrare la tabella

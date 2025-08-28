@@ -117,9 +117,11 @@ public class GameEngine implements Observer {
         gameView.unlockPlay();
         setOrder1v1(partita, umano, ai);
 
+        AudioManager.getInstance().playLoop("src/audio/timer.wav");
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
 
+            AudioManager.getInstance().stop();
             // 1) l'umano gioca e mostri SUBITO la 1ª carta sul terreno
             giocaCarta(umano, carta, partita);
             showTerreno(partita);
@@ -156,6 +158,7 @@ public class GameEngine implements Observer {
                     }
 
                     if (vincente instanceof GiocatoreUmano) {
+                        AudioManager.getInstance().play("src/audio/win.wav"); // esempio di utilizzo di AudioManager
                         giocaTurnoUmano1V1(partita, umano, ai);
                     } else {
                         giocaTurnoAI1V1(partita, umano, ai);
@@ -207,6 +210,7 @@ public class GameEngine implements Observer {
                 }
 
                 if (vincente instanceof GiocatoreUmano) {
+                    AudioManager.getInstance().play("src/audio/win.wav"); // esempio di utilizzo di AudioManager
                     giocaTurnoUmano1V1(partita, umano, ai);
                 } else {
                     giocaTurnoAI1V1(partita, umano, ai);
@@ -283,15 +287,19 @@ public class GameEngine implements Observer {
 
         // Ordine di gioco di partenza: Sud, Ovest, Nord, Est
         List<Giocatore> g = List.of(giocatoreSud, aiOvest, aiNord, aiEst);
+        
         giocaTurnoUmano2v2(p, g, giocatoreSud);
         showTerreno(p);
     }
 
     private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> ordineTurno, GiocatoreUmano umano) {
         gameView2v2.unlockPlay();
+        AudioManager.getInstance().playLoop("src/audio/timer.wav"); // esempio di utilizzo di AudioManager
+
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
 
+            AudioManager.getInstance().stop();
             giocaCarta(umano, carta, partita);
             // Dopo l’umano giocano gli altri
             giocaSequenzaRec(partita, ordineTurno, ordineTurno.indexOf(umano) + 1);
@@ -327,9 +335,10 @@ public class GameEngine implements Observer {
             });
 
         } else if (corrente instanceof GiocatoreUmano) {
+            AudioManager.getInstance().playLoop("src/audio/timer.wav"); // esempio di utilizzo di AudioManager
             ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
                 if (carta == null) return;
-
+                AudioManager.getInstance().stop();
                 giocaCarta(corrente, carta, partita);
                 giocaSequenzaRec(partita, giocatori, index + 1);
             });
@@ -382,6 +391,7 @@ public class GameEngine implements Observer {
                 }
 
                 if (vincente instanceof GiocatoreUmano) {
+                    AudioManager.getInstance().play("src/audio/win.wav"); // esempio di utilizzo di AudioManager
                     giocaTurnoUmano2v2(partita, ordineGioco2v2, (GiocatoreUmano) vincente);
                 } else {
                     giocaTurnoAI2v2(partita, ordineGioco2v2, (GiocatoreAI) vincente);
@@ -475,6 +485,7 @@ public class GameEngine implements Observer {
         mano.remove(c);
         g.setMano(mano);
         p.getTerreno().add(c);
+        AudioManager.getInstance().play("src/audio/card-sound.wav"); // esempio di utilizzo di AudioManager
     }
 
 
@@ -490,7 +501,7 @@ public class GameEngine implements Observer {
     private void showTerreno(Partita p) {
         if (p instanceof Partita1v1) {
             gameView.setTerreno(p.getTerreno());
-        } else {
+        } else if (p instanceof Partita2v2) {
             gameView2v2.setTerreno(p.getTerreno());
         }
     }
