@@ -1,12 +1,12 @@
 package view;
 
-import controller.AudioManager;
 import controller.GameEngine;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import model.Carta; // Ensure this is the correct package for AudioManager
+import ui.AudioManager;
 
 /**
  * View per la modalità 1v1 (giocatore umano vs AI).

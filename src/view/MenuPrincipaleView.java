@@ -1,10 +1,11 @@
 package view;
 
-import controller.AudioManager;
 import controller.GameEngine;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
+
+import ui.AudioManager;
 import ui.UIAssets;
 import ui.UIConstants;
 import ui.UISettings;

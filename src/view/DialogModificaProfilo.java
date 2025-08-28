@@ -1,6 +1,5 @@
 package view;
 
-import controller.AudioManager;
 import controller.GameEngine;
 import data.*;
 import java.awt.image.BufferedImage;
@@ -12,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.WindowConstants;
+
+import ui.AudioManager;
 import ui.UIAssets;
 
 public class DialogModificaProfilo {

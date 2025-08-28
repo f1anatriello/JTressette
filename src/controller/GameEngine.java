@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import model.*;
+import ui.AudioManager;
 import ui.UIConstants;
 import view.Celebrations;
 import view.ClassificaView;

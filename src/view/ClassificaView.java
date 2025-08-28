@@ -1,7 +1,6 @@
 package view;
 
-import controller.AudioManager;
-    import controller.GameEngine;
+import controller.GameEngine;
     import data.UtentePojo;
     import java.awt.*;
     import java.util.List;
@@ -9,7 +8,9 @@ import controller.AudioManager;
     import javax.swing.table.DefaultTableCellRenderer;
     import javax.swing.table.DefaultTableModel;
     import javax.swing.table.JTableHeader; // Ensure this matches the package where AudioManager is located
-    import ui.UIConstants;
+
+import ui.AudioManager;
+import ui.UIConstants;
     import ui.UISettings;
 
 public class ClassificaView extends JPanel {

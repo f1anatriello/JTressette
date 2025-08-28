@@ -1,4 +1,4 @@
-package controller;
+package ui;
 
 import java.io.File;
 import javax.sound.sampled.AudioInputStream;

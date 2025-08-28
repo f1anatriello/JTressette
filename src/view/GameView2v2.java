@@ -1,6 +1,5 @@
 package view;
 
-import controller.AudioManager;
 import controller.GameEngine;
 import java.awt.*;
 import java.util.ArrayList;
@@ -8,6 +7,7 @@ import java.util.List;
 import javax.swing.*;
 import model.Carta;
 import model.Giocatore;
+import ui.AudioManager;
 
 /**
  * Vista principale della partita 2v2.

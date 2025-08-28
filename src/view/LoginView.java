@@ -1,6 +1,5 @@
 package view;
 
-import controller.AudioManager;
 import controller.GameEngine;
 import data.UserRepository;
 import data.UtentePojo;
@@ -8,6 +7,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
+
+import ui.AudioManager;
 import ui.UIConstants;
 import ui.UISettings;
 
