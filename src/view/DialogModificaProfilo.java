@@ -59,7 +59,7 @@ public class DialogModificaProfilo {
             );
             JRadioButton avatarButton = new JRadioButton(icon);
             avatarButton.addActionListener(e -> {
-                AudioManager.getInstance().play("src/audio/button.wav");
+                AudioManager.getInstance().play("src/audio/avatar.wav");
                 controller.getPlayer().setAvatarPath(avatarPath);
                 dialog.dispose();
                 controller.visualizzaProfilo();

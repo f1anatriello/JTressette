@@ -74,8 +74,8 @@ public class ProfiloView extends JPanel {
         btnMenu     = UISettings.createButton("Torna al Menù", UISettings.ButtonVariant.TERTIARY);
 
         btnModifica.addActionListener(e -> {
-            controller.avviaModificaProfilo();
             AudioManager.getInstance().play("src/audio/button.wav");
+            controller.avviaModificaProfilo();
         });
         btnMenu.addActionListener(e -> {
             controller.visualizzaMenu();

@@ -80,12 +80,12 @@ public class MenuPrincipaleView extends JPanel {
         // Azioni
         btnPartita1v1.addActionListener(e -> {
             AudioManager.getInstance().stop();
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("src/audio/start.wav");
             gameEngine.avviaNuovaPartita(2);
         });
         btnPartita2v2.addActionListener(e -> {
             AudioManager.getInstance().stop();
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("src/audio/start.wav");
             gameEngine.avviaNuovaPartita(4);
         });
         btnProfilo.addActionListener(e -> {
@@ -93,7 +93,7 @@ public class MenuPrincipaleView extends JPanel {
             gameEngine.visualizzaProfilo();
         });
         btnClassifica.addActionListener(e -> {
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("../audio/button.wav");
             gameEngine.visualizzaStatistiche();
         });
         btnEsci.addActionListener(e -> {
