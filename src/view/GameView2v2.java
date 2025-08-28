@@ -1,5 +1,6 @@
 package view;
 
+import controller.AudioManager;
 import controller.GameEngine;
 import java.awt.*;
 import java.util.ArrayList;
@@ -123,6 +124,8 @@ public class GameView2v2 extends JPanel {
 
         JButton btnMenu = new JButton("⬅ Torna al Menù");
         btnMenu.addActionListener(e -> {
+            AudioManager.getInstance().stop();
+            AudioManager.getInstance().play("src/audio/button.wav");
             int scl = JOptionPane.showConfirmDialog(
                     this,
                     "Tornare al menù principale?\nLa partita in corso andrà persa.",
@@ -131,12 +134,17 @@ public class GameView2v2 extends JPanel {
                     JOptionPane.QUESTION_MESSAGE
             );
             if (scl == JOptionPane.YES_OPTION) {
+                AudioManager.getInstance().stop();
+                AudioManager.getInstance().play("src/audio/button.wav");
+                // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav");
                 try {
                     gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null);
                 } catch (Exception ignore) {}
                 GameView2v2.disposeInstance(); // <— importantissimo: azzera il singleton
                 gameEngine.visualizzaMenu(); // torna al menu
                 gameEngine.reset();
+            } else {
+                AudioManager.getInstance().playLoop("src/audio/timer.wav");
             }
         });
         topHUD.add(Box.createHorizontalStrut(200));

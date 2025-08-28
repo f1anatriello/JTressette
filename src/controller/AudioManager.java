@@ -21,6 +21,10 @@ public class AudioManager {
 	private AudioManager() {
 
 	}
+
+	public void reset() {
+		instance = null;
+	}
 	
 
 	/**

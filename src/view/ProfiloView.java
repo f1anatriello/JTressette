@@ -1,12 +1,13 @@
 package view;
 
+import controller.AudioManager;
 import controller.GameEngine;
 import data.UserRepository;
 import data.UtentePojo;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
-import ui.UIAssets;
+import ui.UIAssets; // Ensure this matches the actual package of AudioManager
 import ui.UIConstants;
 import ui.UISettings;
 
@@ -72,10 +73,14 @@ public class ProfiloView extends JPanel {
         btnModifica = UISettings.createButton("Modifica Profilo", UISettings.ButtonVariant.PRIMARY);
         btnMenu     = UISettings.createButton("Torna al Menù", UISettings.ButtonVariant.TERTIARY);
 
-        
-        btnModifica.addActionListener(e -> controller.avviaModificaProfilo());
-        btnMenu.addActionListener(e -> controller.visualizzaMenu());
-
+        btnModifica.addActionListener(e -> {
+            controller.avviaModificaProfilo();
+            AudioManager.getInstance().play("src/audio/button.wav");
+        });
+        btnMenu.addActionListener(e -> {
+            controller.visualizzaMenu();
+            AudioManager.getInstance().play("src/audio/button.wav");
+        });
 
         // Wrapper centrato per la colonna di bottoni
         JPanel southWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));

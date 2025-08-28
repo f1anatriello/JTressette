@@ -234,6 +234,7 @@ public class GameEngine implements Observer {
      * Dialogo di fine partita 1v1.
      */
     private void finePartita1v1(Partita1v1 p) {
+        AudioManager.getInstance().stop();
         Giocatore vincitore = p.vincitore1v1();
 
         update(vincitore, p);
@@ -245,7 +246,7 @@ public class GameEngine implements Observer {
             JOptionPane.INFORMATION_MESSAGE
         );
         GameView1v1.disposeInstance();
-
+        // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav");
         visualizzaMenu();
         reset();
     }
@@ -314,7 +315,7 @@ public class GameEngine implements Observer {
         showTerreno(partita);
 
         // Poi gli altri a giro
-        giocaSequenzaRec(partita, giocatori, 1);
+        giocaSequenzaRec(partita, giocatori, giocatori.indexOf(aiCorrente) + 1);
     }
 
 
@@ -415,6 +416,8 @@ public class GameEngine implements Observer {
     }
 
     private void finePartita2v2(Partita2v2 p) {
+        AudioManager.getInstance().stop();
+
         Giocatore vincitore = p.vincitore2v2();
 
         if (vincitore == null) {
@@ -425,6 +428,7 @@ public class GameEngine implements Observer {
                 JOptionPane.INFORMATION_MESSAGE
             );
             GameView2v2.disposeInstance();
+            // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav");
             visualizzaMenu();
             reset();
             return;

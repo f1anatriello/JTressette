@@ -1,5 +1,6 @@
 package view;
 
+import controller.AudioManager;
 import controller.GameEngine;
 import data.UserRepository;
 import data.UtentePojo;
@@ -34,6 +35,7 @@ public class LoginView extends JFrame{
                 );
 
                 if (scl == JOptionPane.YES_OPTION) {
+                    AudioManager.getInstance().play("src/audio/button.wav");
                     System.exit(0);
                 }
             }
@@ -84,12 +86,14 @@ public class LoginView extends JFrame{
 
         // Actions
         btnEntra.addActionListener(e -> {
+            AudioManager.getInstance().play("src/audio/button.wav");
             String username = txtUsername.getText().trim();
 
             if (!UserRepository.isValidUsername(username)) {
                 JOptionPane.showMessageDialog(this,
                         "Nickname non valido.\nAmmessi: 3–20 caratteri, lettere/numeri, _ - .",
                         "Attenzione", JOptionPane.WARNING_MESSAGE);
+                AudioManager.getInstance().play("src/audio/button.wav");
                 return;
             }
 
@@ -97,13 +101,14 @@ public class LoginView extends JFrame{
             JOptionPane.showMessageDialog(this,
                     existed != null ? "Bentornato, " + username + "!" : "Creato nuovo utente: " + username,
                     "Accesso", JOptionPane.INFORMATION_MESSAGE);
-
+            AudioManager.getInstance().play("src/audio/button.wav");
             GameEngine engine = GameEngine.getInstance(existed);
             engine.avviaUIPrincipale();    // crea la JFrame principale e mostra il menu
             dispose();                    // chiudi il login
         });
 
         btnEsci.addActionListener(e -> {
+                AudioManager.getInstance().play("src/audio/button.wav");
                 System.exit(0);
         });
 

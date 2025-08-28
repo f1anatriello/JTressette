@@ -1,6 +1,6 @@
 package view;
 
-// Ensure the import path is correct; adjust if necessary
+import controller.AudioManager;
 import controller.GameEngine;
 import data.*;
 import java.awt.image.BufferedImage;
@@ -59,6 +59,7 @@ public class DialogModificaProfilo {
             );
             JRadioButton avatarButton = new JRadioButton(icon);
             avatarButton.addActionListener(e -> {
+                AudioManager.getInstance().play("src/audio/button.wav");
                 controller.getPlayer().setAvatarPath(avatarPath);
                 dialog.dispose();
                 controller.visualizzaProfilo();

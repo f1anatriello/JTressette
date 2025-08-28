@@ -1,13 +1,14 @@
 package view;
 
-import controller.GameEngine;
+import controller.AudioManager;
+    import controller.GameEngine;
     import data.UtentePojo;
     import java.awt.*;
     import java.util.List;
     import javax.swing.*;
     import javax.swing.table.DefaultTableCellRenderer;
     import javax.swing.table.DefaultTableModel;
-    import javax.swing.table.JTableHeader;
+    import javax.swing.table.JTableHeader; // Ensure this matches the package where AudioManager is located
     import ui.UIConstants;
     import ui.UISettings;
 
@@ -79,7 +80,10 @@ public class ClassificaView extends JPanel {
 
         // Bottone per tornare al menù, stilizzato con variante TERTIARY
         btnMenu = UISettings.createButton("Torna al Menù", UISettings.ButtonVariant.TERTIARY);
-        btnMenu.addActionListener(e -> gameEngine.visualizzaMenu());
+        btnMenu.addActionListener(e -> {
+            gameEngine.visualizzaMenu();
+            AudioManager.getInstance().play("src/audio/button.wav");
+        });
         JPanel south = new JPanel();
         south.setOpaque(false);
         south.add(btnMenu);

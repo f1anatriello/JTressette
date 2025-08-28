@@ -1,11 +1,12 @@
 package view;
 
+import controller.AudioManager;
 import controller.GameEngine;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
-import model.Carta;
+import model.Carta; // Ensure this is the correct package for AudioManager
 
 /**
  * View per la modalità 1v1 (giocatore umano vs AI).
@@ -149,7 +150,10 @@ public class GameView1v1 extends JPanel {
         JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
         rightTop.setOpaque(false);
         JButton btnMenu = new JButton("⬅ Torna al Menù");
+        
         btnMenu.addActionListener(e -> {
+            AudioManager.getInstance().stop();
+            AudioManager.getInstance().play("src/audio/button.wav");
             int scl = JOptionPane.showConfirmDialog(
                     this,
                     "Tornare al menù principale?\nLa partita in corso andrà persa.",
@@ -158,12 +162,16 @@ public class GameView1v1 extends JPanel {
                     JOptionPane.QUESTION_MESSAGE
             );
             if (scl == JOptionPane.YES_OPTION) {
+                AudioManager.getInstance().play("src/audio/button.wav");
+                // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav");
                 try {
                     gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null);
                 } catch (Exception ignore) {}
                 GameView1v1.disposeInstance(); // <— importantissimo: azzera il singleton
                 gameEngine.visualizzaMenu(); // torna al menu
                 gameEngine.reset();
+            } else {
+                AudioManager.getInstance().playLoop("src/audio/timer.wav");
             }
         });
         rightTop.add(btnMenu);
