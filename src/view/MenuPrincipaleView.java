@@ -4,7 +4,6 @@ import controller.GameEngine;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
-
 import ui.AudioManager;
 import ui.UIAssets;
 import ui.UIConstants;
@@ -94,7 +93,7 @@ public class MenuPrincipaleView extends JPanel {
             gameEngine.visualizzaProfilo();
         });
         btnClassifica.addActionListener(e -> {
-            AudioManager.getInstance().play("../audio/button.wav");
+            AudioManager.getInstance().play("src/audio/button.wav");
             gameEngine.visualizzaStatistiche();
         });
         btnEsci.addActionListener(e -> {
