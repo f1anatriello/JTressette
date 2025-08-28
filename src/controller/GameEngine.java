@@ -17,11 +17,12 @@ import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import model.*;
 import ui.UIConstants;
+import view.Celebrations;
 import view.ClassificaView;
 import view.GameView1v1;
 import view.GameView2v2;
 import view.MenuPrincipaleView;
-import view.ProfiloView;
+import view.ProfiloView; // Ensure this is the correct package for the Celebrations class
 
 /**
  * Controller dell'applicazione: gestisce le azioni dell'interfaccia utente,
@@ -234,21 +235,26 @@ public class GameEngine implements Observer {
      * Dialogo di fine partita 1v1.
      */
     private void finePartita1v1(Partita1v1 p) {
-        AudioManager.getInstance().stop();
+        AudioManager.getInstance().playLoop("src/audio/bigwin.wav");
         Giocatore vincitore = p.vincitore1v1();
+        if (vincitore instanceof GiocatoreUmano) {
+            player.incrementaVinte();
+        } else {
+            player.incrementaPerse();
+        }
 
-        update(vincitore, p);
-
-        JOptionPane.showMessageDialog(
+        // Dialog celebrativo con confetti
+        Celebrations.showVictoryDialog(
             mainFrame,
-            "La partita è finita! Il vincitore è: " + vincitore.getNome(),
-            "Partita Terminata",
-            JOptionPane.INFORMATION_MESSAGE
+            "La partita è finita!",
+            "🏆 Vincitore: " + vincitore.getNome() + " 🏆",
+            () -> {
+                AudioManager.getInstance().stop();
+                AudioManager.getInstance().play("src/audio/button.wav");
+                GameView1v1.disposeInstance();
+                visualizzaMenu();
+            }
         );
-        GameView1v1.disposeInstance();
-        // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav");
-        visualizzaMenu();
-        reset();
     }
 
     /* ================================================================
@@ -416,34 +422,26 @@ public class GameEngine implements Observer {
     }
 
     private void finePartita2v2(Partita2v2 p) {
-        AudioManager.getInstance().stop();
-
+        AudioManager.getInstance().playLoop("src/audio/bigwin.wav");
         Giocatore vincitore = p.vincitore2v2();
-
-        if (vincitore == null) {
-            JOptionPane.showMessageDialog(
-                mainFrame,
-                "La partita è finita! La partita è finita in pareggio!",
-                "Partita Terminata",
-                JOptionPane.INFORMATION_MESSAGE
-            );
-            GameView2v2.disposeInstance();
-            // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav");
-            visualizzaMenu();
-            reset();
-            return;
+        if (vincitore instanceof GiocatoreUmano) {
+            player.incrementaVinte();
+        } else {
+            player.incrementaPerse();
         }
 
-        update(vincitore, p);
-
-        JOptionPane.showMessageDialog(
+        // Dialog celebrativo con confetti
+        Celebrations.showVictoryDialog(
             mainFrame,
-            "La partita è finita! Il vincitore è: " + vincitore.getSquadra().getNome(),
-            "Partita Terminata",
-            JOptionPane.INFORMATION_MESSAGE
+            "La partita è finita!",
+            "🏆 Vincitore: " + vincitore.getSquadra().getNome() + " 🏆",
+            () -> {
+                AudioManager.getInstance().stop();
+                AudioManager.getInstance().play("src/audio/button.wav");
+                GameView2v2.disposeInstance();
+                visualizzaMenu();
+            }
         );
-        visualizzaMenu();
-        reset();
     }
 
     /* ================================================================
