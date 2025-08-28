@@ -18,12 +18,13 @@ import javax.swing.WindowConstants;
 import model.*;
 import ui.AudioManager;
 import ui.UIConstants;
-import view.Celebrations;
+import view.DialogCelebrations;
 import view.ClassificaView;
 import view.GameView1v1;
 import view.GameView2v2;
+import view.LoginView;
 import view.MenuPrincipaleView;
-import view.ProfiloView; // Ensure this is the correct package for the Celebrations class
+import view.ProfiloView;
 
 /**
  * Controller dell'applicazione: gestisce le azioni dell'interfaccia utente,
@@ -47,6 +48,7 @@ public class GameEngine implements Observer {
     private JFrame mainFrame;
     private Partita partita;
     private List<Giocatore> ordineGioco2v2;
+
 
     /* =========== COSTRUTTORI - SINGLETON =============== */
 
@@ -97,7 +99,7 @@ public class GameEngine implements Observer {
             player.getUsername(),
             new ImageIcon(player.getAvatarPath()),
             p.getGiocatori().get(1).getNome(),
-            new ImageIcon("images/avatars/avatar5.png"),
+            new ImageIcon("images/avatars/avatar"+(3 + (int)(Math.random() * 3))+".png"),
             p.getGiocatori().get(0).getMano(),
             p.getGiocatori().get(1).getMano()
         );
@@ -245,7 +247,7 @@ public class GameEngine implements Observer {
         }
 
         // Dialog celebrativo con confetti
-        Celebrations.showVictoryDialog(
+        DialogCelebrations.showVictoryDialog(
             mainFrame,
             "La partita è finita!",
             "🏆 Vincitore: " + vincitore.getNome() + " 🏆",
@@ -432,7 +434,7 @@ public class GameEngine implements Observer {
         }
 
         // Dialog celebrativo con confetti
-        Celebrations.showVictoryDialog(
+        DialogCelebrations.showVictoryDialog(
             mainFrame,
             "La partita è finita!",
             "🏆 Vincitore: " + vincitore.getSquadra().getNome() + " 🏆",
@@ -575,6 +577,7 @@ public class GameEngine implements Observer {
         });
     }
 
+
     /** Visualizza il menu principale. */
     public void visualizzaMenu() {
         mpv = MenuPrincipaleView.getInstance(this);
@@ -627,4 +630,5 @@ public class GameEngine implements Observer {
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
     }
+
 }

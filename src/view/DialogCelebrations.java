@@ -4,9 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
-public final class Celebrations {
+public final class DialogCelebrations {
  
-    private Celebrations() {}
+    private DialogCelebrations() {}
 
     public static void showVictoryDialog(Window owner, String title, String subtitle, Runnable onClose) {
         // dialog modale con owner corretto (niente glitch)
