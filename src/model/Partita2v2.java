@@ -2,12 +2,26 @@ package model;
 
 import java.util.List;
 
+/**
+ * Rappresenta una partita di briscola 2 contro 2.
+ * Implementa il pattern Singleton per garantire che ci sia una sola istanza di Partita2v2.
+ * Estende la classe astratta Partita.
+ * @author 1957447
+ */
 public class Partita2v2 extends Partita {
 
+    /**
+     * Istanza singleton di Partita2v2.
+     */
     private static Partita2v2 instance = null;
     private Squadra squadra1;
     private Squadra squadra2;
 
+    /**
+     * Costruttore privato per il pattern Singleton.
+     * Inizializza le squadre con i giocatori forniti.
+     * @param giocatori Lista di 4 giocatori (2 per squadra).
+     */
     public Partita2v2(List<Giocatore> giocatori) {
         super(giocatori);
         if (giocatori.size() != 4) {
@@ -21,6 +35,12 @@ public class Partita2v2 extends Partita {
         giocatori.get(3).setSquadra(squadra2);
     }
 
+    /**
+     * Restituisce l'istanza singleton di Partita2v2.
+     * Se l'istanza non esiste, la crea con i giocatori forniti.
+     * @param giocatori Lista di 4 giocatori (2 per squadra).
+     * @return Istanza singleton di Partita2v2.
+     */
     public static Partita2v2 getInstance(List<Giocatore> giocatori) {
         if (instance == null) {
             instance = new Partita2v2(giocatori);
@@ -28,6 +48,10 @@ public class Partita2v2 extends Partita {
         return instance;
     }
 
+    /**
+     * Resetta lo stato della partita, permettendo di iniziare una nuova partita.
+     * Imposta l'istanza singleton a null.
+     */
     @Override
     public void reset() {
         giocatori.clear();
@@ -40,7 +64,8 @@ public class Partita2v2 extends Partita {
     }
 
     /**
-     * Restituisce il nome della squadra vincente (Nord-Sud o Est-Ovest)
+     * Determina il vincitore della partita 2v2.
+     * @return La squadra che ha vinto la partita (sotto forma del primo giocatore della squadra vincente).
      */
     public Giocatore vincitore2v2() {
         return List.of(squadra1, squadra2).stream()
@@ -52,6 +77,8 @@ public class Partita2v2 extends Partita {
     /**
      * Determina il vincitore della mano (tra 4 carte giocate).
      * @param terr Lista di 4 carte (una per ciascun giocatore).
+     * @return Il giocatore che ha vinto la mano.
+     * @throws IllegalArgumentException se la lista di carte non è valida (null o non contiene esattamente 4 carte).
      */
     @Override
     public Giocatore manoVintaDa(List<Carta> terr) {

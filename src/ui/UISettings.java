@@ -7,9 +7,11 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 /**
- * Factory e helper per creare/stilizzare componenti UI Swing in modo coerente,
- * secondo lo stile impostato dalle costanti in UIConstants.
+ * Classe contentente costanti grafiche e di stile per l'interfaccia utente.
+ * Include metodi helper per creare componenti stilizzati coerentemente.
+ * @author 1957447
  */
+
 public final class UISettings {
 
     private UISettings() {}
@@ -17,14 +19,23 @@ public final class UISettings {
     // Varianti per i pulsanti
     public enum ButtonVariant { PRIMARY, SECONDARY, TERTIARY }
 
-    /** Crea un JButton già stilizzato (con varianti e hover/press). */
+    /** 
+     * Crea un JButton già stilizzato (con varianti e hover/press). 
+     * @param text Il testo del pulsante.
+     * @param variant La variante di stile del pulsante (PRIMARY, SECONDARY, TERTIARY).
+     * @return Un JButton con lo stile applicato.
+    */
     public static JButton createButton(String text, ButtonVariant variant) {
         JButton b = new JButton(text);
         applyButtonStyle(b, variant);
         return b;
     }
 
-    /** Crea un JLabel per il titolo principale. */
+    /** 
+     * Crea un JLabel per il titolo principale. 
+     * @param text Il testo del titolo.
+     * @return Un JLabel stilizzato come titolo.
+     * */
     public static JLabel createTitleLabel(String text) {
         JLabel label = new JLabel(text, SwingConstants.CENTER);
         label.setFont(UIConstants.FONT_MAIN_TITLE);
@@ -34,7 +45,10 @@ public final class UISettings {
         return label;
     }
 
-    /** Crea un pannello base (es. contenitore schermata). */
+    /** Crea un pannello base (es. contenitore schermata). 
+     * @param titleIfAny Titolo opzionale per il bordo del pannello (null o "" per nessun titolo).
+     * @return Un JPanel con lo stile applicato.
+    */
     public static JPanel createPanel(String titleIfAny) {
         JPanel panel = new JPanel();
         panel.setOpaque(true);
@@ -50,7 +64,10 @@ public final class UISettings {
     // STYLE APPLIERS
     // ---------------------------------------------------------
 
-    /** Applica lo stile standard a un pulsante con variante (hover/press). */
+    /** Applica lo stile standard a un pulsante con variante (hover/press). 
+     * @param button Il JButton da stilizzare.
+     * @param variant La variante di stile del pulsante (PRIMARY, SECONDARY, TERTIARY).
+    */
     public static void applyButtonStyle(JButton button, ButtonVariant variant) {
         button.setFont(UIConstants.FONT_REGULAR);
         button.setForeground(UIConstants.TEXT_COLOR);
@@ -61,8 +78,8 @@ public final class UISettings {
         button.setBorder(UIConstants.BORDER_STANDARD);
         button.setPreferredSize(new Dimension(UIConstants.BUTTON_WIDTH, UIConstants.BUTTON_HEIGHT));
 
-        Color base = baseColorFor(variant);
-        Color hover = hoverColorFor(variant);
+        Color base = baseColor(variant);
+        Color hover = hoverColor(variant);
         button.setBackground(base);
 
         // Effetti hover/press
@@ -82,12 +99,16 @@ public final class UISettings {
         });
     }
 
-    /** Versione compatibile con l'esempio originale (default: PRIMARY). */
+    /** Versione compatibile con l'esempio originale (default: PRIMARY). 
+     * @param button Il JButton da stilizzare.
+    */
     public static void applyButtonStyle(JButton button) {
         applyButtonStyle(button, ButtonVariant.PRIMARY);
     }
 
-    /** Applica stile coerente a JTextField. */
+    /** Applica stile coerente a JTextField. 
+     * @param field Il JTextField da stilizzare.
+    */
     public static void applyTextFieldStyle(JTextField field) {
         field.setFont(UIConstants.FONT_REGULAR);
         field.setForeground(UIConstants.INPUT_FG);
@@ -108,7 +129,10 @@ public final class UISettings {
         });
     }
 
-    /** Applica stile base a un JPanel già creato. */
+    /** Applica stile base a un JPanel già creato. 
+     * @param panel Il JPanel da stilizzare.
+     * Se il pannello non ha un bordo, gli viene applicato BORDER_STANDARD.
+    */
     public static void applyPanelStyle(JPanel panel) {
         panel.setOpaque(true);
         panel.setBackground(UIConstants.BACKGROUND_PANEL);
@@ -120,8 +144,8 @@ public final class UISettings {
     // ---------------------------------------------------------
     // HELPERS
     // ---------------------------------------------------------
-
-    private static Color baseColorFor(ButtonVariant v) {
+ 
+    private static Color baseColor(ButtonVariant v) {
         switch (v) {
             case SECONDARY: return UIConstants.BUTTON_SECONDARY;
             case TERTIARY:    return UIConstants.BUTTON_TERTIARY;
@@ -129,7 +153,7 @@ public final class UISettings {
         }
     }
 
-    private static Color hoverColorFor(ButtonVariant v) {
+    private static Color hoverColor(ButtonVariant v) {
         switch (v) {
             case SECONDARY: return UIConstants.BUTTON_SECONDARY_HOVER;
             case TERTIARY:    return UIConstants.BUTTON_TERTIARY_HOVER;
@@ -137,7 +161,11 @@ public final class UISettings {
         }
     }
 
-    /** Schiarisce un colore di delta (0–255) senza superare i limiti. */
+    /** Schiarisce un colore di delta (0–255) senza superare i limiti. 
+     * @param c Il colore da schiarire.
+     * @param delta La quantità di schiaritura (0-255).
+     * @return Il colore schiarito.
+    */
     public static Color lighten(Color c, int delta) {
         int r = Math.min(255, c.getRed()   + delta);
         int g = Math.min(255, c.getGreen() + delta);
@@ -145,7 +173,11 @@ public final class UISettings {
         return new Color(r, g, b, c.getAlpha());
     }
 
-    /** Scurisce un colore di delta (0–255) senza scendere sotto zero. */
+    /** Scurisce un colore di delta (0–255) senza scendere sotto zero. 
+     * @param c Il colore da scurire.
+     * @param delta La quantità di scuritura (0-255).
+     * @return Il colore scurito.
+    */
     public static Color darken(Color c, int delta) {
         int r = Math.max(0, c.getRed()   - delta);
         int g = Math.max(0, c.getGreen() - delta);

@@ -8,9 +8,9 @@ import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 
 /**
- * Classe di appoggio per definire tutte le costanti 
- * necessarie per mantenere uno stile 
- * su tutte le schermate
+ * Classe contentente costanti grafiche e di stile per l'interfaccia utente.
+ * Include colori, font, dimensioni, bordi e cursori standardizzati.
+ * @author 1957447
  */
 
 public final class UIConstants {

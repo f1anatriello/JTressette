@@ -125,7 +125,7 @@ public class GameView2v2 extends JPanel {
         JButton btnMenu = new JButton("⬅ Torna al Menù");
         btnMenu.addActionListener(e -> {
             AudioManager.getInstance().stop();
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("audio/button.wav");
             int scl = JOptionPane.showConfirmDialog(
                     this,
                     "Tornare al menù principale?\nLa partita in corso andrà persa.",
@@ -135,8 +135,7 @@ public class GameView2v2 extends JPanel {
             );
             if (scl == JOptionPane.YES_OPTION) {
                 AudioManager.getInstance().stop();
-                AudioManager.getInstance().play("src/audio/button.wav");
-                // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav");
+                AudioManager.getInstance().play("audio/button.wav");
                 try {
                     gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null);
                 } catch (Exception ignore) {}
@@ -144,7 +143,7 @@ public class GameView2v2 extends JPanel {
                 gameEngine.visualizzaMenu(); // torna al menu
                 gameEngine.reset();
             } else {
-                AudioManager.getInstance().playLoop("src/audio/timer.wav");
+                AudioManager.getInstance().playLoop("audio/timer.wav");
             }
         });
         topHUD.add(Box.createHorizontalStrut(200));

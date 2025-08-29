@@ -15,10 +15,19 @@ import javax.swing.WindowConstants;
 import ui.AudioManager;
 import ui.UIAssets;
 
+/**
+ * Dialog modale per modificare il profilo dell'utente.
+ * Permette di selezionare un avatar tra quelli disponibili.
+ * @autor 1957447
+ */
 public class DialogModificaProfilo {
     private final GameEngine controller;
     private final JDialog dialog;
 
+    /**
+     * Costruttore che inizializza il dialog per modificare il profilo.
+     * @param controller Il controller del gioco per accedere al giocatore corrente.
+     */
     public DialogModificaProfilo(GameEngine controller) {
         this.controller = controller;
 
@@ -28,6 +37,11 @@ public class DialogModificaProfilo {
         dialog.setModal(true);
         dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
+
+    /**
+     * Mostra il dialog per selezionare un avatar.
+     * Quando un avatar viene selezionato, aggiorna il profilo del giocatore e chiude il dialog.
+     */
     public void showDialog() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -36,7 +50,7 @@ public class DialogModificaProfilo {
         panel.add(label);
 
         JPanel avatarsPanel = new JPanel();
-        avatarsPanel.setLayout(new java.awt.GridLayout(2, 5, 10, 10)); // 2 righe, 5 colonne
+        avatarsPanel.setLayout(new java.awt.GridLayout(2, 3, 10, 10)); // 2 righe, 3 colonne
         // ButtonGroup per permettere la selezione singola
         javax.swing.ButtonGroup avatarGroup = new javax.swing.ButtonGroup();
 
@@ -60,7 +74,7 @@ public class DialogModificaProfilo {
             );
             JRadioButton avatarButton = new JRadioButton(icon);
             avatarButton.addActionListener(e -> {
-                AudioManager.getInstance().play("src/audio/avatar.wav");
+                AudioManager.getInstance().play("audio/avatar.wav");
                 controller.getPlayer().setAvatarPath(avatarPath);
                 dialog.dispose();
                 controller.visualizzaProfilo();

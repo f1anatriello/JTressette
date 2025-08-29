@@ -1,28 +1,42 @@
 package view;
 
 import javax.swing.*;
+
+import ui.UIConstants;
+
 import java.awt.*;
 import java.util.Objects;
 
+/**
+ * Dialog modale per celebrare la vittoria di un giocatore.
+ * Mostra un messaggio di congratulazioni e un pulsante per tornare al menù principale.
+ * @autor 1957447
+ */
 public final class DialogCelebrations {
  
     private DialogCelebrations() {}
-
+    /**
+     * Mostra un dialog modale con messaggio di vittoria.
+     * @param owner La finestra proprietaria del dialog.
+     * @param title Il titolo principale del dialog (es. "Hai Vinto!").
+     * @param subtitle Il sottotitolo con dettagli (es. "La tua squadra ha vinto con 21 punti!").
+     * @param onClose Runnable da eseguire quando il dialog viene chiuso (es. tornare al menù).
+     */
     public static void showVictoryDialog(Window owner, String title, String subtitle, Runnable onClose) {
         // dialog modale con owner corretto (niente glitch)
         final JDialog dlg = new JDialog(owner, "🎉 Partita Terminata", Dialog.ModalityType.DOCUMENT_MODAL);
         dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dlg.setResizable(false);
 
-        // wrapper con sfondo verde a gradiente
+        // wrapper con sfondo gradiente verde-giallo (ACCENT_YELLOW)
         JPanel wrapper = new JPanel(new BorderLayout()) {
             @Override protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g.create();
-                int w = getWidth(), h = getHeight();
-                g2.setPaint(new GradientPaint(0, 0, new Color(0,110,0), 0, h, new Color(0,70,0)));
-                g2.fillRect(0, 0, w, h);
-                g2.dispose();
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            int w = getWidth(), h = getHeight();
+            g2.setPaint(new GradientPaint(0, 0, UIConstants.ACCENT_YELLOW, 0, h, new Color(0, 110, 0)));
+            g2.fillRect(0, 0, w, h);
+            g2.dispose();
             }
         };
         wrapper.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));

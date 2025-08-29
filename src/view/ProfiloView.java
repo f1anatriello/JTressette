@@ -75,12 +75,12 @@ public class ProfiloView extends JPanel {
         btnMenu     = UISettings.createButton("Torna al Menù", UISettings.ButtonVariant.TERTIARY);
 
         btnModifica.addActionListener(e -> {
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("audio/button.wav");
             controller.avviaModificaProfilo();
         });
         btnMenu.addActionListener(e -> {
             controller.visualizzaMenu();
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("audio/button.wav");
         });
 
         // Wrapper centrato per la colonna di bottoni

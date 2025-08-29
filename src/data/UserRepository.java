@@ -3,9 +3,15 @@ package data;
 import java.io.*;
 import java.util.*;
 
-/*
- * Classe che fa da tramite tra la base dati 
- * (in questo caso, un file .txt) ed il gioco 
+/**
+ * Repository per la gestione dei profili utente.
+ * I dati sono salvati in un file di testo "utenti.txt" con il seguente formato per riga:
+ * nickname;avatarPath;partiteGiocate;partiteVinte;partitePerse
+ * Esempio:
+ * mario;images/avatars/avatar2.png;10;7;3
+ * Lettura e scrittura avvengono ad ogni operazione per garantire la persistenza.
+ * Il repository segue il pattern Singleton.
+ * @author 1957447
  */
 
 public final class UserRepository {
@@ -14,6 +20,11 @@ public final class UserRepository {
     public static final String FILE_NAME = "utenti.txt";
     public static final String DEFAULT_AVATAR = "images/avatars/avatar1.png";
 
+    /**
+     * Costruttore privato per il pattern Singleton.
+     * Crea il file utenti.txt se non esiste.
+     * @throws IOException se si verifica un errore di I/O durante la creazione del file
+     */
     public UserRepository() {
         File f = new File(FILE_NAME);
         try {
@@ -25,6 +36,11 @@ public final class UserRepository {
         }
     }
 
+    /**
+     * Restituisce l'istanza singleton del repository.
+     * @return L'istanza di UserRepository
+     * @throws IOException se si verifica un errore di I/O durante la creazione del file
+     */
     public static UserRepository getInstance() {
         if (instance == null) {
             instance = new UserRepository();
@@ -32,7 +48,10 @@ public final class UserRepository {
         return instance;
     }
 
-    /** Login o crea nuovo profilo */
+    /** Login o creazione di un nuovo profilo 
+     * @param nickname Il nickname dell'utente
+     * @return Il profilo utente esistente o appena creato
+     * */
     public UtentePojo loginOrCreate(String nickname) {
         Map<String, UtentePojo> utenti = leggiTutti();
         if (utenti.containsKey(nickname)) {
@@ -46,16 +65,30 @@ public final class UserRepository {
         return utenti.get(nickname);
     }
 
+    /**
+     * Salva o aggiorna un profilo utente.
+     * @param profilo
+     * @return true se l'operazione ha avuto successo, false altrimenti
+     */
     public boolean salvaProfilo(UtentePojo profilo) {
         Map<String, UtentePojo> utenti = leggiTutti();
         utenti.put(profilo.getUsername(), profilo);
         return salvaTutti(utenti);
     }
 
+    /**
+     * Carica un profilo utente dato il nickname.
+     * @param nickname
+     * @return Il profilo utente o null se non esiste
+     */
     public UtentePojo caricaProfilo(String nickname) {
         return leggiTutti().get(nickname);
     }
 
+    /**
+     * Registra una vittoria per l'utente specificato.
+     * @param nickname
+     */
     public void registraVittoria(String nickname) {
         Map<String, UtentePojo> utenti = leggiTutti();
         UtentePojo p = utenti.getOrDefault(nickname, creaProfiloDiDefault(nickname));
@@ -63,6 +96,10 @@ public final class UserRepository {
         salvaTutti(utenti);
     }
 
+    /**
+     * Registra una sconfitta per l'utente specificato.
+     * @param nickname
+     */
     public void registraSconfitta(String nickname) {
         Map<String, UtentePojo> utenti = leggiTutti();
         UtentePojo p = utenti.getOrDefault(nickname, creaProfiloDiDefault(nickname));
@@ -70,6 +107,11 @@ public final class UserRepository {
         salvaTutti(utenti);
     }
 
+    /**
+     * Aggiorna il percorso dell'avatar per l'utente specificato.
+     * @param nickname
+     * @param avatarPath
+     */
     public void aggiornaAvatar(String nickname, String avatarPath) {
         Map<String, UtentePojo> utenti = leggiTutti();
         UtentePojo p = utenti.getOrDefault(nickname, creaProfiloDiDefault(nickname));
@@ -78,12 +120,24 @@ public final class UserRepository {
         salvaTutti(utenti);
     }
 
+    /**
+     * Restituisce la classifica degli utenti ordinata per partite vinte in ordine decrescente.
+     * @return Lista degli utenti ordinata per vittorie
+     */
     public static List<UtentePojo> getClassifica() {
         List<UtentePojo> list = new ArrayList<>(leggiTutti().values());
         list.sort(Comparator.comparingInt(UtentePojo::getPartiteVinte).reversed());
         return list;
     }
 
+    /**
+     * Verifica se un username è valido. Un username valido:
+     * - Non è vuoto
+     * - Ha una lunghezza tra 3 e 20 caratteri
+     * - Contiene solo lettere, numeri, spazi, underscore, trattini o punti
+     * @param u
+     * @return true se l'username è valido, false altrimenti
+     */
     public static boolean isValidUsername(String u) {
         if (u == null) return false;
         String s = u.trim();
@@ -92,15 +146,19 @@ public final class UserRepository {
 
     /* ===== Utilities ===== */
 
+    /**
+     * Crea un profilo utente di default con avatar predefinito e statistiche a zero.
+     * @param nickname
+     * @return Il profilo utente appena creato
+     */
     private UtentePojo creaProfiloDiDefault(String nickname) {
         UtentePojo p = new UtentePojo(nickname, DEFAULT_AVATAR, 0, 0, 0);
         return p;
     }
 
-    /** Legge tutto il file in memoria */
     /**
-     * Legge tutti gli utenti dal file di testo e li restituisce come mappa.
-     * @return Una mappa contenente tutti gli utenti, identificati dal loro nickname.
+     * Legge tutti i profili utente dal file e li restituisce in una mappa.
+     * @return Mappa dei profili utente con nickname come chiave e UtentePojo come valore
      */
     private static Map<String, UtentePojo> leggiTutti() {
         Map<String, UtentePojo> map = new HashMap<>();
@@ -125,7 +183,11 @@ public final class UserRepository {
         return map;
     }
 
-    /** Aggiunge o aggiorna un utente nel file senza cancellare gli altri */
+    /**
+     * Salva tutti i profili utente nella mappa nel file, sovrascrivendo il contenuto esistente.
+     * @param utenti Mappa dei profili utente da salvare
+     * @return true se l'operazione ha avuto successo, false altrimenti
+     */
     private boolean salvaTutti(Map<String, UtentePojo> utenti) {
         Map<String, UtentePojo> esistenti = leggiTutti();
         // Aggiorna o aggiunge i dati degli utenti passati
@@ -146,6 +208,10 @@ public final class UserRepository {
         }
     }
 
+    /**
+     * Recupera e stampa i dati dell'utente specificato.
+     * @param nickname
+     */
     public void recuperaDatiUtente(String nickname) {
         try (BufferedReader r = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;

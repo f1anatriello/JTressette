@@ -22,7 +22,6 @@ import view.DialogCelebrations;
 import view.ClassificaView;
 import view.GameView1v1;
 import view.GameView2v2;
-import view.LoginView;
 import view.MenuPrincipaleView;
 import view.ProfiloView;
 
@@ -30,6 +29,10 @@ import view.ProfiloView;
  * Controller dell'applicazione: gestisce le azioni dell'interfaccia utente,
  * l'avvio delle partite e il ciclo di gioco. È un Observer in attesa
  * dell'evoluzione del modello (non ancora implementato completamente).
+ * Implementa il pattern Singleton per garantire una singola istanza
+ * dell'engine di gioco.
+ * @see Observer
+ * @author 1957447
  */
 public class GameEngine implements Observer {
 
@@ -67,20 +70,13 @@ public class GameEngine implements Observer {
 
     @Override
     public void update(java.util.Observable o, Object arg) {
-        if (arg instanceof Partita1v1) {
-            Giocatore vincitore = (Giocatore) o;
-            if (vincitore instanceof GiocatoreUmano) {
-                player.incrementaVinte();
-            } else {
-                player.incrementaPerse();
-            }
-        } else if (arg instanceof Partita2v2) {
-            Giocatore vincitore = (Giocatore) o;
-            if (vincitore instanceof GiocatoreUmano) {
-                player.incrementaVinte();
-            } else {
-                player.incrementaPerse();
-            }
+        if (o == playerUmano && arg instanceof Boolean) {
+            boolean haVinto = (Boolean) arg;
+            if (haVinto) player.incrementaVinte();
+            else         player.incrementaPerse();
+
+            // opzionale: mi tolgo dall’osservazione finita la partita
+            playerUmano.deleteObserver(this);
         }
     }
 
@@ -99,7 +95,7 @@ public class GameEngine implements Observer {
             player.getUsername(),
             new ImageIcon(player.getAvatarPath()),
             p.getGiocatori().get(1).getNome(),
-            new ImageIcon("images/avatars/avatar"+(3 + (int)(Math.random() * 3))+".png"),
+            new ImageIcon("images/avatars/avatar"+ (1 + (int)(Math.random() * 6)) +".png"),
             p.getGiocatori().get(0).getMano(),
             p.getGiocatori().get(1).getMano()
         );
@@ -121,7 +117,7 @@ public class GameEngine implements Observer {
         gameView.unlockPlay();
         setOrder1v1(partita, umano, ai);
 
-        AudioManager.getInstance().playLoop("src/audio/timer.wav");
+        AudioManager.getInstance().playLoop("audio/timer.wav");
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
 
@@ -162,7 +158,7 @@ public class GameEngine implements Observer {
                     }
 
                     if (vincente instanceof GiocatoreUmano) {
-                        AudioManager.getInstance().play("src/audio/win.wav"); // esempio di utilizzo di AudioManager
+                        AudioManager.getInstance().play("audio/win.wav"); // esempio di utilizzo di AudioManager
                         giocaTurnoUmano1V1(partita, umano, ai);
                     } else {
                         giocaTurnoAI1V1(partita, umano, ai);
@@ -214,7 +210,7 @@ public class GameEngine implements Observer {
                 }
 
                 if (vincente instanceof GiocatoreUmano) {
-                    AudioManager.getInstance().play("src/audio/win.wav"); // esempio di utilizzo di AudioManager
+                    AudioManager.getInstance().play("audio/win.wav"); // esempio di utilizzo di AudioManager
                     giocaTurnoUmano1V1(partita, umano, ai);
                 } else {
                     giocaTurnoAI1V1(partita, umano, ai);
@@ -238,13 +234,12 @@ public class GameEngine implements Observer {
      * Dialogo di fine partita 1v1.
      */
     private void finePartita1v1(Partita1v1 p) {
-        AudioManager.getInstance().playLoop("src/audio/bigwin.wav");
+        AudioManager.getInstance().playLoop("audio/bigwin.wav");
         Giocatore vincitore = p.vincitore1v1();
-        if (vincitore instanceof GiocatoreUmano) {
-            player.incrementaVinte();
-        } else {
-            player.incrementaPerse();
-        }
+
+        // Notifica al giocatore umano se ha vinto o perso
+        boolean haVintoUmano = (vincitore instanceof GiocatoreUmano);
+        playerUmano.notificaFinePartita(haVintoUmano);
 
         // Dialog celebrativo con confetti
         DialogCelebrations.showVictoryDialog(
@@ -253,7 +248,7 @@ public class GameEngine implements Observer {
             "🏆 Vincitore: " + vincitore.getNome() + " 🏆",
             () -> {
                 AudioManager.getInstance().stop();
-                AudioManager.getInstance().play("src/audio/button.wav");
+                AudioManager.getInstance().play("audio/button.wav");
                 GameView1v1.disposeInstance();
                 visualizzaMenu();
             }
@@ -276,15 +271,15 @@ public class GameEngine implements Observer {
             p.getGiocatori().get(0).getMano(),
             // Giocatore est (avversario 1)
             p.getGiocatori().get(1).getNome(),
-            new ImageIcon("images/avatars/avatar5.png"),
+            new ImageIcon("images/avatars/avatar" + (1 + (int)(Math.random() * 6)) +".png"),
             p.getGiocatori().get(1).getMano(),
             // Giocatore nord (compagno di squadra)
             p.getGiocatori().get(2).getNome(),
-            new ImageIcon("images/avatars/avatar4.png"),
+            new ImageIcon("images/avatars/avatar" + (1 + (int)(Math.random() * 6)) + ".png"),
             p.getGiocatori().get(2).getMano(),
             // Giocatore Ovest (avversario 2)
             p.getGiocatori().get(3).getNome(),
-            new ImageIcon("images/avatars/avatar3.png"),
+            new ImageIcon("images/avatars/avatar" + (1 + (int)(Math.random() * 6)) + "png"),
             p.getGiocatori().get(3).getMano()
         );
 
@@ -304,7 +299,7 @@ public class GameEngine implements Observer {
 
     private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> ordineTurno, GiocatoreUmano umano) {
         gameView2v2.unlockPlay();
-        AudioManager.getInstance().playLoop("src/audio/timer.wav"); // esempio di utilizzo di AudioManager
+        AudioManager.getInstance().playLoop("aaudio/timer.wav"); // esempio di utilizzo di AudioManager
 
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
@@ -345,7 +340,7 @@ public class GameEngine implements Observer {
             });
 
         } else if (corrente instanceof GiocatoreUmano) {
-            AudioManager.getInstance().playLoop("src/audio/timer.wav"); // esempio di utilizzo di AudioManager
+            AudioManager.getInstance().playLoop("audio/timer.wav"); // esempio di utilizzo di AudioManager
             ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
                 if (carta == null) return;
                 AudioManager.getInstance().stop();
@@ -401,7 +396,7 @@ public class GameEngine implements Observer {
                 }
 
                 if (vincente instanceof GiocatoreUmano) {
-                    AudioManager.getInstance().play("src/audio/win.wav"); // esempio di utilizzo di AudioManager
+                    AudioManager.getInstance().play("audio/win.wav"); // esempio di utilizzo di AudioManager
                     giocaTurnoUmano2v2(partita, ordineGioco2v2, (GiocatoreUmano) vincente);
                 } else {
                     giocaTurnoAI2v2(partita, ordineGioco2v2, (GiocatoreAI) vincente);
@@ -425,22 +420,21 @@ public class GameEngine implements Observer {
     }
 
     private void finePartita2v2(Partita2v2 p) {
-        AudioManager.getInstance().playLoop("src/audio/bigwin.wav");
+        AudioManager.getInstance().playLoop("audio/bigwin.wav");
         Giocatore vincitore = p.vincitore2v2();
-        if (vincitore instanceof GiocatoreUmano) {
-            player.incrementaVinte();
-        } else {
-            player.incrementaPerse();
-        }
+
+        // Notifica al giocatore umano se ha vinto o perso
+        boolean haVintoUmano = (vincitore instanceof GiocatoreUmano);
+        playerUmano.notificaFinePartita(haVintoUmano);
 
         // Dialog celebrativo con confetti
         DialogCelebrations.showVictoryDialog(
             mainFrame,
-            "La partita è finita!",
+            "La Partita è Finita!",
             "🏆 Vincitore: " + vincitore.getSquadra().getNome() + " 🏆",
             () -> {
                 AudioManager.getInstance().stop();
-                AudioManager.getInstance().play("src/audio/button.wav");
+                AudioManager.getInstance().play("audio/button.wav");
                 GameView2v2.disposeInstance();
                 visualizzaMenu();
             }
@@ -461,6 +455,9 @@ public class GameEngine implements Observer {
             giocatori.add(playerUmano);
             ai = new GiocatoreAI();
             giocatori.add(ai);
+
+            playerUmano.addObserver(this);
+
             partita = new Partita1v1(giocatori);
             partita.inizializzaPartita();
             iniziaPartita1v1((Partita1v1) partita);
@@ -474,6 +471,9 @@ public class GameEngine implements Observer {
             giocatori.add(playerEst);
             giocatori.add(ai);
             giocatori.add(playerOvest);
+
+            playerUmano.addObserver(this);
+
             partita = new Partita2v2(giocatori);
             partita.inizializzaPartita();
             iniziaPartita2v2((Partita2v2) partita);
@@ -490,7 +490,7 @@ public class GameEngine implements Observer {
         mano.remove(c);
         g.setMano(mano);
         p.getTerreno().add(c);
-        AudioManager.getInstance().play("src/audio/card-sound.wav"); // esempio di utilizzo di AudioManager
+        AudioManager.getInstance().play("audio/card-sound.wav"); // esempio di utilizzo di AudioManager
     }
 
 

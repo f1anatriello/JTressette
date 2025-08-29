@@ -128,13 +128,6 @@ public class HelperGrafico extends JPanel {
     /** Mostra fronte avversari (debug). */
     public void setShowOpponentsFaceUp(boolean show) { this.showOpponentsFaceUp = show; repaint(); }
 
-    @Override public Dimension getPreferredSize() { return new Dimension(900, 700); }
-
-    @Override public void addNotify() {
-        super.addNotify();
-        SwingUtilities.invokeLater(() -> { recomputeLayout(); repaint(); });
-    }
-
     @Override public void invalidate() {
         super.invalidate();
         recomputeLayout();
@@ -304,10 +297,5 @@ public class HelperGrafico extends JPanel {
 
         g2.drawImage(img, x, y, w, h, this);
         g2.setTransform(old);
-    }
-
-    public void clearSelection() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'clearSelection'");
     }
 }

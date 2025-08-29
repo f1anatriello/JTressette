@@ -1,23 +1,33 @@
 package view;
 
 import controller.GameEngine;
-    import data.UtentePojo;
-    import java.awt.*;
-    import java.util.List;
-    import javax.swing.*;
-    import javax.swing.table.DefaultTableCellRenderer;
-    import javax.swing.table.DefaultTableModel;
-    import javax.swing.table.JTableHeader; // Ensure this matches the package where AudioManager is located
+import data.UtentePojo;
+import java.awt.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import ui.AudioManager;
 import ui.UIConstants;
-    import ui.UISettings;
+import ui.UISettings;
+
+/**
+ * Pannello per visualizzare la classifica dei giocatori.
+ * Utilizza una JTable per una visualizzazione ordinata e stilizzata.
+ * @autor 1957447
+ */
 
 public class ClassificaView extends JPanel {
     private final JLabel titolo;
     private final JTable classificaTable;
     private final JButton btnMenu;
 
+    /**
+     * Costruttore che inizializza il pannello della classifica.
+     * @param gameEngine
+     */
     public ClassificaView(GameEngine gameEngine) {
         // Usa un layout con gap costanti e applica lo stile base del pannello
         setLayout(new BorderLayout(UIConstants.GAP, UIConstants.GAP));
@@ -27,7 +37,7 @@ public class ClassificaView extends JPanel {
         titolo = UISettings.createTitleLabel("Classifica");
         add(titolo, BorderLayout.NORTH);
 
-        // Tabella per la classifica: più ordinata di una JTextArea
+        // Tabella per la classifica
         classificaTable = new JTable();
         classificaTable.setFont(UIConstants.FONT_MONOSPACE);
         classificaTable.setForeground(UIConstants.TEXT_COLOR);
@@ -38,7 +48,7 @@ public class ClassificaView extends JPanel {
         classificaTable.setSelectionForeground(UIConstants.TEXT_COLOR);
         classificaTable.setOpaque(false);
 
-        // Header della tabella: personalizziamo font e colori
+        // Header della tabella stilizzato
         JTableHeader header = classificaTable.getTableHeader();
         header.setFont(UIConstants.FONT_REGULAR);
         header.setBackground(UIConstants.ACCENT_YELLOW);
@@ -49,21 +59,19 @@ public class ClassificaView extends JPanel {
         classificaTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (!isSelected) {
-                    c.setForeground(UIConstants.TEXT_COLOR);
-                    // Riga pari e dispari con colori diversi
-                    if (row % 2 == 0) {
-                        c.setBackground(UIConstants.INPUT_BG);
-                    } else {
-                        c.setBackground(UISettings.lighten(UIConstants.ACCENT_YELLOW,50));
-                    }
-                }
-                // Centra tutte le colonne tranne quella dei nickname
-                setHorizontalAlignment(column == 1 ? JLabel.LEFT : JLabel.CENTER);
-                return c;
+                                   boolean isSelected, boolean hasFocus,
+                                   int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, false, false, row, column);
+            c.setForeground(UIConstants.TEXT_COLOR);
+            // Riga pari e dispari con colori diversi
+            if (row % 2 == 0) {
+                c.setBackground(UIConstants.INPUT_BG);
+            } else {
+                c.setBackground(UISettings.lighten(UIConstants.ACCENT_YELLOW,50));
+            }
+            // Centra tutte le colonne tranne quella dei nickname
+            setHorizontalAlignment(column == 1 ? JLabel.LEFT : JLabel.CENTER);
+            return c;
             }
         });
 
@@ -83,17 +91,19 @@ public class ClassificaView extends JPanel {
         btnMenu = UISettings.createButton("Torna al Menù", UISettings.ButtonVariant.TERTIARY);
         btnMenu.addActionListener(e -> {
             gameEngine.visualizzaMenu();
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("audio/button.wav");
         });
         JPanel south = new JPanel();
+        south.setBorder(BorderFactory.createEmptyBorder(0, 0, 22, 0));
         south.setOpaque(false);
         south.add(btnMenu);
         add(south, BorderLayout.SOUTH);
     }
 
     /**
-     * Carica e mostra la classifica prendendo i dati dalla classe UserRepository
-     */
+        * Aggiorna e mostra la classifica nella tabella.
+        * @param classifica Lista di UtentePojo rappresentante la classifica.
+        */
     public void mostraClassifica(List<UtentePojo> classifica) {
         String[] columns = { "Rank", "Nickname", "P. Giocate", "P. Vinte", "P. Perse" };
         Object[][] data;

@@ -2,6 +2,9 @@ package data;
 
 /**
  * Rappresenta il profilo di un utente con statistiche di gioco e avatar.
+ * Contiene informazioni come nome utente, numero di partite giocate, vinte e perse, e il percorso dell'avatar.
+ * Fornisce metodi per aggiornare le statistiche e l'avatar.
+ * @author 1957447
  */
 public class UtentePojo {
 
@@ -45,10 +48,15 @@ public class UtentePojo {
     /** @return percorso/URL dell'avatar (stringa vuota se non impostato) */
     public String getAvatarPath() { return avatarPath; }
 
+    /** Imposta il nome utente. @param username */
     public void setUsername(String username) { this.username = username; }
+    /** Imposta il numero di partite giocate. @param partiteGiocate */
     public void setPartiteGiocate(int partiteGiocate) { this.partiteGiocate = getPartiteGiocate() + 1; }
+    /** Imposta il numero di partite vinte. @param partiteVinte */
     public void setPartiteVinte(int partiteVinte) { this.partiteVinte = getPartiteVinte() + 1; }
+    /** Imposta il numero di partite perse. @param partitePerse */
     public void setPartitePerse(int partitePerse) { this.partitePerse = getPartitePerse() + 1; }
+    /** Imposta il percorso/URL dell'avatar. @param avatarPath */
     public void setAvatarPath(String avatarPath) { this.avatarPath = avatarPath == null ? UserRepository.DEFAULT_AVATAR : avatarPath; }
     
 

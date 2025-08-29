@@ -2,6 +2,9 @@ package model;
 
 /**
  * Rappresenta i valori nominali delle carte nel gioco del Tressette.
+ * Ogni valore ha un punteggio associato e un ordine di presa.
+ * I valori sono: TRE, DUE, ASSO, RE, CAVALLO, FANTE, SETTE, SEI, CINQUE, QUATTRO.
+ * @author 1957447
  */
 public enum Valore {
     

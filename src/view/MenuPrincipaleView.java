@@ -26,8 +26,6 @@ public class MenuPrincipaleView extends JPanel {
 
     private MenuPrincipaleView(GameEngine gameEngine) {
         AudioManager.getInstance().stop();
-        // AudioManager.getInstance().playLoop("src/audio/menu-princ.wav"); // esempio di utilizzo di AudioManager
-        // Removed assignment to unused field
 
         setLayout(new BorderLayout());
         setBackground(UIConstants.BACKGROUND_DARK);
@@ -80,24 +78,24 @@ public class MenuPrincipaleView extends JPanel {
         // Azioni
         btnPartita1v1.addActionListener(e -> {
             AudioManager.getInstance().stop();
-            AudioManager.getInstance().play("src/audio/start.wav");
+            AudioManager.getInstance().play("audio/start.wav");
             gameEngine.avviaNuovaPartita(2);
         });
         btnPartita2v2.addActionListener(e -> {
             AudioManager.getInstance().stop();
-            AudioManager.getInstance().play("src/audio/start.wav");
+            AudioManager.getInstance().play("audio/start.wav");
             gameEngine.avviaNuovaPartita(4);
         });
         btnProfilo.addActionListener(e -> {
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("audio/button.wav");
             gameEngine.visualizzaProfilo();
         });
         btnClassifica.addActionListener(e -> {
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("audio/button.wav");
             gameEngine.visualizzaStatistiche();
         });
         btnEsci.addActionListener(e -> {
-            AudioManager.getInstance().play("src/audio/button.wav");
+            AudioManager.getInstance().play("audio/button.wav");
             System.exit(0);
         });
     }
