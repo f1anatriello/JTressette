@@ -55,10 +55,19 @@ public class GameEngine implements Observer {
 
     /* =========== COSTRUTTORI - SINGLETON =============== */
 
+    /**
+     * Costruttore privato per il pattern Singleton.
+     * @param player L'utente che ha effettuato il login.
+     */
     private GameEngine(UtentePojo player) {
         this.player = player;
     }
 
+    /**
+     * Restituisce l'istanza singleton del GameEngine.
+     * @param player L'utente che ha effettuato il login.
+     * @return L'istanza singleton di GameEngine.
+     */
     public static GameEngine getInstance(UtentePojo player) {
         if (instance == null) {
             instance = new GameEngine(player);
@@ -68,6 +77,11 @@ public class GameEngine implements Observer {
 
     /* ===================== OBSERVER ===================== */
 
+    /**
+     * Aggiorna le statistiche dell'utente quando la partita termina.
+     * @param o   L'oggetto osservato (GiocatoreUmano).
+     * @param arg L'argomento passato (Boolean che indica se ha vinto).
+     */
     @Override
     public void update(java.util.Observable o, Object arg) {
         if (o == playerUmano && arg instanceof Boolean) {
@@ -88,6 +102,7 @@ public class GameEngine implements Observer {
      * Avvia la partita 1v1 inizializzando la GameView e il primo turno. Prepara
      * i riferimenti a {@link GiocatoreUmano} e {@link GiocatoreAI} e lascia
      * partire il turno dell'umano.
+     * @param p La partita 1v1 da avviare.
      */
     public void iniziaPartita1v1(Partita1v1 p) {
         gameView = GameView1v1.getInstance(
@@ -111,7 +126,10 @@ public class GameEngine implements Observer {
     }
 
     /**
-     * Turno con umano che inizia.
+     * Turno con umano che inizia nella partita1v1.
+     * @param partita La partita in corso.
+     * @param umano   Il giocatore umano.
+     * @param ai      L'avversario AI.
      */
     private void giocaTurnoUmano1V1(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
         gameView.unlockPlay();
@@ -169,7 +187,10 @@ public class GameEngine implements Observer {
     }
 
     /**
-     * Turno con AI che inizia.
+     * Turno con AI che inizia nella partita1v1.
+     * @param partita La partita in corso.
+     * @param umano   Il giocatore umano.
+     * @param ai      L'avversario AI.
      */
     private void giocaTurnoAI1V1(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
         gameView.unlockPlay();
@@ -221,6 +242,9 @@ public class GameEngine implements Observer {
 
     /**
      * Imposta l'ordine dei giocatori (1v1) in modo che first giochi per primo.
+     * @param p     La partita in corso.
+     * @param first  Il giocatore che deve iniziare.
+     * @param second L'altro giocatore.
      */
     private void setOrder1v1(Partita p, Giocatore first, Giocatore second) {
         List<Giocatore> g = p.getGiocatori();
@@ -231,7 +255,9 @@ public class GameEngine implements Observer {
     }
 
     /**
-     * Dialogo di fine partita 1v1.
+     * Verifica la fine della partita 1v1, notifica il giocatore umano
+     * e mostra il dialogo di vittoria/sconfitta.
+     * @param p La partita 1v1 appena terminata.
      */
     private void finePartita1v1(Partita1v1 p) {
         AudioManager.getInstance().playLoop("audio/bigwin.wav");
@@ -259,8 +285,12 @@ public class GameEngine implements Observer {
        =                        PARTITA 2v2                           =
        ================================================================ */
 
+    
     /**
-     * Inizia una nuova partita 2v2.
+     * Avvia la partita 2v2 inizializzando la GameView e il primo turno. Prepara
+     * i riferimenti a {@link GiocatoreUmano} e {@link GiocatoreAI} e lascia
+     * partire il turno dell'umano. Prepara anche la lista con l'ordine di gioco.
+     * @param p La partita 2v2 da avviare.
      */
     public void iniziaPartita2v2(Partita2v2 p) {
         gameView2v2 = GameView2v2.getInstance(
@@ -297,6 +327,12 @@ public class GameEngine implements Observer {
         showTerreno(p);
     }
 
+    /**
+     * Turno con umano che inizia nella partita2v2.
+     * @param partita
+     * @param ordineTurno
+     * @param umano
+     */
     private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> ordineTurno, GiocatoreUmano umano) {
         gameView2v2.unlockPlay();
         AudioManager.getInstance().playLoop("aaudio/timer.wav"); // esempio di utilizzo di AudioManager
@@ -311,6 +347,12 @@ public class GameEngine implements Observer {
         });
     }
 
+    /**
+     * Turno con AI che inizia nella partita2v2.
+     * @param partita
+     * @param giocatori
+     * @param aiCorrente
+     */
     private void giocaTurnoAI2v2(Partita2v2 partita, List<Giocatore> giocatori, GiocatoreAI aiCorrente) {
         gameView2v2.unlockPlay();
         Carta cartaAI = aiCorrente.scegliCarta(partita);
@@ -323,6 +365,12 @@ public class GameEngine implements Observer {
     }
 
 
+    /**
+     * Sequenza ricorsiva per far giocare a turno i giocatori in ordine.
+     * @param partita
+     * @param giocatori
+     * @param index
+     */
     private void giocaSequenzaRec(Partita2v2 partita, List<Giocatore> giocatori, int index) {
         if (index >= giocatori.size()) {
             after(400, () -> risolviMano(partita, giocatori));
@@ -340,7 +388,7 @@ public class GameEngine implements Observer {
             });
 
         } else if (corrente instanceof GiocatoreUmano) {
-            AudioManager.getInstance().playLoop("audio/timer.wav"); // esempio di utilizzo di AudioManager
+            AudioManager.getInstance().playLoop("audio/timer.wav");
             ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
                 if (carta == null) return;
                 AudioManager.getInstance().stop();
@@ -350,6 +398,12 @@ public class GameEngine implements Observer {
         }
     }
 
+    /**
+     * Risolvi la mano dopo che tutti hanno giocato, assegna i punti,
+     * fa pescare e avvia il turno successivo o la fine partita.
+     * @param partita La partita in corso.
+     * @param giocatori La lista dei giocatori in ordine di gioco.
+     */
     private void risolviMano(Partita2v2 partita, List<Giocatore> giocatori) {
         after(400, () -> {
             Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
@@ -396,7 +450,7 @@ public class GameEngine implements Observer {
                 }
 
                 if (vincente instanceof GiocatoreUmano) {
-                    AudioManager.getInstance().play("audio/win.wav"); // esempio di utilizzo di AudioManager
+                    AudioManager.getInstance().play("audio/win.wav"); 
                     giocaTurnoUmano2v2(partita, ordineGioco2v2, (GiocatoreUmano) vincente);
                 } else {
                     giocaTurnoAI2v2(partita, ordineGioco2v2, (GiocatoreAI) vincente);
@@ -406,6 +460,12 @@ public class GameEngine implements Observer {
     }
 
 
+    /**
+     * Ritorna la lista dei giocatori iniziando da vincente e proseguendo in ordine circolare.
+     * @param vincente
+     * @param giocatori
+     * @return La lista dei giocatori iniziando dal vincente.
+     */
     private List<Giocatore> giocatoriSenza(Giocatore vincente, List<Giocatore> giocatori) {
         List<Giocatore> result = new ArrayList<>();
         int index = giocatori.indexOf(vincente);
@@ -419,6 +479,11 @@ public class GameEngine implements Observer {
         return result;
     }
 
+    /**
+     * Verifica la fine della partita 2v2, notifica il giocatore umano
+     * e mostra il dialogo di vittoria/sconfitta.
+     * @param p La partita 2v2 appena terminata.
+     */
     private void finePartita2v2(Partita2v2 p) {
         AudioManager.getInstance().playLoop("audio/bigwin.wav");
         Giocatore vincitore = p.vincitore2v2();
@@ -447,6 +512,7 @@ public class GameEngine implements Observer {
 
     /**
      * Avvia una nuova partita. Se {@code numPlayer == 2} avvia una 1v1; altrimenti 2v2.
+     * @param numPlayer Numero di giocatori (2 o 4).
      */
     public void avviaNuovaPartita(int numPlayer) {
         if (numPlayer == 2) {
@@ -481,7 +547,10 @@ public class GameEngine implements Observer {
     }
 
     /**
-     * Solo logica di stato: rimuove la carta dalla mano e la mette sul terreno.
+     * Gestisce il gioco di una carta da parte di un giocatore,
+     * aggiornando la mano del giocatore e il terreno della partita.
+     * @param g Giocatore che gioca la carta.
+     * @param c Carta giocata.
      */
     public void giocaCarta(Giocatore g, Carta c, Partita p) {
         if (c == null) return;
@@ -494,7 +563,13 @@ public class GameEngine implements Observer {
     }
 
 
-    /** Delay helper. */
+    /** 
+     * Esegue un'azione dopo un ritardo specificato in millisecondi.
+     * Serve per dare un po' di respiro visivo tra le azioni, una sorta di
+     * simulazione di "turno" anche per l'AI.
+     * @param ms     Ritardo in millisecondi.
+     * @param action Azione da eseguire dopo il ritardo.
+     */
     private void after(int ms, Runnable action) {
         new Timer(ms, e -> {
             ((Timer) e.getSource()).stop();
@@ -502,7 +577,10 @@ public class GameEngine implements Observer {
         }).start();
     }
 
-    /** Mostra lo stato attuale del terreno. */
+    /** 
+     * Mostra il terreno di gioco aggiornato nella GameView.
+     * @param p La partita in corso.
+     */
     private void showTerreno(Partita p) {
         if (p instanceof Partita1v1) {
             gameView.setTerreno(p.getTerreno());
@@ -519,33 +597,58 @@ public class GameEngine implements Observer {
         this.playerOvest = null;
     }
 
-    /** Getter utente loggato. */
+    /** 
+     * Getter utente loggato.
+     * @return L'istanza di UtentePojo che rappresenta l'utente loggato.
+     */
     public UtentePojo getPlayer() {
         return player;
     }
 
-    /** Getter umano corrente. */
+    /** 
+     * Getter umano corrente. 
+     * @return L'istanza di GiocatoreUmano che rappresenta il giocatore umano.
+     * */
     public GiocatoreUmano getGiocatoreUmano() {
         return this.playerUmano;
     }
 
-    /** Getter AI corrente. */
+    /** 
+     * Getter AI corrente. 
+     * @return L'istanza di GiocatoreAI che rappresenta l'avversario AI.
+    */
     public GiocatoreAI getGiocatoreAI() {
         return this.ai;
     }
 
+    /**
+     * Getter AI Est (2v2).
+     * @return L'istanza di GiocatoreAI che rappresenta il giocatore Est.
+     */
     public GiocatoreAI getGiocatoreEst() {
         return this.playerEst;
     }
 
+    /**
+     * Getter AI Ovest (2v2).
+     * @return L'istanza di GiocatoreAI che rappresenta il giocatore Ovest.
+     */
     public GiocatoreAI getGiocatoreOvest() {
         return this.playerOvest;
     }
 
+    /** 
+     * Getter partita corrente. 
+     * @return L'istanza di Partita che rappresenta la partita in corso.
+     */
     public Partita getPartita() {
         return this.partita;
     }
 
+    /**
+     * Registra il JFrame principale dell'applicazione.
+     * @param frame Il JFrame principale.
+     */
     public void registerMainFrame(JFrame frame) {
         this.mainFrame = frame;
     }
@@ -607,11 +710,21 @@ public class GameEngine implements Observer {
 
     /* ---------- Gestione dimensioni e cambio pannello ---------- */
 
+    /**
+     * Determina se una vista ha dimensioni fisse o adattabili.
+     * @param panel
+     * @return True se la vista ha dimensioni fisse, false altrimenti.
+     */
     private boolean isFixedSizedView(JPanel panel) {
         return !(panel instanceof MenuPrincipaleView ||
                  panel instanceof ProfiloView);
     }
 
+    /**
+     * Imposta il pannello corrente nel JFrame principale, adattando
+     * le dimensioni in base al tipo di pannello.
+     * @param panel Il pannello da visualizzare.
+     */
     private void setScreen(JPanel panel) {
         boolean fixed = isFixedSizedView(panel);
 

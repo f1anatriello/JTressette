@@ -13,12 +13,17 @@ import java.awt.image.BufferedImage;
  * - Sfondo color UIConstants.BACKGROUND_PANEL
  * - Logo centrato, scalato al 70% della finestra
  * - Dopo la durata indicata, chiude e apre LoginView.
+ * @author 1957447
  */
 public class IntroView extends JFrame {
 
     private final BufferedImage logo;
     private final int durationMs;
 
+    /**
+     * Crea la finestra di intro.
+     * @param durationMs Durata in millisecondi prima di chiudere e aprire LoginView.
+     */
     public IntroView(int durationMs) {
         this.durationMs = durationMs;
 
@@ -68,6 +73,9 @@ public class IntroView extends JFrame {
         t.start();
     }
 
+    /**
+     * Crea la finestra di intro con durata di 3 secondi.
+     */
     public IntroView() {
         this(3000); // default 3 secondi
     }

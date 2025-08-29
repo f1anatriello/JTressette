@@ -19,6 +19,7 @@ import ui.UIAssets;
  * - Nord/Est/Ovest con retro (o fronte in debug); Est/Ovest ruotate orizzontali.
  * - Terreno al centro.
  * - Layout e hit-test basati su INDICI, non su identità/equals() di Carta.
+ * @author 1957447 
  */
 public class HelperGrafico extends JPanel {
 
@@ -59,7 +60,14 @@ public class HelperGrafico extends JPanel {
     private boolean showOpponentsFaceUp = false;      // debug
     private Dimension lastLaidOutSize = new Dimension(0, 0);
 
-    /* ===== Costruttori ===== */
+    /**
+     * Costruttore valido per il 2v2.
+     * Se una mano è null, verrà considerata vuota.
+     * @param manoSud   mano del giocatore in basso (cliccabile)
+     * @param manoNord  mano del giocatore in alto
+     * @param manoEst   mano del giocatore a destra
+     * @param manoOvest mano del giocatore a sinistra
+     * */
     public HelperGrafico(List<Carta> manoSud, List<Carta> manoNord, List<Carta> manoEst, List<Carta> manoOvest) {
         setHands(manoSud, manoNord, manoEst, manoOvest);
 
@@ -78,14 +86,25 @@ public class HelperGrafico extends JPanel {
         });
     }
 
-    /** Overload 1v1. */
+    /** Costruttore per l'1v1 (Est/Ovest vuote). 
+     * Se una mano è null, verrà considerata vuota.
+     * @param manoSud   mano del giocatore in basso (cliccabile)
+     * @param manoNord  mano del giocatore in alto
+    */
     public HelperGrafico(List<Carta> manoSud, List<Carta> manoNord) {
         this(manoSud, manoNord, Collections.emptyList(), Collections.emptyList());
     }
 
     /* ================= API ================= */
 
-    /** 2v2 */
+    /**
+     * Aggiorna le mani dei giocatori e ridisegna l'interfaccia 2v2.
+     * Se una mano è null, verrà considerata vuota.
+     * @param manoSud
+     * @param manoNord
+     * @param manoEst
+     * @param manoOvest
+     * */
     public final void setHands(List<Carta> manoSud, List<Carta> manoNord, List<Carta> manoEst, List<Carta> manoOvest) {
         this.manoSud   = (manoSud   != null) ? new ArrayList<>(manoSud)   : Collections.emptyList();
         this.manoNord  = (manoNord  != null) ? new ArrayList<>(manoNord)  : Collections.emptyList();
@@ -97,16 +116,26 @@ public class HelperGrafico extends JPanel {
         repaint();
     }
 
-    /** 1v1 */
+    /** Aggiorna le mani dei giocatori e ridisegna l'interfaccia 1v1.
+     * Se una mano è null, verrà considerata vuota.
+     * @param manoSud
+     * @param manoNord
+     * */
     public final void setHands(List<Carta> manoSud, List<Carta> manoNord) {
         setHands(manoSud, manoNord, Collections.emptyList(), Collections.emptyList());
     }
 
+    /**
+     * Imposta il terreno.
+     * Se il terreno è null, verrà considerato vuoto.
+     * @param terreno
+     */
     public void setTerreno(List<Carta> terreno) {
         this.terreno = (terreno != null) ? new ArrayList<>(terreno) : Collections.emptyList();
         repaint();
     }
 
+    /** Ridisegna il canvas (revalidate + repaint). */
     public void refresh() { revalidate(); repaint(); }
 
     /** Se nessuna carta è selezionata, seleziona la prima della mano Sud. */
@@ -114,18 +143,29 @@ public class HelperGrafico extends JPanel {
         if (selectedIndex < 0 && !manoSud.isEmpty()) { selectedIndex = 0; repaint(); }
     }
 
-    /** Seleziona una carta per indice nella mano Sud. */
+    /** 
+     * Seleziona una carta per indice nella mano Sud. *
+     * @param idx
+     * @return true se l'indice è valido e la selezione è cambiata, false altrimenti.
+    */
     public boolean selectAtIndex(int idx) {
         if (idx < 0 || idx >= manoSud.size()) return false;
         selectedIndex = idx; repaint(); return true;
     }
 
-    /** Carta attualmente selezionata nella mano Sud (può essere null). */
+    /** 
+     * Carta attualmente selezionata nella mano Sud (può essere null). 
+     * @return Carta selezionata, o null se nessuna o indice invalido. 
+     */
     public Carta getSelected() {
         return (selectedIndex >= 0 && selectedIndex < manoSud.size()) ? manoSud.get(selectedIndex) : null;
     }
 
-    /** Mostra fronte avversari (debug). */
+    /**
+     * Imposta se mostrare le carte degli avversari (Nord/Est/Ovest) a faccia in su.
+     * Utile per il debug.
+     * @param show
+     */
     public void setShowOpponentsFaceUp(boolean show) { this.showOpponentsFaceUp = show; repaint(); }
 
     @Override public void invalidate() {
@@ -135,6 +175,11 @@ public class HelperGrafico extends JPanel {
 
     /* ================= Layout ================= */
 
+    /**
+     * Ricalcola il layout delle carte in base alla dimensione attuale del pannello.
+     * Deve essere richiamato ogni volta che cambia la dimensione del pannello o le
+     * mani (numero di carte).
+     */
     private void recomputeLayout() {
         southBounds.clear();
         northBounds.clear();
@@ -184,6 +229,16 @@ public class HelperGrafico extends JPanel {
 
     /* ================= Rendering ================= */
 
+    /**
+     * Disegna le carte e gli altri elementi grafici.
+     * Le carte sono disegnate in questo ordine (z-order):
+     * - Terreno (sotto, al centro)
+     * - Nord
+     * - Ovest (ruotata -90°)
+     * - Est (ruotata +90°)
+     * - Sud (prima non selezionate, poi la selezionata sollevata e con bordo dorato)
+     * @param g Graphics
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -222,7 +277,7 @@ public class HelperGrafico extends JPanel {
         for (int i = 0; i < westBounds.size(); i++) {
             Rectangle r = westBounds.get(i);
             Image img = showOpponentsFaceUp ? assets.getImmagineCarta(manoOvest.get(i)) : back;
-            drawCardRotated(g2, img, r, /*clockwise=*/false);
+            drawCardRotated(g2, img, r, false);
             g2.setColor(showOpponentsFaceUp ? Color.BLACK : Color.DARK_GRAY);
             g2.drawRect(r.x, r.y, r.width, r.height);
         }
@@ -231,7 +286,7 @@ public class HelperGrafico extends JPanel {
         for (int i = 0; i < eastBounds.size(); i++) {
             Rectangle r = eastBounds.get(i);
             Image img = showOpponentsFaceUp ? assets.getImmagineCarta(manoEst.get(i)) : back;
-            drawCardRotated(g2, img, r, /*clockwise=*/true);
+            drawCardRotated(g2, img, r, true);
             g2.setColor(showOpponentsFaceUp ? Color.BLACK : Color.DARK_GRAY);
             g2.drawRect(r.x, r.y, r.width, r.height);
         }
@@ -245,7 +300,7 @@ public class HelperGrafico extends JPanel {
             g2.setColor(Color.BLACK);
             g2.drawRect(r.x, r.y, r.width, r.height);
         }
-        if (selectedIndex >= 0 && selectedIndex < manoSud.size()) {
+        if (selectedIndex >= 0 && selectedIndex < manoSud.size()) {  
             Rectangle r = southBounds.get(selectedIndex);
             int drawY = r.y - LIFT_SELECTED;
             Image img = assets.getImmagineCarta(manoSud.get(selectedIndex));
@@ -253,7 +308,7 @@ public class HelperGrafico extends JPanel {
             g2.setColor(Color.BLACK);
             g2.drawRect(r.x, drawY, r.width, r.height);
 
-            // bordo dorato completo intorno alla carta selezionata (sta sopra, niente clip)
+            // bordo dorato completo intorno alla carta selezionata
             g2.setColor(new Color(255, 215, 0));
             g2.setStroke(new BasicStroke(3f));
             g2.drawRect(r.x + 1, drawY + 1, r.width - 3, r.height - 3);
@@ -264,6 +319,9 @@ public class HelperGrafico extends JPanel {
 
     /* ================= Helpers ================= */
 
+    /** Gestisce il click del mouse nella zona Sud (mano cliccabile). 
+     * @param p Punto cliccato
+    */
     private void handleSouthClick(Point p) {
         int newSel = -1;
         // cerca da destra a sinistra per rispettare lo z-order dell'overlap
@@ -278,7 +336,13 @@ public class HelperGrafico extends JPanel {
         if (newSel != selectedIndex) { selectedIndex = newSel; repaint(); }
     }
 
-    /** Disegna una carta ruotata di 90° (clockwise se true, anti se false). */
+    /** 
+     * Disegna una carta ruotata di 90° (clockwise se true, anti se false). 
+     * @param g2 Graphics2D
+     * @param img Immagine della carta (può essere null, in tal caso verrà disegnato un rettangolo bianco di fallback)
+     * @param r Bounding box della carta (prima della rotazione)
+     * @param clockwise true per rotazione oraria, false per antioraria
+     */
     private void drawCardRotated(Graphics2D g2, Image img, Rectangle r, boolean clockwise) {
         if (img == null) { // fallback semplice
             g2.setColor(Color.WHITE); g2.fillRect(r.x, r.y, r.width, r.height);

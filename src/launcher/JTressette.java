@@ -4,6 +4,11 @@ import javax.swing.SwingUtilities;
 import ui.AudioManager;
 import view.IntroView;
 
+/**
+ * Classe principale per avviare l'applicazione JTressette.
+ * Inizializza la schermata introduttiva e gestisce il flusso iniziale.
+ * @author 1957447
+ */
 public class JTressette {
 	public static void main(String[] args) {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {

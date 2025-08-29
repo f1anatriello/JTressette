@@ -10,8 +10,11 @@ import model.Giocatore;
 import ui.AudioManager;
 
 /**
- * Vista principale della partita 2v2.
- * Usa HelperGrafico come canvas centrale.
+ * View per la modalità 2v2.
+ * Implementa il pattern Singleton: usare {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)} per ottenere l'istanza.
+ * Usa {@link HelperGrafico} come canvas centrale per disegnare le carte.
+ * Comunica con il controller tramite {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
+ * @author 1957447
  */
 public class GameView2v2 extends JPanel {
 
@@ -54,6 +57,23 @@ public class GameView2v2 extends JPanel {
 
     public static final Color BACKGROUND_GREEN = new Color(0, 128, 0);
 
+    /**
+     * Restituisce l'istanza singleton di GameView2v2, creandola se non esiste.
+     * @param gameEngine
+     * @param southName
+     * @param southAvatar
+     * @param southHand
+     * @param northName
+     * @param northAvatar
+     * @param northHand
+     * @param eastName
+     * @param eastAvatar
+     * @param eastHand
+     * @param westName
+     * @param westAvatar
+     * @param westHand
+     * @return l'istanza singleton di GameView2v2
+     */
     public static GameView2v2 getInstance(
             GameEngine gameEngine,
             String southName, ImageIcon southAvatar, List<Carta> southHand,
@@ -73,6 +93,22 @@ public class GameView2v2 extends JPanel {
         return instance;
     }
 
+    /**
+     * Costruttore privato per il pattern Singleton.
+     * @param gameEngine
+     * @param southName
+     * @param southAvatar
+     * @param southHand
+     * @param northName
+     * @param northAvatar
+     * @param northHand
+     * @param eastName
+     * @param eastAvatar
+     * @param eastHand
+     * @param westName
+     * @param westAvatar
+     * @param westHand
+     */
     private GameView2v2(
             GameEngine gameEngine,
             String southName, ImageIcon southAvatar, List<Carta> southHand,
@@ -109,6 +145,18 @@ public class GameView2v2 extends JPanel {
 
     /* ================= UI ================= */
 
+    /**
+     * Costruisce l'interfaccia utente.
+     * Usa BorderLayout con:
+     * - NORTH: info giocatore Nord (AI)
+     * - SOUTH: info giocatore Sud (umano)
+     * - WEST: info giocatore Ovest (AI)
+     * - EAST: info giocatore Est (AI)
+     * - CENTER: {@link HelperGrafico} per disegnare carte e terreno
+     * Imposta gli handler dei bottoni.
+     * Usa il colore di sfondo {@link #BACKGROUND_GREEN}.
+     * Richiama {@link #render()} alla fine per il primo disegno.
+     */
     private void buildUI() {
         root = new JPanel(new BorderLayout());
         root.setBackground(BACKGROUND_GREEN);
@@ -233,6 +281,13 @@ public class GameView2v2 extends JPanel {
         gameSupp.setTerreno(terreno);
     }
 
+    /**
+     * Scala un'ImageIcon alle dimensioni specificate.
+     * @param icon l'icona da scalare
+     * @param w larghezza desiderata
+     * @param h altezza desiderata
+     * @return una nuova ImageIcon scalata, o l'icona originale se nulla
+     */
     private ImageIcon scale(ImageIcon icon, int w, int h) {
         if (icon == null || icon.getImage() == null) return icon;
         Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
@@ -241,6 +296,16 @@ public class GameView2v2 extends JPanel {
 
     /* ============== RENDER/UPDATE ============== */
 
+    /**
+     * Ridisegna l'interfaccia grafica.
+     * Aggiorna le mani del giocatore e dell'avversario, il terreno e i punteggi.
+     * Dopo il refresh, assicura che ci sia una carta selezionata (se possibile).
+     * Se una mano o il terreno sono null, verranno considerati vuoti.
+     * Richiama {@link HelperGrafico#refresh()} per ridisegnare il canvas.
+     * Usa {@link SwingUtilities#invokeLater(Runnable)} per assicurare che la selezione
+     * sia aggiornata dopo il ridisegno.
+     * Viene richiamato ogni volta che cambia lo stato del gioco.
+     */
     public void render() {
         List<Giocatore> giocatori = gameEngine.getPartita().getGiocatori();
         gameSupp.setHands(giocatori.get(0).getMano(), giocatori.get(1).getMano(), giocatori.get(2).getMano(), giocatori.get(3).getMano());
@@ -256,6 +321,14 @@ public class GameView2v2 extends JPanel {
         SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone());
     }
 
+    /**
+     * Aggiorna le mani dei giocatori e ridisegna l'interfaccia.
+     * Se una mano è null, verrà considerata vuota.
+     * @param south
+     * @param north
+     * @param east
+     * @param west
+     */
     public void refreshHands(List<Carta> south, List<Carta> north, List<Carta> east, List<Carta> west) {
         this.playerSouthHand = south;
         this.playerNorthHand = north;
@@ -264,20 +337,42 @@ public class GameView2v2 extends JPanel {
         render();
     }
 
+    
+    /**
+     * Imposta il terreno.
+     * Se il terreno è null, verrà considerato vuoto.
+     * @param terreno
+     */
     public void setTerreno(List<Carta> terreno) {
         this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
     }
 
+    /**
+     * Aggiorna il terreno e ridisegna l'interfaccia.
+     * Se il terreno è null, verrà considerato vuoto.
+     * @param terreno
+     */
     public void refreshTerreno(List<Carta> terreno) {
         this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
     }
 
+    /**
+     * Azzera l'istanza singleton.
+     * Deve essere richiamato quando si abbandona la partita in corso.
+     * Altrimenti, la prossima volta che si richiamerà {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)}
+     * verrà restituita l'istanza precedente, con i vecchi dati.    
+     */
     public static void disposeInstance() { instance = null; }
 
     /* ============== Azioni ============== */
 
+    /**
+     * Notifica al controller che l'utente vuole giocare la carta selezionata.
+     * Se non c'è nessuna carta selezionata, mostra un messaggio di avviso.
+     * In caso contrario, chiama {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
+     */
     private void giocaCartaSelezionata() {
         // Debounce: se è già stato premuto, ignora
         if (playLocked) return;

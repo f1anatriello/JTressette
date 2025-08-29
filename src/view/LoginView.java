@@ -12,6 +12,11 @@ import ui.AudioManager;
 import ui.UIConstants;
 import ui.UISettings;
 
+/**
+ * Schermata di login come JFrame.
+ * @author 1957447
+ */
+
 public class LoginView extends JFrame{
 
     private static final long serialVersionUID = 1L;
@@ -20,6 +25,9 @@ public class LoginView extends JFrame{
     private final JButton btnEsci  = UISettings.createButton("Esci", UISettings.ButtonVariant.TERTIARY);
     private final JLabel  info     = new JLabel("Nickname (3–20 caratteri)");
 
+    /**
+     * Crea la finestra di login.
+     */
     public LoginView() {
         setTitle("JTressette - Login");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

@@ -10,8 +10,7 @@ import ui.AudioManager;
 
 /**
  * View per la modalità 1v1 (giocatore umano vs AI).
- * Implementa il pattern Singleton: usare {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)}
- * per ottenere l'istanza.
+ * Implementa il pattern Singleton: usare {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)} per ottenere l'istanza.
  * Usa {@link HelperGrafico} come canvas centrale per disegnare le carte.
  * Comunica con il controller tramite {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
  * @author Francesco
@@ -58,7 +57,7 @@ public class GameView1v1 extends JPanel {
      * @param player2Avatar
      * @param player1Hand
      * @param player2Hand
-     * @return
+     * @return l'istanza singleton di GameView1v1
      */
     public static GameView1v1 getInstance(
             GameEngine gameEngine,

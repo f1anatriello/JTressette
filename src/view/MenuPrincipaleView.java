@@ -9,6 +9,12 @@ import ui.UIAssets;
 import ui.UIConstants;
 import ui.UISettings;
 
+/**
+ * Schermata principale (menu) come JPanel singleton.
+ * Usare {@link #getInstance(GameEngine)} per ottenere l'istanza.
+ * @author 1957447
+ */
+
 public class MenuPrincipaleView extends JPanel {
     private final JButton btnPartita1v1;
     private final JButton btnPartita2v2;
@@ -17,6 +23,11 @@ public class MenuPrincipaleView extends JPanel {
     private final JButton btnEsci;
     private static MenuPrincipaleView instance;
 
+    /**
+     * Restituisce l'istanza singleton del menu principale.
+     * @param gameEngine Il controller del gioco per gestire le azioni dei pulsanti.
+     * @return L'istanza singleton di MenuPrincipaleView.
+     */
     public static MenuPrincipaleView getInstance(GameEngine gameEngine) {
         if (instance == null) {
             instance = new MenuPrincipaleView(gameEngine);
@@ -24,6 +35,10 @@ public class MenuPrincipaleView extends JPanel {
         return instance;
     }
 
+    /**
+     * Costruttore privato per il pattern Singleton.
+     * @param gameEngine Il controller del gioco per gestire le azioni dei pulsanti.
+     */
     private MenuPrincipaleView(GameEngine gameEngine) {
         AudioManager.getInstance().stop();
 

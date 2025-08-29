@@ -15,6 +15,7 @@ import ui.UISettings;
 /**
  * Mostra le informazioni del profilo dell'utente loggato (versione BorderLayout),
  * usando UISettings per lo stile e le dimensioni dei bottoni.
+ * @author 1957447
  */
 public class ProfiloView extends JPanel {
 
@@ -26,6 +27,10 @@ public class ProfiloView extends JPanel {
     private final JButton btnModifica;
     private final JButton btnMenu;
 
+    /**
+     * Crea la vista del profilo.
+     * @param controller Il controller del gioco per gestire le azioni dei bottoni.
+     */
     public ProfiloView(GameEngine controller) {
         this.controller = controller;
 
@@ -104,6 +109,7 @@ public class ProfiloView extends JPanel {
     /**
      * Rende i bottoni larghi uguali prendendo come riferimento la massima preferred width
      * calcolata dai componenti creati con UISettings.
+     * @param buttons I bottoni da uniformare.
      */
     private void uniformaLarghezzaBottoni(JButton... buttons) {
         int maxWidth = 0;
@@ -125,6 +131,10 @@ public class ProfiloView extends JPanel {
         }
     }
 
+    /**
+     * Apre il dialogo per modificare il profilo.
+     * @param player L'utente di cui modificare il profilo.
+     */
     public void modificaProfilo(UtentePojo player) {
         // Apri un dialogo per modificare il profilo
         DialogModificaProfilo dialog = new DialogModificaProfilo(controller);
@@ -133,6 +143,7 @@ public class ProfiloView extends JPanel {
 
     /**
      * Aggiorna la vista con i dati dell'utente.
+     * @param utente L'utente di cui mostrare il profilo.
      */
     public void mostraProfilo(UtentePojo utente) {
         if (utente != null) {
