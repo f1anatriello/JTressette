@@ -14,7 +14,7 @@ public class JTressette {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
             	SwingUtilities.invokeLater(() -> {
-                    new IntroView(3000).setVisible(true); // splash di 3 secondi.
+                    new IntroView(5000).setVisible(true); // splash di 3 secondi.
                     AudioManager.getInstance().play("audio/intro.wav");
                 });
             }

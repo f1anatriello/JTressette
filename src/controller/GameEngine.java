@@ -134,8 +134,8 @@ public class GameEngine implements Observer {
     private void giocaTurnoUmano1V1(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
         gameView.unlockPlay();
         setOrder1v1(partita, umano, ai);
+        gameView.highlightAvatar(umano.getNome());
 
-        AudioManager.getInstance().playLoop("audio/timer.wav");
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
 
@@ -143,6 +143,7 @@ public class GameEngine implements Observer {
             // 1) l'umano gioca e mostri SUBITO la 1ª carta sul terreno
             giocaCarta(umano, carta, partita);
             showTerreno(partita);
+            gameView.highlightAvatar(ai.getNome());
 
             // 2) dopo un attimo, gioca l'AI e mostri entrambe
             after(180, () -> {
@@ -194,15 +195,16 @@ public class GameEngine implements Observer {
      */
     private void giocaTurnoAI1V1(Partita1v1 partita, GiocatoreUmano umano, GiocatoreAI ai) {
         gameView.unlockPlay();
-
         setOrder1v1(partita, ai, umano);
+        gameView.highlightAvatar(ai.getNome());
+
         Carta cartaAI = ai.scegliCarta(partita);
         giocaCarta(ai, cartaAI, partita);
         showTerreno(partita);
 
+        gameView.highlightAvatar(umano.getNome());
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
-
             giocaCarta(umano, carta, partita);
             showTerreno(partita);
 
@@ -309,7 +311,7 @@ public class GameEngine implements Observer {
             p.getGiocatori().get(2).getMano(),
             // Giocatore Ovest (avversario 2)
             p.getGiocatori().get(3).getNome(),
-            new ImageIcon("images/avatars/avatar" + (1 + (int)(Math.random() * 6)) + "png"),
+            new ImageIcon("images/avatars/avatar" + (1 + (int)(Math.random() * 6)) + ".png"),
             p.getGiocatori().get(3).getMano()
         );
 
@@ -335,7 +337,7 @@ public class GameEngine implements Observer {
      */
     private void giocaTurnoUmano2v2(Partita2v2 partita, List<Giocatore> ordineTurno, GiocatoreUmano umano) {
         gameView2v2.unlockPlay();
-        AudioManager.getInstance().playLoop("aaudio/timer.wav"); // esempio di utilizzo di AudioManager
+        gameView2v2.highlightAvatar(umano.getNome());
 
         umano.setOnCartaSceltaListener(carta -> {
             if (carta == null) return;
@@ -355,6 +357,7 @@ public class GameEngine implements Observer {
      */
     private void giocaTurnoAI2v2(Partita2v2 partita, List<Giocatore> giocatori, GiocatoreAI aiCorrente) {
         gameView2v2.unlockPlay();
+        gameView2v2.highlightAvatar(aiCorrente.getNome());
         Carta cartaAI = aiCorrente.scegliCarta(partita);
         giocaCarta(aiCorrente, cartaAI, partita);
 
@@ -378,7 +381,7 @@ public class GameEngine implements Observer {
         }
 
         Giocatore corrente = giocatori.get(index);
-
+        gameView2v2.highlightAvatar(corrente.getNome());
         if (corrente instanceof GiocatoreAI) {
             after(400, () -> {
                 Carta cartaAI = ((GiocatoreAI) corrente).scegliCarta(partita);
@@ -388,7 +391,6 @@ public class GameEngine implements Observer {
             });
 
         } else if (corrente instanceof GiocatoreUmano) {
-            AudioManager.getInstance().playLoop("audio/timer.wav");
             ((GiocatoreUmano) corrente).setOnCartaSceltaListener(carta -> {
                 if (carta == null) return;
                 AudioManager.getInstance().stop();
@@ -449,7 +451,7 @@ public class GameEngine implements Observer {
                     return;
                 }
 
-                if (vincente instanceof GiocatoreUmano) {
+                if (vincente instanceof GiocatoreUmano || vincente.getSquadra().equals(playerUmano.getSquadra())) {
                     AudioManager.getInstance().play("audio/win.wav"); 
                     giocaTurnoUmano2v2(partita, ordineGioco2v2, (GiocatoreUmano) vincente);
                 } else {
@@ -492,7 +494,7 @@ public class GameEngine implements Observer {
         boolean haVintoUmano = (vincitore instanceof GiocatoreUmano);
         playerUmano.notificaFinePartita(haVintoUmano);
 
-        // Dialog celebrativo con confetti
+        // Dialog celebrativo
         DialogCelebrations.showVictoryDialog(
             mainFrame,
             "La Partita è Finita!",
@@ -534,8 +536,8 @@ public class GameEngine implements Observer {
             playerEst = new GiocatoreAI();
             playerOvest = new GiocatoreAI();
             giocatori.add(playerUmano);
-            giocatori.add(playerEst);
             giocatori.add(ai);
+            giocatori.add(playerEst);
             giocatori.add(playerOvest);
 
             playerUmano.addObserver(this);

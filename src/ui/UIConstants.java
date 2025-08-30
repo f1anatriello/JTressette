@@ -20,6 +20,7 @@ public final class UIConstants {
     // =========================
     public static final Color BACKGROUND_DARK        = new Color(122,83,162); 
     public static final Color BACKGROUND_PANEL       = new Color(153,112,194); 
+    public static final Color BACKGROUND_GREEN       = new Color(0, 128, 0);
     public static final Color TEXT_COLOR             = new Color(17, 17, 17);    
     public static final Color TEXT_MUTED             = new Color(80, 72, 60);
     public static final Color ACCENT_COLOR           = new Color(0,0,0);

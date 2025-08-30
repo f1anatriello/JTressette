@@ -5,8 +5,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.Border;
 import model.Carta; // Ensure this is the correct package for AudioManager
 import ui.AudioManager;
+import ui.UIConstants;
 
 /**
  * View per la modalità 1v1 (giocatore umano vs AI).
@@ -33,7 +35,6 @@ public class GameView1v1 extends JPanel {
     private JPanel topHUD;      // avatar/nome avversario
     private JPanel bottomHUD;   // avatar/nome giocatore + pulsanti
 
-
     private HelperGrafico gameSupp;   // canvas centrale
 
     private List<Carta> terreno;    // terreno di gioco
@@ -45,7 +46,9 @@ public class GameView1v1 extends JPanel {
     private JButton btnGioca;
     private boolean playLocked = false; // per evitare doppi click sul bottone Gioca
 
-    public static final Color BACKGROUND_GREEN = new Color(0, 128, 0);
+    // --- Avatar labels per bordo/glow ---
+    private JLabel avatar1Label; // bottom (umano)
+    private JLabel avatar2Label; // top (AI)
 
     /**
      * Singleton: restituisce l'istanza esistente o ne crea una nuova.
@@ -76,13 +79,6 @@ public class GameView1v1 extends JPanel {
 
     /**
      * Costruttore privato (singleton).
-     * @param gameEngine
-     * @param player1Name
-     * @param player1Avatar
-     * @param player2Name
-     * @param player2Avatar
-     * @param player1Hand
-     * @param player2Hand
      */
     private GameView1v1(
             GameEngine gameEngine,
@@ -109,7 +105,7 @@ public class GameView1v1 extends JPanel {
         leftTop.add(score2Label);
 
         setLayout(new BorderLayout());
-        setBackground(BACKGROUND_GREEN);
+        setBackground(UIConstants.BACKGROUND_GREEN);
 
         buildUI();
         render(); // primo disegno
@@ -123,14 +119,11 @@ public class GameView1v1 extends JPanel {
      * - NORTH: topHUD (avatar/nome avversario + bottone menù)
      * - SOUTH: bottomHUD (avatar/nome giocatore + bottone gioca)
      * - CENTER: HelperGrafico (canvas carte)
-     * Imposta gli handler dei bottoni.
-     * Usa il colore di sfondo {@link #BACKGROUND_GREEN}.
-     * Richiama {@link #render()} alla fine per il primo disegno.
      */
     private void buildUI() {
         // root con BorderLayout
         root = new JPanel(new BorderLayout());
-        root.setBackground(BACKGROUND_GREEN);
+        root.setBackground(UIConstants.BACKGROUND_GREEN);
         add(root, BorderLayout.CENTER);
 
         // --- TOP HUD: avversario (sx) + bottone Menù (dx) ---
@@ -138,18 +131,18 @@ public class GameView1v1 extends JPanel {
         topHUD.setOpaque(false);
 
         // sinistra: avatar + nome avversario
-        JLabel avatar2 = new JLabel(scale(player2Avatar, 60, 60));
+        avatar2Label = new JLabel(scale(player2Avatar, 60, 60));
         JLabel name2 = new JLabel(player2Name, SwingConstants.LEFT);
         name2.setFont(name2.getFont().deriveFont(Font.BOLD, 14f));
-        score2Label = new JLabel(" - Punti: " + gameEngine.getGiocatoreAI().getPunti());
-        leftTop.add(avatar2);
+        score2Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
+        leftTop.add(avatar2Label);
         leftTop.add(name2);
 
         // destra: bottone Menù
         JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
         rightTop.setOpaque(false);
         JButton btnMenu = new JButton("⬅ Torna al Menù");
-        
+
         btnMenu.addActionListener(e -> {
             AudioManager.getInstance().stop();
             AudioManager.getInstance().play("audio/button.wav");
@@ -165,11 +158,11 @@ public class GameView1v1 extends JPanel {
                 try {
                     gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null);
                 } catch (Exception ignore) {}
-                GameView1v1.disposeInstance(); // <— importantissimo: azzera il singleton
+                GameView1v1.disposeInstance(); // azzera il singleton
                 gameEngine.visualizzaMenu(); // torna al menu
                 gameEngine.reset();
             } else {
-                AudioManager.getInstance().playLoop("audio/timer.wav");
+                AudioManager.getInstance().playLoop("audio/button.wav");
             }
         });
         rightTop.add(btnMenu);
@@ -181,13 +174,13 @@ public class GameView1v1 extends JPanel {
         // --- BOTTOM HUD: giocatore ---
         bottomHUD = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
         bottomHUD.setOpaque(false);
-        JLabel avatar1 = new JLabel(scale(player1Avatar, 60, 60));
+        avatar1Label = new JLabel(scale(player1Avatar, 60, 60));
         JLabel name1 = new JLabel(player1Name, SwingConstants.LEFT);
         name1.setFont(name1.getFont().deriveFont(Font.BOLD, 14f));
-        score1Label = new JLabel(" - Punti: " + gameEngine.getGiocatoreUmano().getPunti());
+        score1Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
         btnGioca = new JButton("Gioca");
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
-        bottomHUD.add(avatar1);
+        bottomHUD.add(avatar1Label);
         bottomHUD.add(name1);
         bottomHUD.add(Box.createHorizontalStrut(16));
         bottomHUD.add(btnGioca);
@@ -204,96 +197,76 @@ public class GameView1v1 extends JPanel {
 
     /**
     * Ridimensiona un'icona immagine alle dimensioni specificate.
-    * Se l'icona è null, restituisce null.
-    * @param icon l'icona da ridimensionare
-    * @param w larghezza desiderata
-    * @param h altezza desiderata
-    * @return l'icona ridimensionata
-     */
+    */
     private ImageIcon scale(ImageIcon icon, int w, int h) {
         if (icon == null || icon.getImage() == null) return icon;
         Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_AREA_AVERAGING);
         return new ImageIcon(scaled);
     }
 
+    /* ============== HIGHLIGHTER ============== */
+
+    /** Evidenzia con un bordo l'avatar del giocatore corrente (per nome). */
+    public void highlightAvatar(String name) {
+        boolean p1 = name != null && name.equalsIgnoreCase(player1Name);
+        boolean p2 = name != null && name.equalsIgnoreCase(player2Name);
+        Border hi = BorderFactory.createLineBorder(Color.CYAN, 2, true);
+
+        if (avatar1Label != null) avatar1Label.setBorder(p1 ? hi : null);
+        if (avatar2Label != null) avatar2Label.setBorder(p2 ? hi : null);
+    }
+
+    /** Rimuove qualsiasi evidenziazione. */
+    public void clearHighlight() {
+        if (avatar1Label != null) avatar1Label.setBorder(null);
+        if (avatar2Label != null) avatar2Label.setBorder(null);
+    }
+
     /* ============== RENDER/UPDATE ============== */
 
-    /**
-     * Ridisegna l'interfaccia grafica.
-     * Aggiorna le mani del giocatore e dell'avversario, il terreno e i punteggi.
-     * Dopo il refresh, assicura che ci sia una carta selezionata (se possibile).
-     * Se una mano o il terreno sono null, verranno considerati vuoti.
-     * Richiama {@link HelperGrafico#refresh()} per ridisegnare il canvas.
-     * Usa {@link SwingUtilities#invokeLater(Runnable)} per assicurare che la selezione
-     * sia aggiornata dopo il ridisegno.
-     * Viene richiamato ogni volta che cambia lo stato del gioco.
-     */
+    /** Ridisegna l'interfaccia grafica. */
     public void render() {
         gameSupp.setHands(player1Hand, player2Hand);
         gameSupp.setTerreno(terreno);
         gameSupp.refresh();
 
-        // aggiorna i punteggi    
+        // aggiorna i punteggi
         score1Label.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
         score2Label.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
-        bottomHUD.add(score1Label);
-        leftTop.add(score2Label);
 
         // dopo il refresh assicuriamo una selezione valida
         SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone());
     }
 
-    /** 
-     * Aggiorna le mani del giocatore e dell'avversario e ridisegna. 
-     * Se una mano è null, verrà considerata vuota.
-     * @param newP1 la nuova mano del giocatore
-     * @param newP2 la nuova mano dell'avversario
-    */
+    /** Aggiorna le mani e ridisegna. */
     public void refreshHands(List<Carta> newP1, List<Carta> newP2) {
         this.player1Hand = newP1;
         this.player2Hand = newP2;
         render();
     }
 
-    /**
-     * Imposta la lista di carte sul terreno e ridisegna.
-     * Se il terreno è null, verrà considerato vuoto.
-     * @param terreno la nuova lista di carte sul terreno
-     */
+    /** Imposta la lista di carte sul terreno e ridisegna. */
     public void setTerreno(List<Carta> terreno) {
         this.terreno = terreno;
         render();
     }
 
-    /**
-     * Aggiornamento del terreno (mantiene compatibilità con il codice esistente).
-     * Si limita a impostare la nuova lista e ridisegnare.
-     * @param terreno la nuova lista di carte sul terreno
-     */
+    /** Compatibilità: aggiorna il terreno e ridisegna. */
     public void refreshTerreno(List<Carta> terreno) {
         this.terreno = terreno;
         render();
     }
 
-    /**
-     * Azzera l'istanza singleton.
-     * Deve essere richiamato quando si abbandona la partita in corso.
-     * Altrimenti, la prossima volta che si richiamerà {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)}
-     * verrà restituita l'istanza precedente, con i vecchi dati.    
-     */
+    /** Azzera l'istanza singleton. */
     public static void disposeInstance() {
         instance = null;
     }
 
     /* ============== Azioni ============== */
 
-    /**
-     * Notifica al controller che l'utente vuole giocare la carta selezionata.
-     * Se non c'è nessuna carta selezionata, mostra un messaggio di avviso.
-     * In caso contrario, chiama {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
-     */
+    /** Gestisce il click su "Gioca" notificando il controller. */
     private void giocaCartaSelezionata() {
-         // Debounce: se è già stato premuto, ignora
+        // Debounce: se è già stato premuto, ignora
         if (playLocked) return;
 
         Carta sel = gameSupp.getSelected();
@@ -315,8 +288,6 @@ public class GameView1v1 extends JPanel {
 
     /**
      * Sblocca il pulsante "Gioca" dopo che il controller ha processato la mossa.
-     * Viene richiamato dal controller tramite {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
-     * Abilita il pulsante "Gioca" se esiste.
      */
     public void unlockPlay() {
         playLocked = false;

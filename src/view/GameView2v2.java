@@ -5,16 +5,23 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.Border;
 import model.Carta;
 import model.Giocatore;
 import ui.AudioManager;
+import ui.UIConstants;
 
 /**
  * View per la modalità 2v2.
  * Implementa il pattern Singleton: usare {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)} per ottenere l'istanza.
  * Usa {@link HelperGrafico} come canvas centrale per disegnare le carte.
  * Comunica con il controller tramite {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
- * @author 1957447
+ * 
+ * Mapping GameEngine (2v2):
+ * - Sud  -> getGiocatoreUmano()
+ * - Nord -> getGiocatoreAI()     (campo 'ai' nel GameEngine)
+ * - Est  -> getGiocatoreEst()
+ * - Ovest-> getGiocatoreOvest()
  */
 public class GameView2v2 extends JPanel {
 
@@ -55,24 +62,15 @@ public class GameView2v2 extends JPanel {
     private JButton btnGioca; 
     private boolean playLocked = false; // per evitare doppi click sul bottone Gioca
 
-    public static final Color BACKGROUND_GREEN = new Color(0, 128, 0);
+    // --- Avatar labels per bordo/glow ---
+    private JLabel avatarSLabel; // South (umano)
+    private JLabel avatarNLabel; // North (AI)
+    private JLabel avatarELabel; // East  (AI)
+    private JLabel avatarWLabel; // West  (AI)
+
 
     /**
      * Restituisce l'istanza singleton di GameView2v2, creandola se non esiste.
-     * @param gameEngine
-     * @param southName
-     * @param southAvatar
-     * @param southHand
-     * @param northName
-     * @param northAvatar
-     * @param northHand
-     * @param eastName
-     * @param eastAvatar
-     * @param eastHand
-     * @param westName
-     * @param westAvatar
-     * @param westHand
-     * @return l'istanza singleton di GameView2v2
      */
     public static GameView2v2 getInstance(
             GameEngine gameEngine,
@@ -95,19 +93,6 @@ public class GameView2v2 extends JPanel {
 
     /**
      * Costruttore privato per il pattern Singleton.
-     * @param gameEngine
-     * @param southName
-     * @param southAvatar
-     * @param southHand
-     * @param northName
-     * @param northAvatar
-     * @param northHand
-     * @param eastName
-     * @param eastAvatar
-     * @param eastHand
-     * @param westName
-     * @param westAvatar
-     * @param westHand
      */
     private GameView2v2(
             GameEngine gameEngine,
@@ -137,7 +122,7 @@ public class GameView2v2 extends JPanel {
         this.terreno = new ArrayList<>();
 
         setLayout(new BorderLayout());
-        setBackground(BACKGROUND_GREEN);
+        setBackground(UIConstants.BACKGROUND_GREEN);
 
         buildUI();
         render();
@@ -153,22 +138,20 @@ public class GameView2v2 extends JPanel {
      * - WEST: info giocatore Ovest (AI)
      * - EAST: info giocatore Est (AI)
      * - CENTER: {@link HelperGrafico} per disegnare carte e terreno
-     * Imposta gli handler dei bottoni.
-     * Usa il colore di sfondo {@link #BACKGROUND_GREEN}.
-     * Richiama {@link #render()} alla fine per il primo disegno.
      */
     private void buildUI() {
         root = new JPanel(new BorderLayout());
-        root.setBackground(BACKGROUND_GREEN);
+        root.setBackground(UIConstants.BACKGROUND_GREEN);
+
         add(root, BorderLayout.CENTER);
 
         // --- TOP HUD (NORD) ---
         topHUD = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
         topHUD.setOpaque(false);
-        JLabel avatarN = new JLabel(scale(playerNorthAvatar, 50, 50));
+        avatarNLabel = new JLabel(scale(playerNorthAvatar, 50, 50));
         JLabel nameN = new JLabel(playerNorthName);
-        scoreNorthLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreAI().getPunti());
-        JLabel squadLabel = new JLabel(" -" + gameEngine.getGiocatoreEst().getSquadra().getNome());
+        scoreNorthLabel = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
+        JLabel squadLabel = new JLabel(" - " + gameEngine.getGiocatoreAI().getSquadra().getNome());
 
         JButton btnMenu = new JButton("⬅ Torna al Menù");
         btnMenu.addActionListener(e -> {
@@ -187,15 +170,15 @@ public class GameView2v2 extends JPanel {
                 try {
                     gameEngine.getGiocatoreUmano().setOnCartaSceltaListener(null);
                 } catch (Exception ignore) {}
-                GameView2v2.disposeInstance(); // <— importantissimo: azzera il singleton
-                gameEngine.visualizzaMenu(); // torna al menu
+                GameView2v2.disposeInstance(); // azzera il singleton
+                gameEngine.visualizzaMenu();
                 gameEngine.reset();
             } else {
-                AudioManager.getInstance().playLoop("audio/timer.wav");
+                AudioManager.getInstance().play("audio/button.wav");
             }
         });
         topHUD.add(Box.createHorizontalStrut(200));
-        topHUD.add(avatarN);
+        topHUD.add(avatarNLabel);
         topHUD.add(nameN);
         topHUD.add(scoreNorthLabel);
         topHUD.add(squadLabel);
@@ -207,15 +190,15 @@ public class GameView2v2 extends JPanel {
         // --- BOTTOM HUD (SUD, umano) ---
         bottomHUD = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
         bottomHUD.setOpaque(false);
-        JLabel avatarS = new JLabel(scale(playerSouthAvatar, 60, 60));
+        avatarSLabel = new JLabel(scale(playerSouthAvatar, 60, 60));
         JLabel nameS = new JLabel(playerSouthName);
-        scoreSouthLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreUmano().getPunti());
-        JLabel squadLabelBot = new JLabel(" -" + gameEngine.getGiocatoreUmano().getSquadra().getNome());
+        scoreSouthLabel = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
+        JLabel squadLabelBot = new JLabel(" - " + gameEngine.getGiocatoreUmano().getSquadra().getNome());
         btnGioca = new JButton("Gioca");
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
 
         bottomHUD.add(Box.createHorizontalStrut(200));
-        bottomHUD.add(avatarS);
+        bottomHUD.add(avatarSLabel);
         bottomHUD.add(nameS);
         bottomHUD.add(btnGioca);
         bottomHUD.add(scoreSouthLabel);
@@ -228,17 +211,17 @@ public class GameView2v2 extends JPanel {
         leftHUD.setLayout(new BoxLayout(leftHUD, BoxLayout.Y_AXIS));
         leftHUD.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
 
-        JLabel avatarW = new JLabel(scale(playerWestAvatar, 50, 50));
-        avatarW.setAlignmentX(Component.CENTER_ALIGNMENT);
+        avatarWLabel = new JLabel(scale(playerWestAvatar, 50, 50));
+        avatarWLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameW = new JLabel(playerWestName);
         nameW.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scoreWestLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreOvest().getPunti());
+        scoreWestLabel = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreOvest().getPunti()));
         scoreWestLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JLabel squadLabelLeft = new JLabel(" -" + gameEngine.getGiocatoreOvest().getSquadra().getNome());
+        JLabel squadLabelLeft = new JLabel(" - " + gameEngine.getGiocatoreOvest().getSquadra().getNome());
         squadLabelLeft.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         leftHUD.add(Box.createVerticalStrut(50));
-        leftHUD.add(avatarW);
+        leftHUD.add(avatarWLabel);
         leftHUD.add(Box.createVerticalStrut(8));
         leftHUD.add(nameW);
         leftHUD.add(Box.createVerticalStrut(8));
@@ -252,21 +235,18 @@ public class GameView2v2 extends JPanel {
         rightHUD.setOpaque(false);
         rightHUD.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0)); // meno spazio dall'alto
 
-        // avatar + info
         rightHUD.add(Box.createVerticalStrut(150));
-        JLabel avatarE = new JLabel(scale(playerEastAvatar, 50, 50));
-        avatarE.setAlignmentX(Component.CENTER_ALIGNMENT);
+        avatarELabel = new JLabel(scale(playerEastAvatar, 50, 50));
+        avatarELabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel nameE = new JLabel(playerEastName);
         nameE.setAlignmentX(Component.CENTER_ALIGNMENT);
-        scoreEastLabel = new JLabel(" - Punti: " + gameEngine.getGiocatoreAI().getPunti());
+        scoreEastLabel = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreEst().getPunti()));
         scoreEastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JLabel squadLabelRight = new JLabel(" -" + gameEngine.getGiocatoreAI().getSquadra().getNome());
+        JLabel squadLabelRight = new JLabel(" - " + gameEngine.getGiocatoreEst().getSquadra().getNome());
         squadLabelRight.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // aggiunta in ordine verticale
-        // rightHUD.add(btnMenu);
         rightHUD.add(Box.createVerticalStrut(12));
-        rightHUD.add(avatarE);
+        rightHUD.add(avatarELabel);
         rightHUD.add(Box.createVerticalStrut(8));
         rightHUD.add(nameE);
         rightHUD.add(Box.createVerticalStrut(8));
@@ -275,7 +255,7 @@ public class GameView2v2 extends JPanel {
 
         root.add(rightHUD, BorderLayout.EAST);
 
-        // --- CENTER: GameSupport2v2 (2v2) ---
+        // --- CENTER: HelperGrafico ---
         gameSupp = new HelperGrafico(playerSouthHand, playerNorthHand, playerEastHand, playerWestHand);
         root.add(gameSupp, BorderLayout.CENTER);
         gameSupp.setTerreno(terreno);
@@ -283,10 +263,6 @@ public class GameView2v2 extends JPanel {
 
     /**
      * Scala un'ImageIcon alle dimensioni specificate.
-     * @param icon l'icona da scalare
-     * @param w larghezza desiderata
-     * @param h altezza desiderata
-     * @return una nuova ImageIcon scalata, o l'icona originale se nulla
      */
     private ImageIcon scale(ImageIcon icon, int w, int h) {
         if (icon == null || icon.getImage() == null) return icon;
@@ -294,41 +270,58 @@ public class GameView2v2 extends JPanel {
         return new ImageIcon(scaled);
     }
 
+    /* ============== HIGHLIGHTER ============== */
+
+    /** Evidenzia con un bordo l'avatar del giocatore corrente (per nome). */
+    public void highlightAvatar(String name) {
+        boolean isSouth = name != null && name.equalsIgnoreCase(playerSouthName);
+        boolean isNorth = name != null && name.equalsIgnoreCase(playerNorthName);
+        boolean isEast  = name != null && name.equalsIgnoreCase(playerEastName);
+        boolean isWest  = name != null && name.equalsIgnoreCase(playerWestName);
+
+        Border hi = BorderFactory.createLineBorder(Color.CYAN, 4, true);
+
+        if (avatarSLabel != null) avatarSLabel.setBorder(isSouth ? hi : null);
+        if (avatarNLabel != null) avatarNLabel.setBorder(isNorth ? hi : null);
+        if (avatarELabel != null) avatarELabel.setBorder(isEast  ? hi : null);
+        if (avatarWLabel != null) avatarWLabel.setBorder(isWest  ? hi : null);
+    }
+
+    /** Rimuove qualsiasi evidenziazione. */
+    public void clearHighlight() {
+        if (avatarSLabel != null) avatarSLabel.setBorder(null);
+        if (avatarNLabel != null) avatarNLabel.setBorder(null);
+        if (avatarELabel != null) avatarELabel.setBorder(null);
+        if (avatarWLabel != null) avatarWLabel.setBorder(null);
+    }
+
     /* ============== RENDER/UPDATE ============== */
 
     /**
      * Ridisegna l'interfaccia grafica.
-     * Aggiorna le mani del giocatore e dell'avversario, il terreno e i punteggi.
-     * Dopo il refresh, assicura che ci sia una carta selezionata (se possibile).
-     * Se una mano o il terreno sono null, verranno considerati vuoti.
-     * Richiama {@link HelperGrafico#refresh()} per ridisegnare il canvas.
-     * Usa {@link SwingUtilities#invokeLater(Runnable)} per assicurare che la selezione
-     * sia aggiornata dopo il ridisegno.
-     * Viene richiamato ogni volta che cambia lo stato del gioco.
+     * Aggiorna le mani dei 4, il terreno e i punteggi.
      */
     public void render() {
         List<Giocatore> giocatori = gameEngine.getPartita().getGiocatori();
-        gameSupp.setHands(giocatori.get(0).getMano(), giocatori.get(1).getMano(), giocatori.get(2).getMano(), giocatori.get(3).getMano());
+        gameSupp.setHands(
+            giocatori.get(0).getMano(),
+            giocatori.get(1).getMano(),
+            giocatori.get(2).getMano(),
+            giocatori.get(3).getMano()
+        );
         gameSupp.setTerreno(terreno);
         gameSupp.refresh();
 
-        // aggiornamento punteggi (adatta ai nomi/metodi del tuo GameEngine)
+        // aggiornamento punteggi coerente con i getter del GameEngine
         scoreSouthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
-        scoreNorthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreEst().getPunti()));
-        scoreEastLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
+        scoreNorthLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
+        scoreEastLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreEst().getPunti()));
         scoreWestLabel.setText(" - Punti: " + Math.round(gameEngine.getGiocatoreOvest().getPunti()));
 
         SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone());
     }
 
-    /**
-     * Aggiorna le mani dei giocatori e ridisegna l'interfaccia.
-     * Se una mano è null, verrà considerata vuota.
-     * @param south
-     * @param north
-     * @param east
-     * @param west
-     */
+    /** Aggiorna le mani dei giocatori e ridisegna l'interfaccia. */
     public void refreshHands(List<Carta> south, List<Carta> north, List<Carta> east, List<Carta> west) {
         this.playerSouthHand = south;
         this.playerNorthHand = north;
@@ -337,41 +330,25 @@ public class GameView2v2 extends JPanel {
         render();
     }
 
-    
-    /**
-     * Imposta il terreno.
-     * Se il terreno è null, verrà considerato vuoto.
-     * @param terreno
-     */
+    /** Imposta il terreno e ridisegna l'interfaccia. */
     public void setTerreno(List<Carta> terreno) {
         this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
     }
 
-    /**
-     * Aggiorna il terreno e ridisegna l'interfaccia.
-     * Se il terreno è null, verrà considerato vuoto.
-     * @param terreno
-     */
+    /** Aggiorna il terreno e ridisegna l'interfaccia. */
     public void refreshTerreno(List<Carta> terreno) {
         this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
     }
 
-    /**
-     * Azzera l'istanza singleton.
-     * Deve essere richiamato quando si abbandona la partita in corso.
-     * Altrimenti, la prossima volta che si richiamerà {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)}
-     * verrà restituita l'istanza precedente, con i vecchi dati.    
-     */
+    /** Azzera l'istanza singleton. */
     public static void disposeInstance() { instance = null; }
 
     /* ============== Azioni ============== */
 
     /**
      * Notifica al controller che l'utente vuole giocare la carta selezionata.
-     * Se non c'è nessuna carta selezionata, mostra un messaggio di avviso.
-     * In caso contrario, chiama {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
      */
     private void giocaCartaSelezionata() {
         // Debounce: se è già stato premuto, ignora
@@ -397,8 +374,6 @@ public class GameView2v2 extends JPanel {
 
     /**
      * Sblocca il pulsante "Gioca" dopo che il controller ha processato la mossa.
-     * Viene richiamato dal controller tramite {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
-     * Abilita il pulsante "Gioca" se esiste.
      */
     public void unlockPlay() {
         playLocked = false;
