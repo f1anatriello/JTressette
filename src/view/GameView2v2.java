@@ -279,7 +279,7 @@ public class GameView2v2 extends JPanel {
         boolean isEast  = name != null && name.equalsIgnoreCase(playerEastName);
         boolean isWest  = name != null && name.equalsIgnoreCase(playerWestName);
 
-        Border hi = BorderFactory.createLineBorder(Color.CYAN, 4, true);
+        Border hi = BorderFactory.createLineBorder(Color.CYAN, 2, true);
 
         if (avatarSLabel != null) avatarSLabel.setBorder(isSouth ? hi : null);
         if (avatarNLabel != null) avatarNLabel.setBorder(isNorth ? hi : null);

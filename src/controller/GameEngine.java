@@ -357,13 +357,12 @@ public class GameEngine implements Observer {
      */
     private void giocaTurnoAI2v2(Partita2v2 partita, List<Giocatore> giocatori, GiocatoreAI aiCorrente) {
         gameView2v2.unlockPlay();
-        gameView2v2.highlightAvatar(aiCorrente.getNome());
+        //gameView2v2.highlightAvatar(aiCorrente.getNome());
+
         Carta cartaAI = aiCorrente.scegliCarta(partita);
         giocaCarta(aiCorrente, cartaAI, partita);
-
         showTerreno(partita);
 
-        // Poi gli altri a giro
         giocaSequenzaRec(partita, giocatori, giocatori.indexOf(aiCorrente) + 1);
     }
 
@@ -435,6 +434,9 @@ public class GameEngine implements Observer {
                 giocatori.get(2).getMano(),
                 giocatori.get(3).getMano()
             );
+            
+            gameView2v2.highlightAvatar(vincente.getNome());
+
 
             // Pulisci terreno e avvia nuovo turno
             after(400, () -> {
@@ -451,11 +453,15 @@ public class GameEngine implements Observer {
                     return;
                 }
 
-                if (vincente instanceof GiocatoreUmano || vincente.getSquadra().equals(playerUmano.getSquadra())) {
+                if (vincente instanceof GiocatoreUmano) {
                     AudioManager.getInstance().play("audio/win.wav"); 
                     giocaTurnoUmano2v2(partita, ordineGioco2v2, (GiocatoreUmano) vincente);
                 } else {
-                    giocaTurnoAI2v2(partita, ordineGioco2v2, (GiocatoreAI) vincente);
+                    if(vincente.getSquadra().equals(playerUmano.getSquadra())){
+                        AudioManager.getInstance().play("audio/win.wav");
+                        giocaTurnoAI2v2(partita, ordineGioco2v2, (GiocatoreAI) vincente);
+                    }
+                    else giocaTurnoAI2v2(partita, ordineGioco2v2, (GiocatoreAI) vincente);
                 }
             });
         });
