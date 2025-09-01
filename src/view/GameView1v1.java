@@ -137,6 +137,7 @@ public class GameView1v1 extends JPanel {
         score2Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
         leftTop.add(avatar2Label);
         leftTop.add(name2);
+        leftTop.add(score2Label);
       
 
         // destra: bottone Menù

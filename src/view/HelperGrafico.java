@@ -19,6 +19,8 @@ import ui.UIAssets;
  * - Nord/Est/Ovest con retro (o fronte in debug); Est/Ovest ruotate orizzontali.
  * - Terreno al centro.
  * - Layout e hit-test basati su INDICI, non su identità/equals() di Carta.
+ * Per maggiori info sull utilizzo + implementazione:
+ * - https://stackoverflow.com/questions/48758977/how-to-display-cards-in-a-card-game-in-java-and-have-them-clickable-for-selectio
  * @author 1957447 
  */
 public class HelperGrafico extends JPanel {

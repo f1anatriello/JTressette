@@ -156,6 +156,7 @@ public class GameEngine implements Observer {
                     Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
                     double puntiMano = partita.getTerreno().stream().mapToDouble(Carta::getPunti).sum();
                     vincente.aggiungiPunti(puntiMano);
+                    gameView.highlightAvatar(vincente.getNome());
 
                     if (!partita.isMazzoVuoto()) {
                         if (vincente.equals(umano)) {
@@ -175,7 +176,7 @@ public class GameEngine implements Observer {
                         finePartita1v1(partita);
                         return;
                     }
-
+                    
                     if (vincente instanceof GiocatoreUmano) {
                         AudioManager.getInstance().play("audio/win.wav"); // esempio di utilizzo di AudioManager
                         giocaTurnoUmano1V1(partita, umano, ai);
