@@ -137,6 +137,7 @@ public class GameView1v1 extends JPanel {
         score2Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreAI().getPunti()));
         leftTop.add(avatar2Label);
         leftTop.add(name2);
+      
 
         // destra: bottone Menù
         JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
@@ -162,7 +163,7 @@ public class GameView1v1 extends JPanel {
                 gameEngine.visualizzaMenu(); // torna al menu
                 gameEngine.reset();
             } else {
-                AudioManager.getInstance().playLoop("audio/button.wav");
+                AudioManager.getInstance().play("audio/button.wav");
             }
         });
         rightTop.add(btnMenu);
