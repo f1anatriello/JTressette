@@ -51,7 +51,7 @@ public class AudioManager {
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
             currentClip = (Clip) AudioSystem.getLine(new DataLine.Info(Clip.class, audioIn.getFormat()));
             currentClip.open(audioIn);
-            currentClip.start(); // Avvia la riproduzione
+            currentClip.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

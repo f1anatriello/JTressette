@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 import ui.AudioManager;
-import ui.UIAssets; // Ensure this matches the actual package of AudioManager
+import ui.UIAssets; 
 import ui.UIConstants;
 import ui.UISettings;
 
@@ -96,7 +96,6 @@ public class ProfiloView extends JPanel {
         JPanel buttonColumn = new JPanel(new GridLayout(0, 1, 0, 12));
         buttonColumn.setOpaque(false);
 
-        // >>> Usa le preferredSize generate da UISettings e uniforma la larghezza
         uniformaLarghezzaBottoni(btnModifica, btnMenu);
 
         buttonColumn.add(btnModifica);
@@ -116,9 +115,9 @@ public class ProfiloView extends JPanel {
         int[] heights = new int[buttons.length];
 
         for (int i = 0; i < buttons.length; i++) {
-            Dimension d = buttons[i].getPreferredSize(); // determinata da UISettings
+            Dimension d = buttons[i].getPreferredSize();
             maxWidth = Math.max(maxWidth, d.width);
-            heights[i] = d.height; // rispetta l'altezza suggerita da UISettings per ciascun bottone
+            heights[i] = d.height; 
         }
 
         for (int i = 0; i < buttons.length; i++) {
@@ -152,8 +151,8 @@ public class ProfiloView extends JPanel {
             // Avatar ridimensionato
             BufferedImage avatarImg = UIAssets.getInstance().getImmagineAvatar(utente);
             if (avatarImg != null) {
-                int avatarWidth = 64;  // larghezza desiderata
-                int avatarHeight = 64; // altezza desiderata
+                int avatarWidth = 64;  
+                int avatarHeight = 64; 
                 Image scaledImg = avatarImg.getScaledInstance(avatarWidth, avatarHeight, Image.SCALE_SMOOTH);
                 ImageIcon avatarIcon = new ImageIcon(scaledImg);
                 lblAvatar.setIcon(avatarIcon);
@@ -163,7 +162,6 @@ public class ProfiloView extends JPanel {
                 lblAvatar.setText("Nessun avatar impostato");
             }
             System.out.println("Stampo le statistiche");
-            // Statistiche
             lblStatistiche.setText(String.format("Partite » | Giocate: %d | Vinte: %d | Perse: %d |",
                     UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartiteGiocate(),
                     UserRepository.getInstance().caricaProfilo(utente.getUsername()).getPartiteVinte(),

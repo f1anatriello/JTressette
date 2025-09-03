@@ -14,6 +14,7 @@ import javax.swing.WindowConstants;
 
 import ui.AudioManager;
 import ui.UIAssets;
+import ui.UIConstants;
 
 /**
  * Dialog modale per modificare il profilo dell'utente.
@@ -73,6 +74,7 @@ public class DialogModificaProfilo {
                 avatarImg.getScaledInstance(48, 48, java.awt.Image.SCALE_SMOOTH)
             );
             JRadioButton avatarButton = new JRadioButton(icon);
+            avatarButton.setCursor(UIConstants.CURSOR_HAND);
             avatarButton.addActionListener(e -> {
                 AudioManager.getInstance().play("audio/avatar.wav");
                 controller.getPlayer().setAvatarPath(avatarPath);

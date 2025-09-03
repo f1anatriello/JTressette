@@ -23,7 +23,6 @@ public final class DialogCelebrations {
      * @param onClose Runnable da eseguire quando il dialog viene chiuso (es. tornare al menù).
      */
     public static void showVictoryDialog(Window owner, String title, String subtitle, Runnable onClose) {
-        // dialog modale con owner corretto (niente glitch)
         final JDialog dlg = new JDialog(owner, "🎉 Partita Terminata", Dialog.ModalityType.DOCUMENT_MODAL);
         dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dlg.setResizable(false);
@@ -77,7 +76,7 @@ public final class DialogCelebrations {
         wrapper.add(center, BorderLayout.CENTER);
         dlg.setContentPane(wrapper);
         dlg.pack();
-        dlg.setSize(new Dimension(420, 220)); // dimensione chiara e costante
+        dlg.setSize(new Dimension(420, 220));
         dlg.setLocationRelativeTo(owner);
         dlg.setVisible(true);
     }

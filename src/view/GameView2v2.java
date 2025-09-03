@@ -154,6 +154,7 @@ public class GameView2v2 extends JPanel {
         JLabel squadLabel = new JLabel(" - " + gameEngine.getGiocatoreAI().getSquadra().getNome());
 
         JButton btnMenu = new JButton("⬅ Torna al Menù");
+        btnMenu.setCursor(UIConstants.CURSOR_HAND);
         btnMenu.addActionListener(e -> {
             AudioManager.getInstance().stop();
             AudioManager.getInstance().play("audio/button.wav");
@@ -195,6 +196,7 @@ public class GameView2v2 extends JPanel {
         scoreSouthLabel = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
         JLabel squadLabelBot = new JLabel(" - " + gameEngine.getGiocatoreUmano().getSquadra().getNome());
         btnGioca = new JButton("Gioca");
+        btnGioca.setCursor(UIConstants.CURSOR_HAND);
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
 
         bottomHUD.add(Box.createHorizontalStrut(200));

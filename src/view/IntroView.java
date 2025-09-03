@@ -40,7 +40,6 @@ public class IntroView extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                // sfondo uniforme
                 g.setColor(UIConstants.BACKGROUND_DARK);
                 g.fillRect(0, 0, getWidth(), getHeight());
 

@@ -87,7 +87,7 @@ public class Partita1v1 extends Partita {
             // Vince automaticamente chi ha giocato la prima carta
             vincitore = cartaPrima.getGiocatore();
         } else {
-            // Entrambi hanno lo stesso seme → vince chi ha il valore più alto
+            // Entrambi hanno lo stesso seme -> vince chi ha il valore più alto
             if (cartaPrima.getValore().getOrdinePresa() >= cartaSeconda.getValore().getOrdinePresa()) {
                 vincitore = cartaPrima.getGiocatore();
             } else {

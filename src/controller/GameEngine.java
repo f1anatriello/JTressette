@@ -376,7 +376,7 @@ public class GameEngine implements Observer {
      */
     private void giocaSequenzaRec(Partita2v2 partita, List<Giocatore> giocatori, int index) {
         if (index >= giocatori.size()) {
-            after(400, () -> risolviMano(partita, giocatori));
+            after(400, () -> risolviMano2v2(partita, giocatori));
             return;
         }
 
@@ -406,7 +406,7 @@ public class GameEngine implements Observer {
      * @param partita La partita in corso.
      * @param giocatori La lista dei giocatori in ordine di gioco.
      */
-    private void risolviMano(Partita2v2 partita, List<Giocatore> giocatori) {
+    private void risolviMano2v2(Partita2v2 partita, List<Giocatore> giocatori) {
         after(400, () -> {
             Giocatore vincente = partita.manoVintaDa(partita.getTerreno());
             double puntiMano = partita.getTerreno().stream()
@@ -418,7 +418,7 @@ public class GameEngine implements Observer {
             partita.getTerreno().clear();
 
             // Riordina partendo dal vincente
-            ordineGioco2v2 = giocatoriSenza(vincente, giocatori);
+            ordineGioco2v2 = setOrder2v2(vincente, giocatori);
 
             // Pesca
             if (!partita.isMazzoVuoto()) {
@@ -475,7 +475,7 @@ public class GameEngine implements Observer {
      * @param giocatori
      * @return La lista dei giocatori iniziando dal vincente.
      */
-    private List<Giocatore> giocatoriSenza(Giocatore vincente, List<Giocatore> giocatori) {
+    private List<Giocatore> setOrder2v2(Giocatore vincente, List<Giocatore> giocatori) {
         List<Giocatore> result = new ArrayList<>();
         int index = giocatori.indexOf(vincente);
         result.add(vincente);

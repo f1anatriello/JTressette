@@ -93,7 +93,6 @@ public class LoginView extends JFrame{
         // Carico la classe che mi legge il file txt con i profili
         UserRepository repo = new UserRepository();
 
-        // Actions
         btnEntra.addActionListener(e -> {
             AudioManager.getInstance().play("audio/button.wav");
             String username = txtUsername.getText().trim();

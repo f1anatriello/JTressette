@@ -24,7 +24,7 @@ public class GiocatoreAI extends Giocatore{
      * @return Un nome casuale scelto da un insieme predefinito di nomi.
      */
     private static String generaNomeCasuale() {
-        String[] nomi = { "Bob", "Matteo", "Alice","Marta", "Alessandro", "Giulia", "Luca", "Francesco", "Marco", "Sara" };
+        String[] nomi = { "Bob", "Matteo", "Alice", "Marta", "Alessandro", "Giulia", "Luca", "Francesco", "Domenico", "Sara"};
         int i = (int) (Math.random() * nomi.length);
         Random rand = new Random();
         return nomi[i] + rand.nextInt(900);
@@ -53,7 +53,8 @@ public class GiocatoreAI extends Giocatore{
             }
             // Altrimenti deve seguire il seme della prima carta sul tavolo se possibile
             Seme semeDaSeguire = p.getTerreno().get(0).getSeme();
-            boolean haSeme = getMano().stream().anyMatch(c -> c.getSeme().equals(semeDaSeguire));
+            // Controlla se il giocatore ha almeno una carta del seme richiesto nella sua mano
+            boolean haSeme = getMano().stream().anyMatch(c -> c.getSeme().equals(semeDaSeguire)); 
             if (haSeme) {
                 if (carta.getSeme().equals(semeDaSeguire)) {
                     System.out.println("Carta giocata: " + carta + " da " + getNome());

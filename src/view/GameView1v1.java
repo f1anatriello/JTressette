@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.Border;
-import model.Carta; // Ensure this is the correct package for AudioManager
+import model.Carta;
 import ui.AudioManager;
 import ui.UIConstants;
 
@@ -144,6 +144,7 @@ public class GameView1v1 extends JPanel {
         JPanel rightTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
         rightTop.setOpaque(false);
         JButton btnMenu = new JButton("⬅ Torna al Menù");
+        btnMenu.setCursor(UIConstants.CURSOR_HAND);
 
         btnMenu.addActionListener(e -> {
             AudioManager.getInstance().stop();
@@ -181,6 +182,7 @@ public class GameView1v1 extends JPanel {
         name1.setFont(name1.getFont().deriveFont(Font.BOLD, 14f));
         score1Label = new JLabel(" - Punti: " + Math.round(gameEngine.getGiocatoreUmano().getPunti()));
         btnGioca = new JButton("Gioca");
+        btnGioca.setCursor(UIConstants.CURSOR_HAND);
         btnGioca.addActionListener(e -> giocaCartaSelezionata());
         bottomHUD.add(avatar1Label);
         bottomHUD.add(name1);
