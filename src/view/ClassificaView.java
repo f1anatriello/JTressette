@@ -16,7 +16,7 @@ import ui.UISettings;
 /**
  * Pannello per visualizzare la classifica dei giocatori.
  * Utilizza una JTable per una visualizzazione ordinata e stilizzata.
- * @autor 1957447
+ * @author 1957447
  */
 
 public class ClassificaView extends JPanel {

@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Dialog modale per celebrare la vittoria di un giocatore.
  * Mostra un messaggio di congratulazioni e un pulsante per tornare al menù principale.
- * @autor 1957447
+ * @author 1957447
  */
 public final class DialogCelebrations {
  

@@ -19,7 +19,7 @@ import ui.UIConstants;
 /**
  * Dialog modale per modificare il profilo dell'utente.
  * Permette di selezionare un avatar tra quelli disponibili.
- * @autor 1957447
+ * @author 1957447
  */
 public class DialogModificaProfilo {
     private final GameEngine controller;

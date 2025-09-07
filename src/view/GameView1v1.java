@@ -15,7 +15,7 @@ import ui.UIConstants;
  * Implementa il pattern Singleton: usare {@link #getInstance(GameEngine, String, ImageIcon, String, ImageIcon, List, List)} per ottenere l'istanza.
  * Usa {@link HelperGrafico} come canvas centrale per disegnare le carte.
  * Comunica con il controller tramite {@link controller.GiocatoreUmano#notificaCartaScelta(Carta)}.
- * @author Francesco
+ * @author 1957447
  */
 public class GameView1v1 extends JPanel {
 

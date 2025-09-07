@@ -22,6 +22,7 @@ import ui.UIConstants;
  * - Nord -> getGiocatoreAI()     (campo 'ai' nel GameEngine)
  * - Est  -> getGiocatoreEst()
  * - Ovest-> getGiocatoreOvest()
+ * @author 1957447
  */
 public class GameView2v2 extends JPanel {
 
@@ -323,7 +324,12 @@ public class GameView2v2 extends JPanel {
         SwingUtilities.invokeLater(() -> gameSupp.selectFirstIfNone());
     }
 
-    /** Aggiorna le mani dei giocatori e ridisegna l'interfaccia. */
+    /** Aggiorna le mani dei giocatori e ridisegna l'interfaccia. 
+     * @param south
+     * @param north
+     * @param east
+     * @param west
+     */
     public void refreshHands(List<Carta> south, List<Carta> north, List<Carta> east, List<Carta> west) {
         this.playerSouthHand = south;
         this.playerNorthHand = north;
@@ -332,13 +338,17 @@ public class GameView2v2 extends JPanel {
         render();
     }
 
-    /** Imposta il terreno e ridisegna l'interfaccia. */
+    /** Imposta il terreno e ridisegna l'interfaccia. 
+     * @param terreno
+     */
     public void setTerreno(List<Carta> terreno) {
         this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
     }
 
-    /** Aggiorna il terreno e ridisegna l'interfaccia. */
+    /** Aggiorna il terreno e ridisegna l'interfaccia. 
+     * @param terreno
+     */
     public void refreshTerreno(List<Carta> terreno) {
         this.terreno = (terreno == null) ? new ArrayList<>() : terreno;
         render();
